@@ -1,12 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+ENV/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+*.pyc
+*.pyo
+
 # Node
 node_modules/
 dist/
+build/
+.next/
+.nuxt/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Python
-venv/
-.venv/
-__pycache__/
-*.pyc
+# Database
+*.db
+*.sqlite
+*.sqlite3
+uidai.db
 
-# Env
+# IDE / Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Environment
 .env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
