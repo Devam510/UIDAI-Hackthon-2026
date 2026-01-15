@@ -1,0 +1,19 @@
+{
+  "csv_source": "aadhaar_master_monthly.csv",
+  "demographic_model_name": "IsolationForest_BiometricEngagement",
+  "model_version": "2.0",
+  "training_date": "2026-01-15 11:14:22",
+  "training_state": "Gujarat",
+  "rows_used": 264,
+  "districts_analyzed": 40,
+  "features": [
+    "bio_rate",
+    "bio_trend",
+    "bio_volatility",
+    "deviation",
+    "enrol_bio_ratio"
+  ],
+  "data_lineage": "CSV \u2192 Feature Engineering \u2192 IsolationForest \u2192 Risk Scores \u2192 API",
+  "contamination": 0.2,
+  "n_estimators": 100
+}

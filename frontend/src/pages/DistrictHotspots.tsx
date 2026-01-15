@@ -1,0 +1,485 @@
+import React, { useEffect, useState, useMemo } from 'react';
+import ReactECharts from 'echarts-for-react';
+import { MapPin, Search, Download, TrendingUp, AlertTriangle, Award, Sparkles } from 'lucide-react';
+import Card from '../components/Common/Card';
+import Loader from '../components/Common/Loader';
+import ErrorRetry from '../components/Common/ErrorRetry';
+import Sparkline from '../components/Common/Sparkline';
+import DataTimestamp from '../components/Common/DataTimestamp';
+import ExportButton from '../components/Common/ExportButton';
+import client from '../api/client';
+import { useStateContext } from '../context/StateContext';
+
+interface DistrictRisk {
+    district: string;
+    risk_score: number;
+    gap_abs_mean: number;
+    negative_gap_ratio: number;
+    severity_level: 'Low' | 'Moderate' | 'Severe';
+    trend_data: number[];
+    recommendations: string[];
+    total_enrolment: number;
+}
+
+const DistrictHotspots: React.FC = () => {
+    const { selectedState } = useStateContext();
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+    const [data, setData] = useState<any>(null);
+    const [search, setSearch] = useState('');
+    const [timeWindow, setTimeWindow] = useState(30);
+    const [selectedDistrict, setSelectedDistrict] = useState<DistrictRisk | null>(null);
+    const [aiInsights, setAiInsights] = useState<any>(null);
+    const [loadingInsights, setLoadingInsights] = useState(false);
+
+    const fetchData = async () => {
+        setLoading(true);
+        setError(false);
+        try {
+            const response = await client.get('/analytics/district-risks', {
+                params: { state: selectedState, window: timeWindow, top: 20 }
+            });
+            setData(response.data);
+            // Auto-select first district
+            if (response.data.districts && response.data.districts.length > 0) {
+                setSelectedDistrict(response.data.districts[0]);
+            }
+        } catch (err) {
+            console.error('Failed to fetch district risks:', err);
+            setError(true);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (selectedState) {
+            fetchData();
+            setAiInsights(null); // Reset AI insights when state changes
+        }
+    }, [selectedState, timeWindow]);
+
+    const fetchAIInsights = async () => {
+        setLoadingInsights(true);
+        try {
+            const response = await client.get('/ai/insights/district-risks', {
+                params: { state: selectedState }
+            });
+            setAiInsights(response.data.insights);
+        } catch (err) {
+            console.error('Failed to fetch AI insights:', err);
+            // Fallback to generated insights
+            const insights = {
+                summary: [
+                    `District risk analysis for ${selectedState} shows ${data?.count || 0} districts analyzed`,
+                    `${data?.critical_count || 0} districts require immediate attention for enrollment gaps`,
+                    `Average risk score of ${data?.avg_risk_score?.toFixed(1) || 'N/A'} indicates ${(data?.avg_risk_score || 0) > 7 ? 'high' : 'moderate'} state-level concern`
+                ],
+                actions: [
+                    `Deploy additional enrollment centers in ${data?.highest_risk_district?.name || 'high-risk districts'}`,
+                    `Conduct targeted outreach programs in critical districts`,
+                    `Implement real-time monitoring systems for enrollment tracking`
+                ]
+            };
+            setAiInsights(insights);
+        } finally {
+            setLoadingInsights(false);
+        }
+    };
+
+    const filteredDistricts = useMemo(() => {
+        if (!data?.districts) return [];
+        return data.districts.filter((d: DistrictRisk) =>
+            d.district.toLowerCase().includes(search.toLowerCase())
+        );
+    }, [data, search]);
+
+    const getSeverityColor = (severity: string) => {
+        switch (severity) {
+            case 'Severe': return '#ef4444';
+            case 'Moderate': return '#f59e0b';
+            case 'Low': return '#22c55e';
+            default: return '#6366f1';
+        }
+    };
+
+    const chartOption = useMemo(() => ({
+        backgroundColor: 'transparent',
+        grid: {
+            left: '15%',
+            right: '5%',
+            top: '3%',
+            bottom: '3%',
+            containLabel: true
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: { type: 'shadow' },
+            backgroundColor: '#1e293b',
+            borderColor: '#334155',
+            borderRadius: 8,
+            textStyle: { color: '#fff' },
+            formatter: (params: any) => {
+                const data = params[0];
+                const district = filteredDistricts[data.dataIndex];
+                return `<strong>${district.district}</strong><br/>Risk Score: <strong>${district.risk_score}</strong><br/>Severity: <strong>${district.severity_level}</strong>`;
+            }
+        },
+        xAxis: {
+            type: 'value',
+            axisLine: { lineStyle: { color: '#334155' } },
+            axisLabel: { color: '#94a3b8' },
+            splitLine: { lineStyle: { color: '#334155', type: 'dashed' } }
+        },
+        yAxis: {
+            type: 'category',
+            data: filteredDistricts.map((d: DistrictRisk) => d.district),
+            axisLine: { lineStyle: { color: '#334155' } },
+            axisLabel: {
+                color: '#94a3b8',
+                fontSize: 12,
+                width: 100,
+                overflow: 'truncate'
+            },
+            splitLine: { show: false },
+            inverse: true
+        },
+        series: [{
+            type: 'bar',
+            data: filteredDistricts.map((d: DistrictRisk) => ({
+                value: d.risk_score,
+                itemStyle: {
+                    color: getSeverityColor(d.severity_level),
+                    borderRadius: [0, 4, 4, 0]
+                }
+            })),
+            barMaxWidth: 30
+        }]
+    }), [filteredDistricts]);
+
+    const handleChartClick = (params: any) => {
+        const district = filteredDistricts[params.dataIndex];
+        setSelectedDistrict(district);
+    };
+
+    const exportCSV = () => {
+        if (!data?.districts) return;
+
+        const headers = ['District', 'Risk Score', 'Gap Mean', 'Negative Gap %', 'Severity'];
+        const rows = data.districts.map((d: DistrictRisk) => [
+            d.district,
+            d.risk_score,
+            d.gap_abs_mean,
+            d.negative_gap_ratio,
+            d.severity_level
+        ]);
+
+        const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `district-risks-${selectedState}-${Date.now()}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    if (loading) return <Loader />;
+    if (error) return <ErrorRetry onRetry={fetchData} message="Failed to load district risk data." />;
+    if (!data) return null;
+
+    return (
+        <div className="space-y-6 animate-in fade-in duration-500">
+            {/* Header with Controls */}
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <h2 className="text-xl md:text-2xl font-bold text-white">District Risk Analysis: {selectedState}</h2>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+                    {/* Search */}
+                    <div className="relative group w-full sm:w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary-500 transition-colors" size={16} />
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Search district..."
+                            className="bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg pl-9 pr-4 py-2 w-full focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                        />
+                    </div>
+
+                    {/* Time Window Toggle */}
+                    <div className="flex bg-slate-800 border border-slate-700 rounded-lg p-1">
+                        {[7, 30, 90].map(days => (
+                            <button
+                                key={days}
+                                onClick={() => setTimeWindow(days)}
+                                className={`px-4 py-1.5 text-sm font-medium rounded transition-colors ${timeWindow === days
+                                    ? 'bg-primary-600 text-white'
+                                    : 'text-slate-400 hover:text-white'
+                                    }`}
+                            >
+                                {days}d
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* KPI Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card className="bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-slate-400 mb-1">Total Districts</p>
+                            <p className="text-3xl font-bold text-white">{data.count}</p>
+                        </div>
+                        <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <MapPin className="text-blue-400" size={24} />
+                        </div>
+                    </div>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-red-900/20 to-slate-900 border-red-900/50">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-slate-400 mb-1">Critical Districts</p>
+                            <p className="text-3xl font-bold text-red-400">{data.critical_count}</p>
+                        </div>
+                        <div className="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
+                            <AlertTriangle className="text-red-400" size={24} />
+                        </div>
+                    </div>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-orange-900/20 to-slate-900 border-orange-900/50">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-slate-400 mb-1">Highest Risk</p>
+                            <p className="text-lg font-bold text-orange-400 truncate">
+                                {data.highest_risk_district?.name || 'N/A'}
+                            </p>
+                            <p className="text-sm text-slate-500">
+                                Score: {data.highest_risk_district?.score || 0}
+                            </p>
+                        </div>
+                        <div className="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                            <Award className="text-orange-400" size={24} />
+                        </div>
+                    </div>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-green-900/20 to-slate-900 border-green-900/50">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-slate-400 mb-1">Avg Risk Score</p>
+                            <p className="text-3xl font-bold text-green-400">{data.avg_risk_score.toFixed(1)}</p>
+                        </div>
+                        <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <TrendingUp className="text-green-400" size={24} />
+                        </div>
+                    </div>
+                </Card>
+            </div>
+
+            {/* Main Content: Chart + Details Panel */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                {/* Chart */}
+                <Card title="Top 20 Critical Districts" className="lg:col-span-3">
+                    <div className="h-[500px] w-full">
+                        {filteredDistricts.length > 0 ? (
+                            <ReactECharts
+                                option={chartOption}
+                                style={{ height: '100%', width: '100%' }}
+                                opts={{ renderer: 'canvas' }}
+                                onEvents={{ click: handleChartClick }}
+                            />
+                        ) : (
+                            <div className="h-full flex items-center justify-center text-slate-500">
+                                No districts found matching your search.
+                            </div>
+                        )}
+                    </div>
+                </Card>
+
+                {/* District Details Panel */}
+                <Card title="District Details" className="lg:col-span-2">
+                    {selectedDistrict ? (
+                        <div className="space-y-4">
+                            {/* District Header */}
+                            <div className="pb-4 border-b border-slate-700">
+                                <h3 className="text-xl font-bold text-white mb-2">{selectedDistrict.district}</h3>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-slate-400">Risk Score:</span>
+                                    <span className="text-2xl font-bold" style={{ color: getSeverityColor(selectedDistrict.severity_level) }}>
+                                        {selectedDistrict.risk_score}
+                                    </span>
+                                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${selectedDistrict.severity_level === 'Severe' ? 'bg-red-900/30 text-red-400 border border-red-900' :
+                                        selectedDistrict.severity_level === 'Moderate' ? 'bg-orange-900/30 text-orange-400 border border-orange-900' :
+                                            'bg-green-900/30 text-green-400 border border-green-900'
+                                        }`}>
+                                        {selectedDistrict.severity_level}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Metrics */}
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm text-slate-400">Gap Mean:</span>
+                                    <span className="text-sm font-semibold text-white">{selectedDistrict.gap_abs_mean}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm text-slate-400">Negative Gap Ratio:</span>
+                                    <span className="text-sm font-semibold text-white">{selectedDistrict.negative_gap_ratio}%</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm text-slate-400">Total Enrolment:</span>
+                                    <span className="text-sm font-semibold text-white">{selectedDistrict.total_enrolment.toLocaleString()}</span>
+                                </div>
+                            </div>
+
+
+                            {/* Trend Sparkline */}
+                            <div className="pt-4 border-t border-slate-700">
+                                <p className="text-sm text-slate-400 mb-2">30-Day Gap Trend</p>
+                                <Sparkline
+                                    data={selectedDistrict.trend_data}
+                                    label=""
+                                    color={getSeverityColor(selectedDistrict.severity_level)}
+                                    changePercent={
+                                        selectedDistrict.trend_data && selectedDistrict.trend_data.length > 1
+                                            ? ((selectedDistrict.trend_data[selectedDistrict.trend_data.length - 1] - selectedDistrict.trend_data[0]) / selectedDistrict.trend_data[0]) * 100
+                                            : 0
+                                    }
+                                />
+                            </div>
+
+
+                            {/* Recommendations */}
+                            <div className="pt-4 border-t border-slate-700">
+                                <p className="text-sm font-semibold text-white mb-3">Recommended Actions</p>
+                                <ul className="space-y-2">
+                                    {selectedDistrict.recommendations.map((rec, idx) => (
+                                        <li key={idx} className="text-sm text-slate-300 flex items-start gap-2">
+                                            <span className="text-primary-400 mt-1">•</span>
+                                            <span>{rec}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="h-full flex items-center justify-center text-slate-500">
+                            Click on a district to view details
+                        </div>
+                    )}
+                </Card>
+            </div>
+
+            {/* AI Insights Panel */}
+            <Card title="🤖 AI District Insight" className="bg-gradient-to-br from-purple-900/10 to-slate-900 border-purple-900/30">
+                {loadingInsights ? (
+                    <div className="flex items-center justify-center py-8">
+                        <Loader />
+                    </div>
+                ) : aiInsights ? (
+                    <div className="space-y-4">
+                        <div>
+                            <h4 className="text-sm font-semibold text-purple-300 mb-2">Key Insights:</h4>
+                            <ul className="space-y-2">
+                                {aiInsights.summary.map((insight: string, idx: number) => (
+                                    <li key={idx} className="text-sm text-slate-300 flex items-start gap-2">
+                                        <span className="text-purple-400 mt-1">•</span>
+                                        <span>{insight}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div className="pt-4 border-t border-slate-700">
+                            <h4 className="text-sm font-semibold text-purple-300 mb-2">Recommended Actions:</h4>
+                            <ul className="space-y-2">
+                                {aiInsights.actions.map((action: string, idx: number) => (
+                                    <li key={idx} className="text-sm text-slate-300 flex items-start gap-2">
+                                        <span className="text-purple-400 mt-1">→</span>
+                                        <span>{action}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="text-center py-8">
+                        <Sparkles className="mx-auto mb-4 text-purple-400" size={32} />
+                        <p className="text-slate-400 mb-4">Get AI-powered insights for {selectedState}</p>
+                        <button
+                            onClick={fetchAIInsights}
+                            className="px-6 py-2 bg-purple-600 hover:bg-purple-500 text-white font-medium rounded-lg transition-colors"
+                        >
+                            Ask AI about this state
+                        </button>
+                    </div>
+                )}
+            </Card>
+
+            {/* Data Table */}
+            <Card title="All Districts" className="overflow-hidden">
+                <div className="flex justify-between items-center mb-4">
+                    <p className="text-sm text-slate-400">Showing {filteredDistricts.length} districts</p>
+                    <button
+                        onClick={exportCSV}
+                        className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium rounded-lg transition-colors"
+                    >
+                        <Download size={16} />
+                        Export CSV
+                    </button>
+                </div>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                        <thead className="text-xs text-slate-400 uppercase bg-slate-800/50 sticky top-0 z-10 backdrop-blur-sm">
+                            <tr>
+                                <th className="px-4 py-3">District</th>
+                                <th className="px-4 py-3 text-center">Risk Score</th>
+                                <th className="px-4 py-3 text-center">Gap Mean</th>
+                                <th className="px-4 py-3 text-center">Neg. Gap %</th>
+                                <th className="px-4 py-3 text-center">Severity</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-700">
+                            {filteredDistricts.map((d: DistrictRisk, idx: number) => (
+                                <tr
+                                    key={idx}
+                                    onClick={() => setSelectedDistrict(d)}
+                                    className="hover:bg-slate-800/30 transition-colors cursor-pointer"
+                                >
+                                    <td className="px-4 py-3 font-medium text-slate-200">{d.district}</td>
+                                    <td className="px-4 py-3 text-center font-bold" style={{ color: getSeverityColor(d.severity_level) }}>
+                                        {d.risk_score}
+                                    </td>
+                                    <td className="px-4 py-3 text-center text-slate-300">{d.gap_abs_mean}</td>
+                                    <td className="px-4 py-3 text-center text-slate-300">{d.negative_gap_ratio}%</td>
+                                    <td className="px-4 py-3 text-center">
+                                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${d.severity_level === 'Severe' ? 'bg-red-900/30 text-red-400 border border-red-900' :
+                                            d.severity_level === 'Moderate' ? 'bg-orange-900/30 text-orange-400 border border-orange-900' :
+                                                'bg-green-900/30 text-green-400 border border-green-900'
+                                            }`}>
+                                            {d.severity_level}
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))}
+                            {filteredDistricts.length === 0 && (
+                                <tr>
+                                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                                        No districts found.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </Card>
+        </div>
+    );
+};
+
+export default DistrictHotspots;

@@ -1,0 +1,10 @@
+{
+  "state": "Karnataka",
+  "model_type": "Prophet",
+  "training_date": "2026-01-15T20:20:17.603546",
+  "data_points": 9,
+  "date_range_start": "2025-03-01",
+  "date_range_end": "2025-12-01",
+  "seasonality_mode": "multiplicative",
+  "interval_width": 0.95
+}

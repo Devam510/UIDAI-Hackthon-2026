@@ -1,0 +1,11 @@
+state,risk_score,anomaly_severity,negative_gap_ratio,forecast_growth_log,recommendations
+Karnataka,2.4461121779526005,-0.27048667356414396,0.5666666666666667,5.846186060318186,Investigate enrolment drop: possible connectivity/device/center outage; Deploy temporary enrolment camp or staff support; High priority state: allocate additional resources and monitoring
+Gujarat,2.4137471584879733,-0.2746513542601796,0.5666666666666667,5.725888279990955,Investigate enrolment drop: possible connectivity/device/center outage; Deploy temporary enrolment camp or staff support; High priority state: allocate additional resources and monitoring
+Jharkhand,2.3240907505380393,-0.27183629467184056,0.6,5.094402850430206,High priority state: allocate additional resources and monitoring
+Rajasthan,2.300203947010643,-0.2631651326019234,0.5,5.7797790797668025,High priority state: allocate additional resources and monitoring
+West Bengal,2.1727999564937757,-0.2571501548198702,0.5,5.256930166578817,High priority state: allocate additional resources and monitoring
+Assam,2.0622051038396423,-0.2769503410223553,0.5,4.85811116560775,High priority state: allocate additional resources and monitoring
+Telangana,2.0185477858831655,-0.2780333408103072,0.6,3.8858644933153372,Investigate enrolment drop: possible connectivity/device/center outage; Deploy temporary enrolment camp or staff support; High priority state: allocate additional resources and monitoring
+Odisha,2.0066222635410806,-0.2784296604586879,0.6,3.839034307173435,Investigate enrolment drop: possible connectivity/device/center outage; Deploy temporary enrolment camp or staff support; High priority state: allocate additional resources and monitoring
+Andhra Pradesh,2.000750840329563,-0.278437064493194,0.5333333333333333,4.348898236536612,Investigate enrolment drop: possible connectivity/device/center outage; Deploy temporary enrolment camp or staff support; High priority state: allocate additional resources and monitoring
+Tamil Nadu,1.896629204726911,-0.2683629446990773,0.5333333333333333,3.910248630578948,Investigate enrolment drop: possible connectivity/device/center outage; Deploy temporary enrolment camp or staff support; High priority state: allocate additional resources and monitoring
