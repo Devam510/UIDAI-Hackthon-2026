@@ -11,6 +11,7 @@ import DataTimestamp from '../components/Common/DataTimestamp';
 import client from '../api/client';
 import { ENDPOINTS } from '../api/endpoints';
 import { useStateContext } from '../context/StateContext';
+import { useChatContext } from '../context/ChatContext';
 import { validateStateMapping } from '../utils/state-name-mapper';
 
 interface StateData {
@@ -25,6 +26,7 @@ interface StateData {
 const Home: React.FC = () => {
     const navigate = useNavigate();
     const { setSelectedState } = useStateContext();
+    const { sendMessage } = useChatContext();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [lastDataDate, setLastDataDate] = useState<string>('');
@@ -373,7 +375,12 @@ const Home: React.FC = () => {
 
                         {/* Ask AI Button */}
                         <button
-                            onClick={() => {/* Could integrate with chatbot */ }}
+                            onClick={() => {
+                                // Generate a summary of alerts for AI
+                                const alertSummary = alerts.map((a, i) => `${i + 1}. ${a.title}: ${a.description}`).join('\n');
+                                const message = `I have the following alerts on my dashboard:\n\n${alertSummary}\n\nCan you help me understand these alerts and suggest what actions I should take?`;
+                                sendMessage(message);
+                            }}
                             className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-500 hover:to-purple-500 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl mt-4"
                         >
                             <MessageSquare size={18} />
