@@ -153,64 +153,48 @@ def predict_trend_forecast(state: str, days: int = 30):
             print(f"[Trend Forecast] Training failed: {train_result}")
             return train_result
     
-    # Load parameters and recreate model
+    
+    # ✅ RENDER-SAFE FORECAST: Use LinearRegression fallback instead of Prophet
+    # Prophet requires cmdstan which isn't available on Render free tier
+    # This fallback uses the same training data to generate realistic forecasts
+    
     try:
         with open(model_path, 'r') as f:
             model_params = json.load(f)
         
         print(f"[Trend Forecast] Loaded parameters for state: {model_params.get('state')}")
         
-        # Recreate Prophet model with same parameters
-        model = Prophet(
-            growth=model_params.get('growth', 'linear'),
-            n_changepoints=model_params.get('n_changepoints', 25),
-            changepoint_range=model_params.get('changepoint_range', 0.8),
-            yearly_seasonality=model_params.get('yearly_seasonality', False),
-            weekly_seasonality=model_params.get('weekly_seasonality', False),
-            daily_seasonality=model_params.get('daily_seasonality', False),
-            seasonality_mode=model_params.get('seasonality_mode', 'additive'),
-            seasonality_prior_scale=model_params.get('seasonality_prior_scale', 10.0),
-            changepoint_prior_scale=model_params.get('changepoint_prior_scale', 0.05),
-            interval_width=model_params.get('interval_width', 0.95)
-        )
-        
-        # Recreate training data
+        # Load training data from saved parameters
         import pandas as pd
+        import numpy as np
+        from sklearn.linear_model import LinearRegression
+        
         training_data = pd.DataFrame(model_params['training_data'])
         training_data['ds'] = pd.to_datetime(training_data['ds'])
+        training_data = training_data.sort_values('ds')
         
-        # Retrain the model (fast since we have few data points)
-        model.fit(training_data)
+        print(f"[Trend Forecast] Using LinearRegression fallback for Render compatibility")
+        print(f"[Trend Forecast] Training data points: {len(training_data)}")
         
-        print(f"[Trend Forecast] Model recreated and trained successfully")
+        # Fit linear regression on historical trend
+        X = np.arange(len(training_data)).reshape(-1, 1)
+        y = training_data['y'].values
+        
+        lr = LinearRegression()
+        lr.fit(X, y)
+        
+        # Calculate trend metrics
+        trend_slope = float(lr.coef_[0])
+        trend_direction = "upward" if trend_slope > 0 else "downward" if trend_slope < 0 else "stable"
+        
+        print(f"[Trend Forecast] Trend direction: {trend_direction}, slope: {trend_slope:.2f}")
+        print(f"[Trend Forecast] Successfully loaded and processed model parameters")
+        
     except Exception as e:
-        print(f"[Trend Forecast] Failed to load/recreate model: {e}")
-        print(f"[Trend Forecast] Attempting to retrain...")
-        # If loading fails, retrain
-        train_result = train_trend_forecast_model(state)
-        if train_result.get("status") != "trained":
-            return {"status": "error", "message": f"Failed to load and retrain model: {str(e)}"}
-        # Try loading again
-        with open(model_path, 'r') as f:
-            model_params = json.load(f)
-        
-        model = Prophet(
-            growth=model_params.get('growth', 'linear'),
-            changepoint_prior_scale=model_params.get('changepoint_prior_scale', 0.05),
-            interval_width=model_params.get('interval_width', 0.95)
-        )
-        model.yearly_seasonality = False
-        model.weekly_seasonality = False
-        model.daily_seasonality = False
-        
-        training_data = pd.DataFrame(model_params['training_data'])
-        training_data['ds'] = pd.to_datetime(training_data['ds'])
-        model.fit(training_data)
-    
-    # Validate we have a Prophet model
-    if not hasattr(model, 'predict') or not hasattr(model, 'make_future_dataframe'):
-        print(f"[Trend Forecast] ERROR: Loaded object is not a valid Prophet model. Type: {type(model)}")
-        return {"status": "error", "message": f"Invalid model type: {type(model).__name__}. Expected Prophet model."}
+        print(f"[Trend Forecast] Failed to load model parameters: {e}")
+        import traceback
+        traceback.print_exc()
+        return {"status": "error", "message": f"Failed to load model: {str(e)}"}
     
     print(f"[Trend Forecast] Successfully validated Prophet model")
     
@@ -248,21 +232,25 @@ def predict_trend_forecast(state: str, days: int = 30):
     MAX_PROJECTION_MONTHS = 6
     num_months = min(MAX_PROJECTION_MONTHS, max(3, days // 30))
     
-    future = model.make_future_dataframe(periods=num_months, freq='MS')
-    forecast = model.predict(future)
     
-    # Extract ONLY future predictions (limited to 6 months max)
+    # ✅ Generate forecast using LinearRegression (Render-safe)
+    future_X = np.arange(len(training_data), len(training_data) + num_months).reshape(-1, 1)
+    forecast_values = lr.predict(future_X)
+    
+    # Create future dates
     last_training_date = pd.to_datetime(metadata['date_range_end'])
-    future_forecast = forecast[forecast['ds'] > last_training_date].copy()
+    future_dates = pd.date_range(start=last_training_date + pd.DateOffset(months=1), periods=num_months, freq='MS')
     
-    # Format predictions using TREND component
+    # Format predictions
     predictions = []
-    for _, row in future_forecast.iterrows():
+    confidence_width = 0.1  # ±10% confidence interval
+    for date, value in zip(future_dates, forecast_values):
+        value = max(0, float(value))  # Clamp to 0
         predictions.append({
-            "date": str(row['ds'].date()),
-            "value": max(0, float(row['yhat'])),
-            "lower": max(0, float(row['yhat_lower'])),
-            "upper": max(0, float(row['yhat_upper'])),
+            "date": str(date.date()),
+            "value": value,
+            "lower": value * (1 - confidence_width),
+            "upper": value * (1 + confidence_width),
             "type": "forecast"
         })
     
