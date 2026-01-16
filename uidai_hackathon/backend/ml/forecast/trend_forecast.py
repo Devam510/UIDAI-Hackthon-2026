@@ -124,17 +124,32 @@ def predict_trend_forecast(state: str, days: int = 30):
     
     # Handle both dict format (old models) and direct Prophet model format
     if isinstance(loaded, dict):
+        print(f"[Trend Forecast] Model is wrapped in dict, keys: {loaded.keys()}")
         # Old format: extract model from dictionary
-        model = loaded.get('model') or loaded.get('prophet_model') or loaded
+        model = loaded.get('model') or loaded.get('prophet_model') or loaded.get('forecast_model')
+        
+        if model is None:
+            print(f"[Trend Forecast] ERROR: Could not find Prophet model in dict. Available keys: {list(loaded.keys())}")
+            return {"status": "error", "message": "Invalid model format: Prophet model not found in saved file"}
+        
         if isinstance(model, dict):
             # Still a dict, try to find the actual model
+            print(f"[Trend Forecast] Model is still a dict, trying to extract further...")
             for key in ['model', 'prophet_model', 'forecast_model']:
                 if key in model and not isinstance(model[key], dict):
                     model = model[key]
+                    print(f"[Trend Forecast] Extracted model from key: {key}")
                     break
     else:
         # Direct Prophet model
         model = loaded
+    
+    # Validate we have a Prophet model
+    if not hasattr(model, 'predict') or not hasattr(model, 'make_future_dataframe'):
+        print(f"[Trend Forecast] ERROR: Loaded object is not a valid Prophet model. Type: {type(model)}")
+        return {"status": "error", "message": f"Invalid model type: {type(model).__name__}. Expected Prophet model."}
+    
+    print(f"[Trend Forecast] Successfully extracted Prophet model, type: {type(model)}")
     
     # Load metadata if exists, otherwise create basic metadata
     if metadata_path.exists():
