@@ -63,11 +63,13 @@ def train_trend_forecast_model(state: str):
     
     model.fit(prophet_df)
     
-    # Save model using pickle (better for Prophet cross-version compatibility)
-    model_path = ARTIFACTS_DIR / f"forecast_{state}.pkl"
-    with open(model_path, 'wb') as f:
-        import pickle
-        pickle.dump(model, f, protocol=4)  # Protocol 4 for Python 3.4+ compatibility
+    # Save model using Prophet's built-in JSON serialization (best compatibility)
+    model_path = ARTIFACTS_DIR / f"forecast_{state}.json"
+    
+    # Use Prophet's to_json() method for serialization
+    import json as json_module
+    with open(model_path, 'w') as f:
+        f.write(model.to_json())
     
     metadata = {
         "state": state,
@@ -102,27 +104,27 @@ def predict_trend_forecast(state: str, days: int = 30):
     if not PROPHET_AVAILABLE:
         return {"status": "error", "message": "Prophet not installed"}
     
-    # ONLY use .pkl files (Prophet models)
-    # Ignore old .joblib files (Ridge regression models)
-    model_path = ARTIFACTS_DIR / f"forecast_{state}.pkl"
+    # ONLY use .json files (Prophet JSON format)
+    # Ignore old .pkl and .joblib files
+    model_path = ARTIFACTS_DIR / f"forecast_{state}.json"
     metadata_path = ARTIFACTS_DIR / f"trend_forecast_{state}_metadata.json"
     
     print(f"[Trend Forecast] Model path: {model_path}")
     print(f"[Trend Forecast] Model exists: {model_path.exists()}")
     
-    # Auto-train if .pkl model doesn't exist
+    # Auto-train if .json model doesn't exist
     if not model_path.exists():
-        print(f"[Trend Forecast] Prophet model (.pkl) not found, training...")
+        print(f"[Trend Forecast] Prophet model (.json) not found, training...")
         train_result = train_trend_forecast_model(state)
         if train_result.get("status") != "trained":
             print(f"[Trend Forecast] Training failed: {train_result}")
             return train_result
     
-    # Load model using pickle
+    # Load model using Prophet's from_json()
     try:
-        import pickle
-        with open(model_path, 'rb') as f:
-            model = pickle.load(f)
+        from prophet import Prophet
+        with open(model_path, 'r') as f:
+            model = Prophet.from_json(f.read())
         print(f"[Trend Forecast] Model loaded successfully, type: {type(model)}")
     except Exception as e:
         print(f"[Trend Forecast] Failed to load model: {e}")
