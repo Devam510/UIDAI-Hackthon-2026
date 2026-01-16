@@ -8,6 +8,7 @@ import DistrictHotspots from './pages/DistrictHotspots';
 import BiometricHotspots from './pages/BiometricHotspots';
 import DemographicRisks from './pages/DemographicRisks';
 import QuickStartGuide from './components/Common/QuickStartGuide';
+import { ChatProvider } from './context/ChatContext';
 
 function App() {
   const [showGuide, setShowGuide] = useState(false);
@@ -24,16 +25,18 @@ function App() {
   return (
     <>
       {showGuide && <QuickStartGuide onClose={() => setShowGuide(false)} />}
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/overview" element={<Overview />} />
-          <Route path="/forecast" element={<Forecast />} />
-          <Route path="/district-hotspots" element={<DistrictHotspots />} />
-          <Route path="/biometric-hotspots" element={<BiometricHotspots />} />
-          <Route path="/demographic-risks" element={<DemographicRisks />} />
-        </Routes>
-      </Layout>
+      <ChatProvider>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/overview" element={<Overview />} />
+            <Route path="/forecast" element={<Forecast />} />
+            <Route path="/district-hotspots" element={<DistrictHotspots />} />
+            <Route path="/biometric-hotspots" element={<BiometricHotspots />} />
+            <Route path="/demographic-risks" element={<DemographicRisks />} />
+          </Routes>
+        </Layout>
+      </ChatProvider>
     </>
   );
 }
