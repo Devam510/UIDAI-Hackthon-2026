@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 from pathlib import Path
-import pickle
+import joblib
 import json
 
 try:
@@ -63,10 +63,9 @@ def train_trend_forecast_model(state: str):
     
     model.fit(prophet_df)
     
-    # Save model
-    model_path = ARTIFACTS_DIR / f"trend_forecast_{state}.pkl"
-    with open(model_path, 'wb') as f:
-        pickle.dump(model, f)
+    # Save model using joblib (matches existing models)
+    model_path = ARTIFACTS_DIR / f"forecast_{state}.joblib"
+    joblib.dump(model, model_path)
     
     metadata = {
         "state": state,
@@ -99,7 +98,7 @@ def predict_trend_forecast(state: str, days: int = 30):
     if not PROPHET_AVAILABLE:
         return {"status": "error", "message": "Prophet not installed"}
     
-    model_path = ARTIFACTS_DIR / f"trend_forecast_{state}.pkl"
+    model_path = ARTIFACTS_DIR / f"forecast_{state}.joblib"
     metadata_path = ARTIFACTS_DIR / f"trend_forecast_{state}_metadata.json"
     
     # Auto-train if needed
@@ -109,12 +108,19 @@ def predict_trend_forecast(state: str, days: int = 30):
         if train_result.get("status") != "trained":
             return train_result
     
-    # Load model
-    with open(model_path, 'rb') as f:
-        model = pickle.load(f)
+    # Load model using joblib
+    model = joblib.load(model_path)
     
-    with open(metadata_path, 'r') as f:
-        metadata = json.load(f)
+    # Load metadata if exists, otherwise create basic metadata
+    if metadata_path.exists():
+        with open(metadata_path, 'r') as f:
+            metadata = json.load(f)
+    else:
+        metadata = {
+            "state": state,
+            "data_points": 10,
+            "date_range_end": "2025-12-01"
+        }
     
     # Get historical data for complete visualization
     series = get_monthly_enrolment_series(state=state)
