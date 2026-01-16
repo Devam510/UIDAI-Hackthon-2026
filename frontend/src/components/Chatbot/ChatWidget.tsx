@@ -44,6 +44,21 @@ const ChatWidget: React.FC = () => {
     const handleSend = async (text: string = input) => {
         if (!text.trim()) return;
 
+        // Enrich "Explain this page" with actual page context
+        let enrichedText = text;
+        if (text === "Explain this page") {
+            const pageNames: { [key: string]: string } = {
+                '/': 'Home page (National Risk Overview)',
+                '/overview': 'Overview page (State Analytics Dashboard)',
+                '/forecast': 'Forecast page (Enrollment Trend Prediction)',
+                '/district-hotspots': 'District Hotspots page (District Risk Analysis)',
+                '/biometric-hotspots': 'Biometric Hotspots page (Biometric Quality Assessment)',
+                '/demographic-risks': 'Demographic Risks page (Demographic Risk Analysis)'
+            };
+            const pageName = pageNames[location.pathname] || 'current page';
+            enrichedText = `Explain the ${pageName}. What data is shown here and what insights can I get from it?`;
+        }
+
         const userMsg: ChatMessage = { id: Date.now().toString(), sender: 'user', text };
         setMessages(prev => [...prev, userMsg]);
         setInput('');
@@ -57,7 +72,7 @@ const ChatWidget: React.FC = () => {
             }));
 
             const response = await client.post(ENDPOINTS.CHAT, {
-                message: text,
+                message: enrichedText,  // Send enriched message to API
                 history: history
             });
 
@@ -79,12 +94,62 @@ const ChatWidget: React.FC = () => {
         }
     };
 
-    const predefinedQuestions = [
-        "Explain this page",
-        "Explain risk score",
-        "What should UIDAI do?",
-        "Explain biometric instability"
-    ];
+    // Dynamic quick panel questions based on current page
+    const getPageSpecificQuestions = () => {
+        const path = location.pathname;
+
+        // Common first question - context-aware "Explain this page"
+        const explainPage = "Explain this page";
+
+        // Page-specific questions
+        const pageQuestions: { [key: string]: string[] } = {
+            '/': [
+                explainPage,
+                "Which state needs attention?",
+                "Explain risk scores",
+                "What are the top priorities?"
+            ],
+            '/overview': [
+                explainPage,
+                "Explain anomaly detection",
+                "What's the enrollment trend?",
+                "How to improve biometric quality?"
+            ],
+            '/forecast': [
+                explainPage,
+                "Explain the forecast model",
+                "Why is growth declining?",
+                "How accurate is the prediction?"
+            ],
+            '/district-hotspots': [
+                explainPage,
+                "Which districts are critical?",
+                "Explain negative gap ratio",
+                "How to prioritize districts?"
+            ],
+            '/biometric-hotspots': [
+                explainPage,
+                "Explain biometric instability",
+                "Which districts need devices?",
+                "How to reduce failures?"
+            ],
+            '/demographic-risks': [
+                explainPage,
+                "Which demographics are at risk?",
+                "Explain enrollment gaps",
+                "What interventions are needed?"
+            ]
+        };
+
+        return pageQuestions[path] || [
+            explainPage,
+            "Explain risk score",
+            "What should UIDAI do?",
+            "Explain biometric instability"
+        ];
+    };
+
+    const predefinedQuestions = getPageSpecificQuestions();
 
     return (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
