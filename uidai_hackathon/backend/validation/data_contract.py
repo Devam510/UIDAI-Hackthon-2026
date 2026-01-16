@@ -14,5 +14,11 @@ DATASET_CONTRACT = {
         "required_columns": {"date", "state", "district", "pincode"},
         "metric_prefixes": ["bio_"],
         "date_columns": {"date"}
+    },
+    "AGGREGATED_MONTHLY": {
+        "required_columns": {"month", "state", "district"},
+        "metric_prefixes": ["total_"],
+        "date_columns": {"month"}
     }
 }
+
