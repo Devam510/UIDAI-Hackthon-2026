@@ -6,8 +6,8 @@ from backend.common.state_resolver import resolve_state
 from backend.ml.anomaly.train import train_baseline_model
 from backend.ml.anomaly.predict import predict_gap_and_anomalies
 
-from backend.ml.forecast.train import train_forecast_model
-from backend.ml.forecast.predict import forecast
+# Use Prophet-based trend forecast (not Ridge regression)
+from backend.ml.forecast.trend_forecast import train_trend_forecast_model, predict_trend_forecast
 
 from backend.ml.risk.scoring import compute_state_risk
 from backend.ml.risk.recommend import recommend_actions
@@ -37,7 +37,7 @@ def gap_anomaly(state: str):
 @router.post("/train/forecast")
 def train_forecast(state: str):
     state = resolve_state(state)
-    return safe_run(train_forecast_model, state=state)
+    return safe_run(train_trend_forecast_model, state=state)
 
 
 @router.get("/forecast")
@@ -51,7 +51,7 @@ def get_forecast(state: str, days: int = 30):
     Limited 2025 data makes 2026 predictions unreliable.
     """
     state = resolve_state(state)
-    result = safe_run(forecast, state=state, days=days)
+    result = safe_run(predict_trend_forecast, state=state, days=days)
     
     # Transform data format for frontend compatibility
     if result.get("status") == "success":
