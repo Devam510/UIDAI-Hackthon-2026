@@ -4,5 +4,5 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/UIDAI-Hackthon-2026/',
+  // base: '/UIDAI-Hackthon-2026/',  // Only needed for GitHub Pages deployment
 })
