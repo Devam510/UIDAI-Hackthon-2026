@@ -687,7 +687,7 @@ const Forecast: React.FC = () => {
                                             </div>
                                             <div className="flex justify-between">
                                                 <span className="text-slate-400">Data Points:</span>
-                                                <span className="text-white font-medium">{insights.model_health.data_points} days</span>
+                                                <span className="text-white font-medium">{insights.model_health.data_points}</span>
                                             </div>
                                             <div className="flex justify-between">
                                                 <span className="text-slate-400">Last Retrain:</span>
@@ -697,7 +697,11 @@ const Forecast: React.FC = () => {
                                             </div>
                                             <div className="flex justify-between">
                                                 <span className="text-slate-400">Error (MAPE):</span>
-                                                <span className="text-white font-medium">{insights.model_health.error_mape}%</span>
+                                                <span className="text-white font-medium">
+                                                    {insights.model_health.error_mape === 'N/A'
+                                                        ? 'N/A'
+                                                        : `${insights.model_health.error_mape}%`}
+                                                </span>
                                             </div>
                                         </div>
                                     </Card>
