@@ -180,39 +180,67 @@ def get_historical_enrolment(state: str, days: int = 30):
 
 @router.get("/forecast/insights")
 def get_forecast_insights(state: str, days: int = 30):
-    """Generate AI-style insights about the forecast."""
+    """Generate insights about the forecast using actual model metadata."""
     state = resolve_state(state)
     
-    # MOCK INSIGHTS - Generate state-specific insights
-    import hashlib
-    state_hash = int(hashlib.md5(state.encode()).hexdigest(), 16)
+    # Get the actual forecast data which includes model_metadata
+    forecast_result = safe_run(predict_trend_forecast, state=state, days=days)
     
-    growth_rate = 5.0 + (state_hash % 30)  # Range: 5-35%
-    volatility = ["Low", "Medium", "High"][(state_hash % 3)]
-    trend = ["stable growth", "accelerating growth", "declining"][state_hash % 3]
+    if forecast_result.get("status") != "success":
+        return {
+            "status": "error",
+            "message": "Unable to generate insights - forecast data not available"
+        }
+    
+    # Extract actual metadata from forecast
+    model_metadata = forecast_result.get("model_metadata", {})
+    trend_analysis = forecast_result.get("trend_analysis", {})
+    data_quality = forecast_result.get("data_quality", {})
+    
+    # Generate dynamic recommendations based on actual trend
+    recommendations = []
+    trend_direction = trend_analysis.get("direction", "stable")
+    trend_strength = trend_analysis.get("strength", "weak")
+    confidence = data_quality.get("confidence", "low")
+    
+    if trend_direction == "upward":
+        if trend_strength in ["strong", "moderate"]:
+            recommendations.append("Prepare for increased enrollment demand - consider capacity expansion")
+            recommendations.append("Ensure adequate staffing for enrollment centers")
+        recommendations.append("Monitor resource allocation to sustain growth trajectory")
+    elif trend_direction == "downward":
+        recommendations.append("Investigate causes of declining enrollment trend")
+        recommendations.append("Review and improve enrollment center accessibility")
+        recommendations.append("Consider targeted outreach campaigns")
+    else:
+        recommendations.append("Maintain current operational capacity")
+        recommendations.append("Focus on service quality improvements")
+    
+    # Add data quality recommendations
+    if confidence in ["low", "very_low"]:
+        recommendations.append("⚠️ Limited data - collect more months for reliable analysis")
+    
+    # Always add monitoring recommendation
+    recommendations.append("Monitor biometric failure rates and schedule device maintenance")
     
     insights = {
         "status": "success",
         "state": state,
-        "summary": f"{state} shows {trend} trajectory",
-        "growth_prediction": f"Expected increase of {growth_rate:.1f}% over next {days} days",
-        "volatility": f"{volatility} volatility detected",
-        "confidence": "High" if volatility == "Low" else "Medium",
-        "recommendations": [
-            f"Increase enrollment capacity in top 3 districts",
-            f"Monitor biometric failure rates if > 5%",
-            f"Schedule device maintenance for high-traffic centers"
-        ],
+        "summary": f"{state} shows {trend_direction} trajectory with {trend_strength} strength",
+        "trend_direction": trend_direction,
+        "confidence": confidence.replace("_", " ").title(),
+        "recommendations": recommendations,
         "model_health": {
-            "model_type": "Ridge Regression",
-            "training_date": "2026-01-12",
-            "data_points": 180,
+            "model_type": model_metadata.get("type", "Prophet (Trend-Only)"),
+            "training_date": model_metadata.get("training_date", "Unknown"),
+            "data_points": f"{model_metadata.get('training_months', 0)} months",
             "last_retrain": "Success",
-            "error_mape": round(2.5 + (state_hash % 50) / 10, 1)  # Range: 2.5-7.5%
+            "error_mape": "N/A"  # MAPE not calculated for trend-only models
         }
     }
     
     return insights
+
 
 
 @router.get("/biometric/hotspots")
