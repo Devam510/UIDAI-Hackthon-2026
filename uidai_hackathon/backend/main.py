@@ -189,4 +189,3 @@ async def upload_csv_data(file: UploadFile = File(...)):
         logger.error(f"❌ Error uploading CSV: {e}")
         logger.exception("Full traceback:")
         raise HTTPException(status_code=500, detail=f"Failed to upload CSV: {str(e)}")
-
