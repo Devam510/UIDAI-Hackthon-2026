@@ -15,6 +15,68 @@ app = FastAPI(
     version="1.0"
 )
 
+# ✅ STARTUP EVENT: Initialize database and load data
+@app.on_event("startup")
+async def startup_event():
+    """
+    Initialize database and load CSV data on application startup.
+    This ensures the database exists before any API requests are processed.
+    Critical for Render deployment where database doesn't persist between builds.
+    """
+    import logging
+    from pathlib import Path
+    from backend.db.base import Base
+    from backend.db.session import engine, SessionLocal
+    from backend.db import models  # Import models to register them with Base
+    from backend.ingestion.ingestion_service import ingest_uidai_source
+    
+    logger = logging.getLogger(__name__)
+    
+    try:
+        # Step 1: Create all database tables
+        logger.info("Creating database tables...")
+        Base.metadata.create_all(bind=engine)
+        logger.info("✅ Database tables created successfully")
+        
+        # Step 2: Check if database already has data
+        session = SessionLocal()
+        record_count = session.query(models.UIDAIRecord).count()
+        session.close()
+        
+        if record_count > 0:
+            logger.info(f"✅ Database already contains {record_count} records. Skipping data load.")
+            return
+        
+        # Step 3: Load data from CSV if database is empty
+        logger.info("Database is empty. Loading data from CSV...")
+        
+        # Find the CSV file
+        project_root = Path(__file__).resolve().parents[1]  # uidai_hackathon folder
+        csv_path = project_root / "data" / "processed" / "aadhaar_master_monthly.csv"
+        
+        if not csv_path.exists():
+            logger.error(f"❌ CSV file not found at {csv_path}")
+            logger.error("Database will remain empty. API endpoints may fail.")
+            return
+        
+        # Ingest the CSV data
+        logger.info(f"Loading data from {csv_path}...")
+        results = ingest_uidai_source(csv_path.parent)  # Pass the directory
+        
+        logger.info(f"✅ Data loaded successfully: {results}")
+        
+        # Verify data was loaded
+        session = SessionLocal()
+        final_count = session.query(models.UIDAIRecord).count()
+        session.close()
+        
+        logger.info(f"✅ Database now contains {final_count} records")
+        
+    except Exception as e:
+        logger.error(f"❌ Error during startup initialization: {e}")
+        logger.exception("Full traceback:")
+        # Don't raise - let the app start anyway, but log the error
+
 from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
