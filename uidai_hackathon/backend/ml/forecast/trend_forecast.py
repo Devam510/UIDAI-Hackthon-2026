@@ -63,14 +63,29 @@ def train_trend_forecast_model(state: str):
     
     model.fit(prophet_df)
     
-    # Save model using cmdstanpy (Prophet's recommended production method)
-    # This saves the Stan model separately from the Python object
-    model_path = ARTIFACTS_DIR / f"forecast_{state}.json"
+    # WORKAROUND: Don't serialize Prophet model (causes stan_backend errors)
+    # Instead, save the training data and model parameters
+    model_path = ARTIFACTS_DIR / f"forecast_{state}_params.json"
     
-    # Serialize using Prophet's built-in method
+    # Extract and save only what we need for predictions
+    model_params = {
+        "training_data": prophet_df.to_dict('records'),
+        "growth": model.growth,
+        "changepoints": model.changepoints.tolist() if hasattr(model, 'changepoints') and model.changepoints is not None else [],
+        "n_changepoints": model.n_changepoints,
+        "changepoint_range": model.changepoint_range,
+        "yearly_seasonality": model.yearly_seasonality,
+        "weekly_seasonality": model.weekly_seasonality,
+        "daily_seasonality": model.daily_seasonality,
+        "seasonality_mode": model.seasonality_mode,
+        "seasonality_prior_scale": model.seasonality_prior_scale,
+        "changepoint_prior_scale": model.changepoint_prior_scale,
+        "interval_width": model.interval_width,
+        "state": state
+    }
+    
     with open(model_path, 'w') as f:
-        model_json = model.to_json()
-        f.write(model_json)
+        json.dump(model_params, f, indent=2)
     
     metadata = {
         "state": state,
@@ -88,7 +103,7 @@ def train_trend_forecast_model(state: str):
     with open(metadata_path, 'w') as f:
         json.dump(metadata, f, indent=2)
     
-    print(f"[Trend Forecast] Saved to {model_path}")
+    print(f"[Trend Forecast] Saved parameters to {model_path}")
     
     return {"status": "trained", "state": state, "metadata": metadata, "monthly_data_points": len(prophet_df)}
 
@@ -106,33 +121,53 @@ def predict_trend_forecast(state: str, days: int = 30):
     if not PROPHET_AVAILABLE:
         return {"status": "error", "message": "Prophet not installed"}
     
-    # Use .json files (Prophet's standard serialization)
-    model_path = ARTIFACTS_DIR / f"forecast_{state}.json"
+    # Use parameter files (workaround for stan_backend issues)
+    model_path = ARTIFACTS_DIR / f"forecast_{state}_params.json"
     metadata_path = ARTIFACTS_DIR / f"trend_forecast_{state}_metadata.json"
     
-    print(f"[Trend Forecast] Model path: {model_path}")
-    print(f"[Trend Forecast] Model exists: {model_path.exists()}")
+    print(f"[Trend Forecast] Model params path: {model_path}")
+    print(f"[Trend Forecast] Params exist: {model_path.exists()}")
     
-    # Auto-train if model doesn't exist
+    # Auto-train if params don't exist
     if not model_path.exists():
-        print(f"[Trend Forecast] Prophet model not found, training...")
+        print(f"[Trend Forecast] Prophet model params not found, training...")
         train_result = train_trend_forecast_model(state)
         if train_result.get("status") != "trained":
             print(f"[Trend Forecast] Training failed: {train_result}")
             return train_result
     
-    # Load model using Prophet's from_json()
+    # Load parameters and recreate model
     try:
         with open(model_path, 'r') as f:
-            model_json = f.read()
+            model_params = json.load(f)
         
-        # Deserialize the model
-        from prophet.serialize import model_from_json
-        model = model_from_json(model_json)
+        print(f"[Trend Forecast] Loaded parameters for state: {model_params.get('state')}")
         
-        print(f"[Trend Forecast] Model loaded successfully, type: {type(model)}")
+        # Recreate Prophet model with same parameters
+        model = Prophet(
+            growth=model_params.get('growth', 'linear'),
+            n_changepoints=model_params.get('n_changepoints', 25),
+            changepoint_range=model_params.get('changepoint_range', 0.8),
+            yearly_seasonality=model_params.get('yearly_seasonality', False),
+            weekly_seasonality=model_params.get('weekly_seasonality', False),
+            daily_seasonality=model_params.get('daily_seasonality', False),
+            seasonality_mode=model_params.get('seasonality_mode', 'additive'),
+            seasonality_prior_scale=model_params.get('seasonality_prior_scale', 10.0),
+            changepoint_prior_scale=model_params.get('changepoint_prior_scale', 0.05),
+            interval_width=model_params.get('interval_width', 0.95)
+        )
+        
+        # Recreate training data
+        import pandas as pd
+        training_data = pd.DataFrame(model_params['training_data'])
+        training_data['ds'] = pd.to_datetime(training_data['ds'])
+        
+        # Retrain the model (fast since we have few data points)
+        model.fit(training_data)
+        
+        print(f"[Trend Forecast] Model recreated and trained successfully")
     except Exception as e:
-        print(f"[Trend Forecast] Failed to load model: {e}")
+        print(f"[Trend Forecast] Failed to load/recreate model: {e}")
         print(f"[Trend Forecast] Attempting to retrain...")
         # If loading fails, retrain
         train_result = train_trend_forecast_model(state)
@@ -140,9 +175,20 @@ def predict_trend_forecast(state: str, days: int = 30):
             return {"status": "error", "message": f"Failed to load and retrain model: {str(e)}"}
         # Try loading again
         with open(model_path, 'r') as f:
-            model_json = f.read()
-        from prophet.serialize import model_from_json
-        model = model_from_json(model_json)
+            model_params = json.load(f)
+        
+        model = Prophet(
+            growth=model_params.get('growth', 'linear'),
+            changepoint_prior_scale=model_params.get('changepoint_prior_scale', 0.05),
+            interval_width=model_params.get('interval_width', 0.95)
+        )
+        model.yearly_seasonality = False
+        model.weekly_seasonality = False
+        model.daily_seasonality = False
+        
+        training_data = pd.DataFrame(model_params['training_data'])
+        training_data['ds'] = pd.to_datetime(training_data['ds'])
+        model.fit(training_data)
     
     # Validate we have a Prophet model
     if not hasattr(model, 'predict') or not hasattr(model, 'make_future_dataframe'):
