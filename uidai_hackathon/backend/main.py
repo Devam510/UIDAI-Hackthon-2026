@@ -117,3 +117,76 @@ app.include_router(export_router, prefix="/export", tags=["Export"])
 
 from backend.api.ai_insights import router as ai_insights_router
 app.include_router(ai_insights_router, prefix="/ai", tags=["AI Insights"])
+
+# ✅ TEMPORARY: CSV Upload Endpoint for Render Free Tier
+# Use this to upload CSV file since shell access is not available in free tier
+from fastapi import UploadFile, File, HTTPException
+from pathlib import Path
+import shutil
+
+@app.post("/admin/upload-csv")
+async def upload_csv_data(file: UploadFile = File(...)):
+    """
+    Temporary endpoint to upload CSV data to Render.
+    Use this once after deployment to upload aadhaar_master_monthly.csv
+    
+    Usage:
+    curl -X POST -F "file=@aadhaar_master_monthly.csv" https://your-app.onrender.com/admin/upload-csv
+    """
+    import logging
+    from backend.ingestion.ingestion_service import ingest_uidai_source
+    from backend.db import models
+    from backend.db.session import SessionLocal
+    
+    logger = logging.getLogger(__name__)
+    
+    try:
+        # Save uploaded file
+        project_root = Path(__file__).resolve().parents[1]
+        csv_dir = project_root / "data" / "processed"
+        csv_dir.mkdir(parents=True, exist_ok=True)
+        csv_path = csv_dir / "aadhaar_master_monthly.csv"
+        
+        logger.info(f"Saving uploaded CSV to {csv_path}")
+        
+        with open(csv_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        
+        logger.info("✅ CSV file saved successfully")
+        
+        # Check if data already exists
+        session = SessionLocal()
+        record_count = session.query(models.UIDAIRecord).count()
+        session.close()
+        
+        if record_count > 0:
+            return {
+                "status": "success",
+                "message": f"CSV uploaded but data already exists ({record_count} records). Skipping ingestion.",
+                "csv_path": str(csv_path)
+            }
+        
+        # Ingest the data
+        logger.info("Starting data ingestion...")
+        results = ingest_uidai_source(csv_dir)
+        
+        # Verify
+        session = SessionLocal()
+        final_count = session.query(models.UIDAIRecord).count()
+        session.close()
+        
+        logger.info(f"✅ Data ingestion complete. {final_count} records in database")
+        
+        return {
+            "status": "success",
+            "message": "CSV uploaded and data ingested successfully",
+            "csv_path": str(csv_path),
+            "records_loaded": final_count,
+            "ingestion_results": results
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Error uploading CSV: {e}")
+        logger.exception("Full traceback:")
+        raise HTTPException(status_code=500, detail=f"Failed to upload CSV: {str(e)}")
+
