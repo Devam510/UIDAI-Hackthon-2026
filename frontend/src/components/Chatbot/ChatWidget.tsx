@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import client from '../../api/client';
 import { ENDPOINTS } from '../../api/endpoints';
 import { useStateContext } from '../../context/StateContext';
+import { useChatContext } from '../../context/ChatContext';
 import { useLocation } from 'react-router-dom';
 
 interface ChatMessage {
@@ -13,7 +14,7 @@ interface ChatMessage {
 }
 
 const ChatWidget: React.FC = () => {
-    const [isOpen, setIsOpen] = useState(false);
+    const { isOpen, toggleChat, closeChat, pendingMessage, clearPendingMessage } = useChatContext();
     const [messages, setMessages] = useState<ChatMessage[]>([
         { id: '1', sender: 'bot', text: 'Hello! I am your UIDAI Assistant. Ask me anything about the trends or specific charts.' }
     ]);
@@ -31,6 +32,14 @@ const ChatWidget: React.FC = () => {
     useEffect(() => {
         if (isOpen) scrollToBottom();
     }, [messages, isOpen]);
+
+    // Handle pending messages from context
+    useEffect(() => {
+        if (pendingMessage && isOpen) {
+            handleSend(pendingMessage);
+            clearPendingMessage();
+        }
+    }, [pendingMessage, isOpen]);
 
     const handleSend = async (text: string = input) => {
         if (!text.trim()) return;
@@ -87,7 +96,7 @@ const ChatWidget: React.FC = () => {
                             <Bot className="text-white" size={20} />
                             <h3 className="font-semibold text-white">AI Assistant</h3>
                         </div>
-                        <button onClick={() => setIsOpen(false)} className="text-white/80 hover:text-white transition-colors">
+                        <button onClick={closeChat} className="text-white/80 hover:text-white transition-colors">
                             <X size={20} />
                         </button>
                     </div>
@@ -165,7 +174,7 @@ const ChatWidget: React.FC = () => {
             )}
 
             <button
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={toggleChat}
                 className={clsx(
                     "h-14 w-14 rounded-full shadow-lg shadow-primary-900/40 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95",
                     isOpen ? "bg-slate-700 text-white rotate-90" : "bg-primary-600 text-white"
