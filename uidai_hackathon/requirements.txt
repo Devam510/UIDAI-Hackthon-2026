@@ -39,4 +39,4 @@ python-json-logger==2.0.7
 matplotlib
 groq==0.9.0
 httpx<0.27
-python-multipartrequests
+python-multipart
