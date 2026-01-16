@@ -23,9 +23,13 @@ def save_to_db(df, dataset_type, source_file, batch_size: int = 20000):
 
     session = SessionLocal()
 
+    # Determine date column based on dataset type
+    date_col = "month" if dataset_type == "AGGREGATED_MONTHLY" else "date"
+    has_pincode = "pincode" in df.columns
+
     metric_cols = [
         c for c in df.columns
-        if c not in {"date", "state", "district", "pincode"}
+        if c not in {date_col, "state", "district", "pincode"}
         and not c.startswith("__")
     ]
 
@@ -33,7 +37,7 @@ def save_to_db(df, dataset_type, source_file, batch_size: int = 20000):
     inserted = 0
 
     for _, row in df.iterrows():
-        date_value = row["date"]
+        date_value = row[date_col]
         if hasattr(date_value, "date"):
             date_value = date_value.date()
 
@@ -42,7 +46,7 @@ def save_to_db(df, dataset_type, source_file, batch_size: int = 20000):
             "date": date_value,
             "state": " ".join(str(row["state"]).strip().split()).title(),
             "district": " ".join(str(row["district"]).strip().split()).title(),
-            "pincode": str(row["pincode"]).strip(),
+            "pincode": str(row["pincode"]).strip() if has_pincode else "",
             "source_file": source_file
         }
 
@@ -68,6 +72,7 @@ def save_to_db(df, dataset_type, source_file, batch_size: int = 20000):
 
     session.close()
     return inserted
+
 
 
 
