@@ -63,9 +63,11 @@ def train_trend_forecast_model(state: str):
     
     model.fit(prophet_df)
     
-    # Save model using joblib (matches existing models)
-    model_path = ARTIFACTS_DIR / f"forecast_{state}.joblib"
-    joblib.dump(model, model_path)
+    # Save model using pickle (better for Prophet cross-version compatibility)
+    model_path = ARTIFACTS_DIR / f"forecast_{state}.pkl"
+    with open(model_path, 'wb') as f:
+        import pickle
+        pickle.dump(model, f, protocol=4)  # Protocol 4 for Python 3.4+ compatibility
     
     metadata = {
         "state": state,
@@ -100,7 +102,20 @@ def predict_trend_forecast(state: str, days: int = 30):
     if not PROPHET_AVAILABLE:
         return {"status": "error", "message": "Prophet not installed"}
     
-    model_path = ARTIFACTS_DIR / f"forecast_{state}.joblib"
+    # Try .pkl first (new format), then .joblib (old format)
+    model_path_pkl = ARTIFACTS_DIR / f"forecast_{state}.pkl"
+    model_path_joblib = ARTIFACTS_DIR / f"forecast_{state}.joblib"
+    
+    if model_path_pkl.exists():
+        model_path = model_path_pkl
+        use_pickle = True
+    elif model_path_joblib.exists():
+        model_path = model_path_joblib
+        use_pickle = False
+    else:
+        model_path = model_path_pkl  # Default to .pkl for new training
+        use_pickle = True
+    
     metadata_path = ARTIFACTS_DIR / f"trend_forecast_{state}_metadata.json"
     
     print(f"[Trend Forecast] Model path: {model_path}")
@@ -113,43 +128,34 @@ def predict_trend_forecast(state: str, days: int = 30):
         if train_result.get("status") != "trained":
             print(f"[Trend Forecast] Training failed: {train_result}")
             return train_result
+        # After training, use the new .pkl format
+        model_path = model_path_pkl
+        use_pickle = True
     
-    # Load model using joblib
+    # Load model using appropriate method
     try:
-        loaded = joblib.load(model_path)
-        print(f"[Trend Forecast] Model loaded successfully, type: {type(loaded)}")
+        if use_pickle:
+            import pickle
+            with open(model_path, 'rb') as f:
+                model = pickle.load(f)
+        else:
+            # For old joblib models, handle dict wrapping
+            loaded = joblib.load(model_path)
+            if isinstance(loaded, dict):
+                model = loaded.get('model') or loaded.get('prophet_model') or loaded
+            else:
+                model = loaded
+        print(f"[Trend Forecast] Model loaded successfully, type: {type(model)}")
     except Exception as e:
         print(f"[Trend Forecast] Failed to load model: {e}")
         return {"status": "error", "message": f"Failed to load model: {str(e)}"}
-    
-    # Handle both dict format (old models) and direct Prophet model format
-    if isinstance(loaded, dict):
-        print(f"[Trend Forecast] Model is wrapped in dict, keys: {loaded.keys()}")
-        # Old format: extract model from dictionary
-        model = loaded.get('model') or loaded.get('prophet_model') or loaded.get('forecast_model')
-        
-        if model is None:
-            print(f"[Trend Forecast] ERROR: Could not find Prophet model in dict. Available keys: {list(loaded.keys())}")
-            return {"status": "error", "message": "Invalid model format: Prophet model not found in saved file"}
-        
-        if isinstance(model, dict):
-            # Still a dict, try to find the actual model
-            print(f"[Trend Forecast] Model is still a dict, trying to extract further...")
-            for key in ['model', 'prophet_model', 'forecast_model']:
-                if key in model and not isinstance(model[key], dict):
-                    model = model[key]
-                    print(f"[Trend Forecast] Extracted model from key: {key}")
-                    break
-    else:
-        # Direct Prophet model
-        model = loaded
     
     # Validate we have a Prophet model
     if not hasattr(model, 'predict') or not hasattr(model, 'make_future_dataframe'):
         print(f"[Trend Forecast] ERROR: Loaded object is not a valid Prophet model. Type: {type(model)}")
         return {"status": "error", "message": f"Invalid model type: {type(model).__name__}. Expected Prophet model."}
     
-    print(f"[Trend Forecast] Successfully extracted Prophet model, type: {type(model)}")
+    print(f"[Trend Forecast] Successfully validated Prophet model")
     
     # Load metadata if exists, otherwise create basic metadata
     if metadata_path.exists():
