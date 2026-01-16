@@ -109,7 +109,21 @@ def predict_trend_forecast(state: str, days: int = 30):
             return train_result
     
     # Load model using joblib
-    model = joblib.load(model_path)
+    loaded = joblib.load(model_path)
+    
+    # Handle both dict format (old models) and direct Prophet model format
+    if isinstance(loaded, dict):
+        # Old format: extract model from dictionary
+        model = loaded.get('model') or loaded.get('prophet_model') or loaded
+        if isinstance(model, dict):
+            # Still a dict, try to find the actual model
+            for key in ['model', 'prophet_model', 'forecast_model']:
+                if key in model and not isinstance(model[key], dict):
+                    model = model[key]
+                    break
+    else:
+        # Direct Prophet model
+        model = loaded
     
     # Load metadata if exists, otherwise create basic metadata
     if metadata_path.exists():
