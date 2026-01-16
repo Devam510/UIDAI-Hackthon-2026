@@ -141,14 +141,14 @@ def export_forecast_csv(state: str, days: int = 180):
     if result.get("status") != "success" or not result.get("forecast"):
         return Response(content="No data available", media_type="text/plain")
     
-    # Convert to DataFrame
+    # Convert to DataFrame - using correct field names from forecast API
     forecast_data = []
     for f in result["forecast"]:
         forecast_data.append({
             "Date": f["date"],
-            "Predicted Enrollment": f["predicted_total_enrolment"],
-            "Lower Bound (95% CI)": f["lower_bound"],
-            "Upper Bound (95% CI)": f["upper_bound"]
+            "Predicted Enrollment": f["value"],  # Changed from "predicted_total_enrolment"
+            "Lower Bound (95% CI)": f["lower"],  # Changed from "lower_bound"
+            "Upper Bound (95% CI)": f["upper"]   # Changed from "upper_bound"
         })
     
     df = pd.DataFrame(forecast_data)
