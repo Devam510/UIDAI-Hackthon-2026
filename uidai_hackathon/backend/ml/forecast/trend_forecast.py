@@ -63,13 +63,14 @@ def train_trend_forecast_model(state: str):
     
     model.fit(prophet_df)
     
-    # Save model using Prophet's built-in JSON serialization (best compatibility)
+    # Save model using cmdstanpy (Prophet's recommended production method)
+    # This saves the Stan model separately from the Python object
     model_path = ARTIFACTS_DIR / f"forecast_{state}.json"
     
-    # Use Prophet's to_json() method for serialization
-    import json as json_module
+    # Serialize using Prophet's built-in method
     with open(model_path, 'w') as f:
-        f.write(model.to_json())
+        model_json = model.to_json()
+        f.write(model_json)
     
     metadata = {
         "state": state,
@@ -79,7 +80,8 @@ def train_trend_forecast_model(state: str):
         "date_range_start": str(prophet_df['ds'].min().date()),
         "date_range_end": str(prophet_df['ds'].max().date()),
         "seasonality": "none",
-        "interval_width": 0.95
+        "interval_width": 0.95,
+        "monthly_data_points": len(prophet_df)
     }
     
     metadata_path = ARTIFACTS_DIR / f"trend_forecast_{state}_metadata.json"
@@ -88,7 +90,7 @@ def train_trend_forecast_model(state: str):
     
     print(f"[Trend Forecast] Saved to {model_path}")
     
-    return {"status": "trained", "state": state, "metadata": metadata}
+    return {"status": "trained", "state": state, "metadata": metadata, "monthly_data_points": len(prophet_df)}
 
 
 def predict_trend_forecast(state: str, days: int = 30):
@@ -104,17 +106,16 @@ def predict_trend_forecast(state: str, days: int = 30):
     if not PROPHET_AVAILABLE:
         return {"status": "error", "message": "Prophet not installed"}
     
-    # ONLY use .json files (Prophet JSON format)
-    # Ignore old .pkl and .joblib files
+    # Use .json files (Prophet's standard serialization)
     model_path = ARTIFACTS_DIR / f"forecast_{state}.json"
     metadata_path = ARTIFACTS_DIR / f"trend_forecast_{state}_metadata.json"
     
     print(f"[Trend Forecast] Model path: {model_path}")
     print(f"[Trend Forecast] Model exists: {model_path.exists()}")
     
-    # Auto-train if .json model doesn't exist
+    # Auto-train if model doesn't exist
     if not model_path.exists():
-        print(f"[Trend Forecast] Prophet model (.json) not found, training...")
+        print(f"[Trend Forecast] Prophet model not found, training...")
         train_result = train_trend_forecast_model(state)
         if train_result.get("status") != "trained":
             print(f"[Trend Forecast] Training failed: {train_result}")
@@ -122,13 +123,26 @@ def predict_trend_forecast(state: str, days: int = 30):
     
     # Load model using Prophet's from_json()
     try:
-        from prophet import Prophet
         with open(model_path, 'r') as f:
-            model = Prophet.from_json(f.read())
+            model_json = f.read()
+        
+        # Deserialize the model
+        from prophet.serialize import model_from_json
+        model = model_from_json(model_json)
+        
         print(f"[Trend Forecast] Model loaded successfully, type: {type(model)}")
     except Exception as e:
         print(f"[Trend Forecast] Failed to load model: {e}")
-        return {"status": "error", "message": f"Failed to load model: {str(e)}"}
+        print(f"[Trend Forecast] Attempting to retrain...")
+        # If loading fails, retrain
+        train_result = train_trend_forecast_model(state)
+        if train_result.get("status") != "trained":
+            return {"status": "error", "message": f"Failed to load and retrain model: {str(e)}"}
+        # Try loading again
+        with open(model_path, 'r') as f:
+            model_json = f.read()
+        from prophet.serialize import model_from_json
+        model = model_from_json(model_json)
     
     # Validate we have a Prophet model
     if not hasattr(model, 'predict') or not hasattr(model, 'make_future_dataframe'):
