@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
-import { Play, TrendingUp, AlertTriangle, CheckCircle2, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
+import { Play, TrendingUp, AlertTriangle, CheckCircle2, Sparkles, ChevronDown, ChevronUp, Info } from 'lucide-react';
 import Card from '../components/Common/Card';
 import Loader from '../components/Common/Loader';
 import ErrorRetry from '../components/Common/ErrorRetry';
@@ -696,7 +696,15 @@ const Forecast: React.FC = () => {
                                                 </span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-slate-400">Error (MAPE):</span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-slate-400">Error (MAPE):</span>
+                                                    <div className="group relative">
+                                                        <Info size={14} className="text-slate-500 cursor-help" />
+                                                        <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-2 bg-slate-800 border border-slate-600 rounded-lg text-xs text-slate-300 shadow-xl z-10">
+                                                            MAPE not calculated - using all {dataQuality?.training_months || 9} months for training provides better trend detection than splitting into train/test sets with limited data
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <span className="text-white font-medium">
                                                     {insights.model_health.error_mape === 'N/A'
                                                         ? 'N/A'
