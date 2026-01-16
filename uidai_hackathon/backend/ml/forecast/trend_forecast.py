@@ -102,49 +102,27 @@ def predict_trend_forecast(state: str, days: int = 30):
     if not PROPHET_AVAILABLE:
         return {"status": "error", "message": "Prophet not installed"}
     
-    # Try .pkl first (new format), then .joblib (old format)
-    model_path_pkl = ARTIFACTS_DIR / f"forecast_{state}.pkl"
-    model_path_joblib = ARTIFACTS_DIR / f"forecast_{state}.joblib"
-    
-    if model_path_pkl.exists():
-        model_path = model_path_pkl
-        use_pickle = True
-    elif model_path_joblib.exists():
-        model_path = model_path_joblib
-        use_pickle = False
-    else:
-        model_path = model_path_pkl  # Default to .pkl for new training
-        use_pickle = True
-    
+    # ONLY use .pkl files (Prophet models)
+    # Ignore old .joblib files (Ridge regression models)
+    model_path = ARTIFACTS_DIR / f"forecast_{state}.pkl"
     metadata_path = ARTIFACTS_DIR / f"trend_forecast_{state}_metadata.json"
     
     print(f"[Trend Forecast] Model path: {model_path}")
     print(f"[Trend Forecast] Model exists: {model_path.exists()}")
     
-    # Auto-train if needed
+    # Auto-train if .pkl model doesn't exist
     if not model_path.exists():
-        print(f"[Trend Forecast] Model not found, training...")
+        print(f"[Trend Forecast] Prophet model (.pkl) not found, training...")
         train_result = train_trend_forecast_model(state)
         if train_result.get("status") != "trained":
             print(f"[Trend Forecast] Training failed: {train_result}")
             return train_result
-        # After training, use the new .pkl format
-        model_path = model_path_pkl
-        use_pickle = True
     
-    # Load model using appropriate method
+    # Load model using pickle
     try:
-        if use_pickle:
-            import pickle
-            with open(model_path, 'rb') as f:
-                model = pickle.load(f)
-        else:
-            # For old joblib models, handle dict wrapping
-            loaded = joblib.load(model_path)
-            if isinstance(loaded, dict):
-                model = loaded.get('model') or loaded.get('prophet_model') or loaded
-            else:
-                model = loaded
+        import pickle
+        with open(model_path, 'rb') as f:
+            model = pickle.load(f)
         print(f"[Trend Forecast] Model loaded successfully, type: {type(model)}")
     except Exception as e:
         print(f"[Trend Forecast] Failed to load model: {e}")
