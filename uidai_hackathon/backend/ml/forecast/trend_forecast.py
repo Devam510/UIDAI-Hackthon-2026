@@ -95,21 +95,32 @@ def predict_trend_forecast(state: str, days: int = 30):
     CRITICAL: This is NOT a prediction system - it shows trend direction only
     Limited 2025 data makes 2026 predictions unreliable
     """
+    print(f"[Trend Forecast] Starting forecast for state: '{state}'")
+    
     if not PROPHET_AVAILABLE:
         return {"status": "error", "message": "Prophet not installed"}
     
     model_path = ARTIFACTS_DIR / f"forecast_{state}.joblib"
     metadata_path = ARTIFACTS_DIR / f"trend_forecast_{state}_metadata.json"
     
+    print(f"[Trend Forecast] Model path: {model_path}")
+    print(f"[Trend Forecast] Model exists: {model_path.exists()}")
+    
     # Auto-train if needed
     if not model_path.exists():
         print(f"[Trend Forecast] Model not found, training...")
         train_result = train_trend_forecast_model(state)
         if train_result.get("status") != "trained":
+            print(f"[Trend Forecast] Training failed: {train_result}")
             return train_result
     
     # Load model using joblib
-    loaded = joblib.load(model_path)
+    try:
+        loaded = joblib.load(model_path)
+        print(f"[Trend Forecast] Model loaded successfully, type: {type(loaded)}")
+    except Exception as e:
+        print(f"[Trend Forecast] Failed to load model: {e}")
+        return {"status": "error", "message": f"Failed to load model: {str(e)}"}
     
     # Handle both dict format (old models) and direct Prophet model format
     if isinstance(loaded, dict):
@@ -136,8 +147,13 @@ def predict_trend_forecast(state: str, days: int = 30):
             "date_range_end": "2025-12-01"
         }
     
+    print(f"[Trend Forecast] Metadata: {metadata}")
+    
     # Get historical data for complete visualization
+    print(f"[Trend Forecast] Fetching historical data for state: '{state}'")
     series = get_monthly_enrolment_series(state=state)
+    print(f"[Trend Forecast] Historical series length: {len(series) if series else 0}")
+    
     historical_data = []
     if series:
         for point in series:
@@ -146,6 +162,8 @@ def predict_trend_forecast(state: str, days: int = 30):
                 "value": float(point['total_enrolment']),
                 "type": "historical"
             })
+    else:
+        print(f"[Trend Forecast] WARNING: No historical data found for state '{state}'")
     
     # LIMIT PROJECTION: Only 3-6 months for trend visualization (not prediction)
     # This shows direction, not future capacity

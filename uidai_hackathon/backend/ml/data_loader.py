@@ -341,21 +341,32 @@ def get_monthly_enrolment_series(state: Optional[str] = None,
     """
     df = load_processed_data(validate=False)
     
+    print(f"[Data Loader] get_monthly_enrolment_series called with state='{state}', district='{district}'")
+    print(f"[Data Loader] Total records in CSV: {len(df)}")
+    print(f"[Data Loader] Unique states in CSV: {df['state'].unique()[:5]}")
+    
     # Normalize filters
     if state:
+        original_state = state
         state = " ".join(str(state).strip().split()).title()
+        print(f"[Data Loader] Normalized state: '{original_state}' -> '{state}'")
         df = df[df['state'] == state]
+        print(f"[Data Loader] Records after state filter: {len(df)}")
     
     if district:
         district = " ".join(str(district).strip().split()).title()
         df = df[df['district'] == district]
+        print(f"[Data Loader] Records after district filter: {len(df)}")
     
     if df.empty:
+        print(f"[Data Loader] WARNING: No data found for state='{state}', district='{district}'")
         return []
     
     # Group by month and sum enrolments
     monthly = df.groupby('month')['total_enrolments'].sum().reset_index()
     monthly = monthly.sort_values('month')
+    
+    print(f"[Data Loader] Returning {len(monthly)} monthly data points")
     
     return [
         {"month": row['month'], "total_enrolment": int(row['total_enrolments'])}
