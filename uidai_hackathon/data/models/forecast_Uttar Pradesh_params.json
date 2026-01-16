@@ -1,4 +1,59 @@
 {
   "training_data": [
     {
-      "ds": 
+      "ds": "2025-03-01T00:00:00",
+      "y": 5393.0
+    },
+    {
+      "ds": "2025-04-01T00:00:00",
+      "y": 57903.0
+    },
+    {
+      "ds": "2025-05-01T00:00:00",
+      "y": 49861.0
+    },
+    {
+      "ds": "2025-06-01T00:00:00",
+      "y": 48753.0
+    },
+    {
+      "ds": "2025-07-01T00:00:00",
+      "y": 157866.0
+    },
+    {
+      "ds": "2025-09-01T00:00:00",
+      "y": 261079.0
+    },
+    {
+      "ds": "2025-10-01T00:00:00",
+      "y": 138152.0
+    },
+    {
+      "ds": "2025-11-01T00:00:00",
+      "y": 182695.0
+    },
+    {
+      "ds": "2025-12-01T00:00:00",
+      "y": 116927.0
+    }
+  ],
+  "growth": "linear",
+  "changepoints": [
+    "2025-04-01T00:00:00",
+    "2025-05-01T00:00:00",
+    "2025-06-01T00:00:00",
+    "2025-07-01T00:00:00",
+    "2025-09-01T00:00:00",
+    "2025-10-01T00:00:00"
+  ],
+  "n_changepoints": 6,
+  "changepoint_range": 0.8,
+  "yearly_seasonality": false,
+  "weekly_seasonality": false,
+  "daily_seasonality": false,
+  "seasonality_mode": "additive",
+  "seasonality_prior_scale": 10.0,
+  "changepoint_prior_scale": 0.05,
+  "interval_width": 0.95,
+  "state": "Uttar Pradesh"
+}

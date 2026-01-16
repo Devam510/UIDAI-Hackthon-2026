@@ -1,4 +1,59 @@
 {
   "training_data": [
     {
-      "ds": 
+      "ds": "2025-03-01T00:00:00",
+      "y": 260.0
+    },
+    {
+      "ds": "2025-04-01T00:00:00",
+      "y": 1745.0
+    },
+    {
+      "ds": "2025-05-01T00:00:00",
+      "y": 1406.0
+    },
+    {
+      "ds": "2025-06-01T00:00:00",
+      "y": 1263.0
+    },
+    {
+      "ds": "2025-07-01T00:00:00",
+      "y": 7587.0
+    },
+    {
+      "ds": "2025-09-01T00:00:00",
+      "y": 28805.0
+    },
+    {
+      "ds": "2025-10-01T00:00:00",
+      "y": 17092.0
+    },
+    {
+      "ds": "2025-11-01T00:00:00",
+      "y": 25926.0
+    },
+    {
+      "ds": "2025-12-01T00:00:00",
+      "y": 19135.0
+    }
+  ],
+  "growth": "linear",
+  "changepoints": [
+    "2025-04-01T00:00:00",
+    "2025-05-01T00:00:00",
+    "2025-06-01T00:00:00",
+    "2025-07-01T00:00:00",
+    "2025-09-01T00:00:00",
+    "2025-10-01T00:00:00"
+  ],
+  "n_changepoints": 6,
+  "changepoint_range": 0.8,
+  "yearly_seasonality": false,
+  "weekly_seasonality": false,
+  "daily_seasonality": false,
+  "seasonality_mode": "additive",
+  "seasonality_prior_scale": 10.0,
+  "changepoint_prior_scale": 0.05,
+  "interval_width": 0.95,
+  "state": "Chhattisgarh"
+}

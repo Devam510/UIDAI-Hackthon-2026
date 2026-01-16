@@ -1,4 +1,49 @@
 {
   "training_data": [
     {
-      "ds": 
+      "ds": "2025-04-01T00:00:00",
+      "y": 286.0
+    },
+    {
+      "ds": "2025-06-01T00:00:00",
+      "y": 167.0
+    },
+    {
+      "ds": "2025-07-01T00:00:00",
+      "y": 665.0
+    },
+    {
+      "ds": "2025-09-01T00:00:00",
+      "y": 3121.0
+    },
+    {
+      "ds": "2025-10-01T00:00:00",
+      "y": 1876.0
+    },
+    {
+      "ds": "2025-11-01T00:00:00",
+      "y": 2984.0
+    },
+    {
+      "ds": "2025-12-01T00:00:00",
+      "y": 2186.0
+    }
+  ],
+  "growth": "linear",
+  "changepoints": [
+    "2025-06-01T00:00:00",
+    "2025-07-01T00:00:00",
+    "2025-09-01T00:00:00",
+    "2025-10-01T00:00:00"
+  ],
+  "n_changepoints": 4,
+  "changepoint_range": 0.8,
+  "yearly_seasonality": false,
+  "weekly_seasonality": false,
+  "daily_seasonality": false,
+  "seasonality_mode": "additive",
+  "seasonality_prior_scale": 10.0,
+  "changepoint_prior_scale": 0.05,
+  "interval_width": 0.95,
+  "state": "Tripura"
+}

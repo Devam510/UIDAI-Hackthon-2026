@@ -1,4 +1,35 @@
 {
   "training_data": [
     {
-      "ds": 
+      "ds": "2025-09-01T00:00:00",
+      "y": 175.0
+    },
+    {
+      "ds": "2025-10-01T00:00:00",
+      "y": 111.0
+    },
+    {
+      "ds": "2025-11-01T00:00:00",
+      "y": 173.0
+    },
+    {
+      "ds": "2025-12-01T00:00:00",
+      "y": 158.0
+    }
+  ],
+  "growth": "linear",
+  "changepoints": [
+    "2025-10-01T00:00:00",
+    "2025-11-01T00:00:00"
+  ],
+  "n_changepoints": 2,
+  "changepoint_range": 0.8,
+  "yearly_seasonality": false,
+  "weekly_seasonality": false,
+  "daily_seasonality": false,
+  "seasonality_mode": "additive",
+  "seasonality_prior_scale": 10.0,
+  "changepoint_prior_scale": 0.05,
+  "interval_width": 0.95,
+  "state": "Ladakh"
+}

@@ -1,0 +1,11 @@
+{
+  "state": "Haryana",
+  "model_type": "Prophet (Trend-Only)",
+  "training_date": "2026-01-16T15:51:13.104714",
+  "data_points": 9,
+  "date_range_start": "2025-03-01",
+  "date_range_end": "2025-12-01",
+  "seasonality": "none",
+  "interval_width": 0.95,
+  "monthly_data_points": 9
+}

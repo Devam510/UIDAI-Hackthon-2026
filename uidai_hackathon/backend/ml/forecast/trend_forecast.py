@@ -68,10 +68,27 @@ def train_trend_forecast_model(state: str):
     model_path = ARTIFACTS_DIR / f"forecast_{state}_params.json"
     
     # Extract and save only what we need for predictions
+    # FIX: Convert Timestamp objects to ISO format strings for JSON serialization
+    training_data_serializable = []
+    for record in prophet_df.to_dict('records'):
+        training_data_serializable.append({
+            'ds': record['ds'].isoformat() if hasattr(record['ds'], 'isoformat') else str(record['ds']),
+            'y': float(record['y'])
+        })
+    
+    # FIX: Convert changepoints Timestamps to ISO format strings
+    changepoints_serializable = []
+    if hasattr(model, 'changepoints') and model.changepoints is not None:
+        for cp in model.changepoints:
+            if hasattr(cp, 'isoformat'):
+                changepoints_serializable.append(cp.isoformat())
+            else:
+                changepoints_serializable.append(str(cp))
+    
     model_params = {
-        "training_data": prophet_df.to_dict('records'),
+        "training_data": training_data_serializable,  # ✅ JSON-serializable
         "growth": model.growth,
-        "changepoints": model.changepoints.tolist() if hasattr(model, 'changepoints') and model.changepoints is not None else [],
+        "changepoints": changepoints_serializable,  # ✅ JSON-serializable
         "n_changepoints": model.n_changepoints,
         "changepoint_range": model.changepoint_range,
         "yearly_seasonality": model.yearly_seasonality,

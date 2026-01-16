@@ -1,0 +1,21 @@
+Traceback (most recent call last):
+  File "D:\Devam\Microsoft VS Code\Codes\UIDAI\UIDAI Hackthon\uidai_hackathon\debug_to_file.py", line 9, in <module>
+    result = train_trend_forecast_model('Gujarat')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Devam\Microsoft VS Code\Codes\UIDAI\UIDAI Hackthon\uidai_hackathon\backend\ml\forecast\trend_forecast.py", line 96, in train_trend_forecast_model
+    json.dump(model_params, f, indent=2)
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\json\__init__.py", line 179, in dump
+    for chunk in iterable:
+                 ^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\json\encoder.py", line 432, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\json\encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\json\encoder.py", line 326, in _iterencode_list
+    yield from chunks
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\json\encoder.py", line 439, in _iterencode
+    o = _default(o)
+        ^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\json\encoder.py", line 180, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type Timestamp is not JSON serializable
