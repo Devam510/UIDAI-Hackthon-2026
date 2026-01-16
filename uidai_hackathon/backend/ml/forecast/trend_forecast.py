@@ -18,8 +18,9 @@ except ImportError:
 
 from backend.ml.data_loader import get_monthly_enrolment_series
 
-# Artifacts directory
-ARTIFACTS_DIR = Path(__file__).resolve().parents[1] / "artifacts"
+# Artifacts directory - use data/models where forecast models are stored
+PROJECT_ROOT = Path(__file__).resolve().parents[3]  # Go up to uidai_hackathon root
+ARTIFACTS_DIR = PROJECT_ROOT / "data" / "models"
 ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
