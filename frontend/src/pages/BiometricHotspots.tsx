@@ -363,16 +363,16 @@ const BiometricHotspots: React.FC = () => {
 
                             {/* Metrics */}
                             <div className="grid grid-cols-3 gap-2">
-                                <div className="bg-slate-800/50 p-3 rounded-lg">
-                                    <p className="text-xs text-slate-400 mb-1">Bio Gap</p>
+                                <div className="bg-slate-100 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Bio Gap</p>
                                     <p className="text-lg font-semibold text-slate-900 dark:text-white">{selectedDistrict.bio_gap_abs_mean_30}</p>
                                 </div>
-                                <div className="bg-slate-800/50 p-3 rounded-lg">
-                                    <p className="text-xs text-slate-400 mb-1">Neg. Gap %</p>
+                                <div className="bg-slate-100 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Neg. Gap %</p>
                                     <p className="text-lg font-semibold text-slate-900 dark:text-white">{selectedDistrict.bio_negative_gap_ratio_30}%</p>
                                 </div>
-                                <div className="bg-slate-800/50 p-3 rounded-lg">
-                                    <p className="text-xs text-slate-400 mb-1">Points</p>
+                                <div className="bg-slate-100 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Points</p>
                                     <p className="text-lg font-semibold text-slate-900 dark:text-white">{selectedDistrict.points_used}</p>
                                 </div>
                             </div>
