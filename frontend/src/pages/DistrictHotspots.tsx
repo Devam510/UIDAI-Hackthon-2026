@@ -227,11 +227,11 @@ const DistrictHotspots: React.FC = () => {
 
             {/* KPI Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card className="bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700">
+                <Card className="bg-gradient-to-br from-blue-50 to-slate-50 dark:from-slate-800 dark:to-slate-900 border-slate-200 dark:border-slate-700">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-400 mb-1">Total Districts</p>
-                            <p className="text-3xl font-bold text-white">{data.count}</p>
+                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total Districts</p>
+                            <p className="text-3xl font-bold text-slate-900 dark:text-white">{data.count}</p>
                         </div>
                         <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
                             <MapPin className="text-blue-400" size={24} />
@@ -239,10 +239,10 @@ const DistrictHotspots: React.FC = () => {
                     </div>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-red-900/20 to-slate-900 border-red-900/50">
+                <Card className="bg-gradient-to-br from-red-50 to-slate-50 dark:from-red-900/20 dark:to-slate-900 border-red-200 dark:border-red-900/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-400 mb-1">Critical Districts</p>
+                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Critical Districts</p>
                             <p className="text-3xl font-bold text-red-400">{data.critical_count}</p>
                         </div>
                         <div className="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
@@ -251,14 +251,14 @@ const DistrictHotspots: React.FC = () => {
                     </div>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-orange-900/20 to-slate-900 border-orange-900/50">
+                <Card className="bg-gradient-to-br from-orange-50 to-slate-50 dark:from-orange-900/20 dark:to-slate-900 border-orange-200 dark:border-orange-900/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-400 mb-1">Highest Risk</p>
+                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Highest Risk</p>
                             <p className="text-lg font-bold text-orange-400 truncate">
                                 {data.highest_risk_district?.name || 'N/A'}
                             </p>
-                            <p className="text-sm text-slate-500">
+                            <p className="text-sm text-slate-500 dark:text-slate-500">
                                 Score: {data.highest_risk_district?.score || 0}
                             </p>
                         </div>
@@ -268,10 +268,10 @@ const DistrictHotspots: React.FC = () => {
                     </div>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-green-900/20 to-slate-900 border-green-900/50">
+                <Card className="bg-gradient-to-br from-green-50 to-slate-50 dark:from-green-900/20 dark:to-slate-900 border-green-200 dark:border-green-900/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-400 mb-1">Avg Risk Score</p>
+                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Avg Risk Score</p>
                             <p className="text-3xl font-bold text-green-400">{data.avg_risk_score.toFixed(1)}</p>
                         </div>
                         <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">

@@ -254,10 +254,10 @@ const BiometricHotspots: React.FC = () => {
 
             {/* KPI Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card className="bg-gradient-to-br from-blue-900/20 to-slate-900 border-blue-900/50">
+                <Card className="bg-gradient-to-br from-blue-50 to-slate-50 dark:from-blue-900/20 dark:to-slate-900 border-blue-200 dark:border-blue-900/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-400 mb-1">Avg Biometric Risk</p>
+                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Avg Biometric Risk</p>
                             <p className="text-3xl font-bold text-blue-400">{data.avg_risk_score.toFixed(1)}</p>
                         </div>
                         <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
@@ -266,10 +266,10 @@ const BiometricHotspots: React.FC = () => {
                     </div>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-red-900/20 to-slate-900 border-red-900/50">
+                <Card className="bg-gradient-to-br from-red-50 to-slate-50 dark:from-red-900/20 dark:to-slate-900 border-red-200 dark:border-red-900/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-400 mb-1">Severe Districts</p>
+                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Severe Districts</p>
                             <p className="text-3xl font-bold text-red-400">{data.severe_count}</p>
                         </div>
                         <div className="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
@@ -278,10 +278,10 @@ const BiometricHotspots: React.FC = () => {
                     </div>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-orange-900/20 to-slate-900 border-orange-900/50">
+                <Card className="bg-gradient-to-br from-orange-50 to-slate-50 dark:from-orange-900/20 dark:to-slate-900 border-orange-200 dark:border-orange-900/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-400 mb-1">Worst District</p>
+                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Worst District</p>
                             <p className="text-lg font-bold text-orange-400 truncate">
                                 {data.worst_district?.name || 'N/A'}
                             </p>
@@ -295,9 +295,9 @@ const BiometricHotspots: React.FC = () => {
                     </div>
                 </Card>
 
-                <Card className={`bg-gradient-to-br ${data.trend === 'Improving' ? 'from-green-900/20 border-green-900/50' :
-                    data.trend === 'Worsening' ? 'from-red-900/20 border-red-900/50' :
-                        'from-gray-900/20 border-gray-900/50'
+                <Card className={`bg-gradient-to-br ${data.trend === 'Improving' ? 'from-green-50 to-slate-50 dark:from-green-900/20 border-green-200 dark:border-green-900/50' :
+                    data.trend === 'Worsening' ? 'from-red-50 to-slate-50 dark:from-red-900/20 border-red-200 dark:border-red-900/50' :
+                        'from-gray-50 to-slate-50 dark:from-gray-900/20 border-gray-200 dark:border-gray-900/50'
                     } to-slate-900`}>
                     <div className="flex items-center justify-between">
                         <div>

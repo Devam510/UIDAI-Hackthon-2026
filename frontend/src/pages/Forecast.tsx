@@ -502,10 +502,10 @@ const Forecast: React.FC = () => {
             </div>
 
             {/* Trend Analysis Warning */}
-            <Card className="border-blue-500/50 bg-blue-900/10">
+            <Card className="border-blue-300 dark:border-blue-500/50 bg-blue-100 dark:bg-blue-900/10">
                 <div className="flex items-start gap-3">
-                    <AlertTriangle className="text-blue-400 mt-1 flex-shrink-0" size={20} />
-                    <div className="text-sm text-blue-200">
+                    <AlertTriangle className="text-blue-600 dark:text-blue-400 mt-1 flex-shrink-0" size={20} />
+                    <div className="text-sm text-slate-800 dark:text-blue-200">
                         <strong>⚠️ Trend Direction Analysis Only:</strong> This page shows trend direction (upward/downward), NOT future predictions.
                         {dataQuality && (
                             <div className="mt-1">
@@ -555,8 +555,8 @@ const Forecast: React.FC = () => {
                                 <Card className="group hover:scale-105 transition-transform duration-300 hover:shadow-xl hover:shadow-primary-500/20">
                                     <div className="flex items-start justify-between">
                                         <div>
-                                            <p className="text-slate-400 text-xs font-medium uppercase">Last Month Value</p>
-                                            <h3 className="text-2xl font-bold text-white mt-1">{lastMonthValue.toLocaleString()}</h3>
+                                            <p className="text-slate-600 dark:text-slate-400 text-xs font-medium uppercase">Last Month Value</p>
+                                            <h3 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{lastMonthValue.toLocaleString()}</h3>
                                         </div>
                                         <TrendingUp className="text-blue-500" size={20} />
                                     </div>
@@ -565,7 +565,7 @@ const Forecast: React.FC = () => {
                                 <Card className={`group hover:scale-105 transition-transform duration-300 hover:shadow-xl border`}>
                                     <div className="flex items-start justify-between">
                                         <div>
-                                            <p className="text-slate-400 text-xs font-medium uppercase">Trend Direction</p>
+                                            <p className="text-slate-600 dark:text-slate-400 text-xs font-medium uppercase">Trend Direction</p>
                                             <h3 className={`text-2xl font-bold mt-1 ${trendColor}`}>
                                                 {trendBadge} {trendBadge === 'Increasing' ? '📈' : trendBadge === 'Decreasing' ? '📉' : '➡️'}
                                             </h3>
@@ -580,8 +580,8 @@ const Forecast: React.FC = () => {
                                 <Card className="group hover:scale-105 transition-transform duration-300 hover:shadow-xl">
                                     <div className="flex items-start justify-between">
                                         <div>
-                                            <p className="text-slate-400 text-xs font-medium uppercase">Data Confidence</p>
-                                            <h3 className="text-2xl font-bold text-white mt-1 capitalize">
+                                            <p className="text-slate-600 dark:text-slate-400 text-xs font-medium uppercase">Data Confidence</p>
+                                            <h3 className="text-2xl font-bold text-slate-900 dark:text-white mt-1 capitalize">
                                                 {dataQuality?.confidence || 'Medium'}
                                             </h3>
                                             {dataQuality && (
