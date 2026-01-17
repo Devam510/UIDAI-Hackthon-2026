@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
-import { Search, Download, TrendingUp, AlertTriangle, Award, Activity, Sparkles } from 'lucide-react';
+import { Search, Download, TrendingUp, AlertTriangle, Award, Activity, Sparkles, MapPin } from 'lucide-react';
 import Card from '../components/Common/Card';
 import Loader from '../components/Common/Loader';
 import ErrorRetry from '../components/Common/ErrorRetry';
@@ -257,14 +257,14 @@ const BiometricHotspots: React.FC = () => {
             {/* KPI Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* 1. Total Districts - NEW */}
-                <Card className="bg-gradient-to-br from-purple-50 to-slate-50 dark:from-purple-900/20 dark:to-slate-900 border-purple-200 dark:border-purple-900/50">
+                <Card className="bg-gradient-to-br from-cyan-50 to-slate-50 dark:from-cyan-900/20 dark:to-slate-900 border-cyan-200 dark:border-cyan-900/50">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total Districts</p>
-                            <p className="text-3xl font-bold text-purple-400">{data.hotspots?.length || 0}</p>
+                            <p className="text-3xl font-bold text-cyan-400">{data.hotspots?.length || 0}</p>
                         </div>
-                        <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                            <MapPin className="text-purple-400" size={24} />
+                        <div className="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+                            <MapPin className="text-cyan-400" size={24} />
                         </div>
                     </div>
                 </Card>
@@ -301,14 +301,14 @@ const BiometricHotspots: React.FC = () => {
                 </Card>
 
                 {/* 4. Avg Biometric Risk - MOVED FROM 1ST */}
-                <Card className="bg-gradient-to-br from-blue-50 to-slate-50 dark:from-blue-900/20 dark:to-slate-900 border-blue-200 dark:border-blue-900/50">
+                <Card className="bg-gradient-to-br from-green-50 to-slate-50 dark:from-green-900/20 dark:to-slate-900 border-green-200 dark:border-green-900/50">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Avg Biometric Risk</p>
-                            <p className="text-3xl font-bold text-blue-400">{data.avg_risk_score.toFixed(1)}</p>
+                            <p className="text-3xl font-bold text-green-400">{data.avg_risk_score.toFixed(1)}</p>
                         </div>
-                        <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                            <TrendingUp className="text-blue-400" size={24} />
+                        <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <TrendingUp className="text-green-400" size={24} />
                         </div>
                     </div>
                 </Card>

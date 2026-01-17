@@ -18,7 +18,6 @@ interface DistrictRisk {
     negative_gap_ratio: number;
     severity_level: 'Low' | 'Moderate' | 'Severe';
     trend_data: number[];
-    recommendations: string[];
     total_enrolment: number;
 }
 
@@ -357,17 +356,15 @@ const DistrictHotspots: React.FC = () => {
                             </div>
 
 
-                            {/* Recommendations */}
+                            {/* vs State Average */}
                             <div className="pt-4 border-t border-slate-300 dark:border-slate-700">
-                                <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Recommended Actions</p>
-                                <ul className="space-y-2">
-                                    {selectedDistrict.recommendations.map((rec, idx) => (
-                                        <li key={idx} className="text-sm text-slate-700 dark:text-slate-300 flex items-start gap-2">
-                                            <span className="text-primary-400 mt-1">•</span>
-                                            <span>{rec}</span>
-                                        </li>
-                                    ))}
-                                </ul>
+                                <p className="text-sm text-slate-700 dark:text-slate-400 mb-1">vs State Average</p>
+                                <p className={`text-2xl font-bold ${(selectedDistrict.risk_score - (data?.avg_risk_score || 0)) > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                                    {(selectedDistrict.risk_score - (data?.avg_risk_score || 0)) > 0 ? '+' : ''}{(selectedDistrict.risk_score - (data?.avg_risk_score || 0)).toFixed(2)}
+                                </p>
+                                <p className="text-xs text-slate-500">
+                                    {(selectedDistrict.risk_score - (data?.avg_risk_score || 0)) > 0 ? 'Above' : 'Below'} state average
+                                </p>
                             </div>
                         </div>
                     ) : (
