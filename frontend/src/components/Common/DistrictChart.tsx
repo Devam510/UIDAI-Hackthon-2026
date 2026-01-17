@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { Search } from 'lucide-react';
 import clsx from 'clsx';
+import { useTheme } from '../../hooks/useTheme';
 
 interface DistrictData {
     name: string;
@@ -23,6 +24,7 @@ const DistrictChart: React.FC<DistrictChartProps> = ({
 }) => {
     const [mode, setMode] = useState<'enrolment' | 'biometric' | 'demographic'>('enrolment');
     const [searchTerm, setSearchTerm] = useState('');
+    const { theme } = useTheme();
 
     const currentData = mode === 'enrolment' ? enrolmentData : mode === 'biometric' ? biometricData : demographicData;
 
@@ -66,7 +68,7 @@ const DistrictChart: React.FC<DistrictChartProps> = ({
             type: 'value',
             max: 10,
             axisLine: { lineStyle: { color: '#334155' } },
-            axisLabel: { color: '#94a3b8' },
+            axisLabel: { color: theme === 'dark' ? '#94a3b8' : '#64748b' },
             splitLine: { lineStyle: { color: '#334155', type: 'dashed' } }
         },
         yAxis: {
@@ -74,7 +76,7 @@ const DistrictChart: React.FC<DistrictChartProps> = ({
             data: filteredData.map(d => d.name),
             axisLine: { lineStyle: { color: '#334155' } },
             axisLabel: {
-                color: '#94a3b8',
+                color: theme === 'dark' ? '#94a3b8' : '#334155',
                 fontSize: 12,
                 width: 100,
                 overflow: 'truncate'
