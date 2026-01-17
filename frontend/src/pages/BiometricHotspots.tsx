@@ -347,7 +347,7 @@ const BiometricHotspots: React.FC = () => {
                         <div className="space-y-4">
                             {/* Header */}
                             <div className="pb-4 border-b border-slate-700">
-                                <h3 className="text-xl font-bold text-white mb-2">{selectedDistrict.district}</h3>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{selectedDistrict.district}</h3>
                                 <div className="flex items-center gap-2 mb-2">
                                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${selectedDistrict.severity === 'Severe' ? 'bg-red-900/30 text-red-400 border border-red-900' :
                                         selectedDistrict.severity === 'Moderate' ? 'bg-orange-900/30 text-orange-400 border border-orange-900' :
@@ -365,15 +365,15 @@ const BiometricHotspots: React.FC = () => {
                             <div className="grid grid-cols-3 gap-2">
                                 <div className="bg-slate-800/50 p-3 rounded-lg">
                                     <p className="text-xs text-slate-400 mb-1">Bio Gap</p>
-                                    <p className="text-lg font-semibold text-white">{selectedDistrict.bio_gap_abs_mean_30}</p>
+                                    <p className="text-lg font-semibold text-slate-900 dark:text-white">{selectedDistrict.bio_gap_abs_mean_30}</p>
                                 </div>
                                 <div className="bg-slate-800/50 p-3 rounded-lg">
                                     <p className="text-xs text-slate-400 mb-1">Neg. Gap %</p>
-                                    <p className="text-lg font-semibold text-white">{selectedDistrict.bio_negative_gap_ratio_30}%</p>
+                                    <p className="text-lg font-semibold text-slate-900 dark:text-white">{selectedDistrict.bio_negative_gap_ratio_30}%</p>
                                 </div>
                                 <div className="bg-slate-800/50 p-3 rounded-lg">
                                     <p className="text-xs text-slate-400 mb-1">Points</p>
-                                    <p className="text-lg font-semibold text-white">{selectedDistrict.points_used}</p>
+                                    <p className="text-lg font-semibold text-slate-900 dark:text-white">{selectedDistrict.points_used}</p>
                                 </div>
                             </div>
 

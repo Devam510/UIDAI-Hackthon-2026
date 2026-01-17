@@ -282,7 +282,7 @@ const DemographicRisks: React.FC = () => {
                         <div className="space-y-4">
                             {/* Segment Header */}
                             <div className="pb-4 border-b border-slate-700">
-                                <h3 className="text-xl font-bold text-white mb-2">{selectedSegment.demographic_group}</h3>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{selectedSegment.demographic_group}</h3>
                                 <div className="flex items-center gap-2 mb-2">
                                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${selectedSegment.severity_level === 'Severe' ? 'bg-red-900/30 text-red-400 border border-red-900' :
                                         selectedSegment.severity_level === 'Moderate' ? 'bg-orange-900/30 text-orange-400 border border-orange-900' :
@@ -300,11 +300,11 @@ const DemographicRisks: React.FC = () => {
                             <div className="space-y-3">
                                 <div className="flex justify-between items-center">
                                     <span className="text-sm text-slate-700 dark:text-slate-400">Trend:</span>
-                                    <span className="text-sm font-semibold text-white capitalize">{selectedSegment.enrolment_trend}</span>
+                                    <span className="text-sm font-semibold text-slate-900 dark:text-white capitalize">{selectedSegment.enrolment_trend}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-sm text-slate-700 dark:text-slate-400">Deviation:</span>
-                                    <span className="text-sm font-semibold text-white">{selectedSegment.deviation_from_state_avg}%</span>
+                                    <span className="text-sm font-semibold text-slate-900 dark:text-white">{selectedSegment.deviation_from_state_avg}%</span>
                                 </div>
                             </div>
 
@@ -329,7 +329,7 @@ const DemographicRisks: React.FC = () => {
 
                             {/* Recommendations */}
                             <div className="pt-4 border-t border-slate-700">
-                                <p className="text-sm font-semibold text-white mb-3">Recommended Actions</p>
+                                <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Recommended Actions</p>
                                 {selectedSegment.recommendations && selectedSegment.recommendations.length > 0 ? (
                                     <ul className="space-y-2">
                                         {selectedSegment.recommendations.map((rec, idx) => (

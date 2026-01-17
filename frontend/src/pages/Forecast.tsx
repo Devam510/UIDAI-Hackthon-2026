@@ -631,7 +631,7 @@ const Forecast: React.FC = () => {
                                     onClick={() => setShowModelInfo(!showModelInfo)}
                                     className="w-full flex items-center justify-between text-left"
                                 >
-                                    <h3 className="text-lg font-bold text-white">📊 Model Information</h3>
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">📊 Model Information</h3>
                                     {showModelInfo ? <ChevronUp size={20} className="text-slate-400" /> : <ChevronDown size={20} className="text-slate-400" />}
                                 </button>
 
@@ -639,31 +639,31 @@ const Forecast: React.FC = () => {
                                     <div className="mt-4 space-y-3 text-sm border-t border-slate-700 pt-4">
                                         <div className="flex justify-between">
                                             <span className="text-slate-700 dark:text-slate-400">Date Range:</span>
-                                            <span className="text-white font-medium">{fromDate} to {toDate}</span>
+                                            <span className="text-slate-900 dark:text-white font-medium">{fromDate} to {toDate}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-slate-700 dark:text-slate-400">Horizon Days:</span>
-                                            <span className="text-white font-medium">{days} days</span>
+                                            <span className="text-slate-900 dark:text-white font-medium">{days} days</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-slate-700 dark:text-slate-400">Forecast Points Returned:</span>
-                                            <span className="text-white font-medium">{forecastData.length}</span>
+                                            <span className="text-slate-900 dark:text-white font-medium">{forecastData.length}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-slate-700 dark:text-slate-400">Historical Points:</span>
-                                            <span className="text-white font-medium">{historicalData.length}</span>
+                                            <span className="text-slate-900 dark:text-white font-medium">{historicalData.length}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-slate-700 dark:text-slate-400">Aggregation:</span>
-                                            <span className="text-white font-medium">Monthly (Trend-Based)</span>
+                                            <span className="text-slate-900 dark:text-white font-medium">Monthly (Trend-Based)</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-slate-700 dark:text-slate-400">Last Available Data:</span>
-                                            <span className="text-white font-medium">{lastAvailableDate}</span>
+                                            <span className="text-slate-900 dark:text-white font-medium">{lastAvailableDate}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-slate-700 dark:text-slate-400">Last Updated:</span>
-                                            <span className="text-white font-medium">
+                                            <span className="text-slate-900 dark:text-white font-medium">
                                                 {lastUpdated ? lastUpdated.toLocaleTimeString() : 'N/A'}
                                             </span>
                                         </div>
@@ -679,15 +679,15 @@ const Forecast: React.FC = () => {
                                         <div className="space-y-3 text-sm">
                                             <div className="flex justify-between">
                                                 <span className="text-slate-700 dark:text-slate-400">Model Type:</span>
-                                                <span className="text-white font-medium">{insights.model_health.model_type}</span>
+                                                <span className="text-slate-900 dark:text-white font-medium">{insights.model_health.model_type}</span>
                                             </div>
                                             <div className="flex justify-between">
                                                 <span className="text-slate-700 dark:text-slate-400">Training Date:</span>
-                                                <span className="text-white font-medium">{insights.model_health.training_date}</span>
+                                                <span className="text-slate-900 dark:text-white font-medium">{insights.model_health.training_date}</span>
                                             </div>
                                             <div className="flex justify-between">
                                                 <span className="text-slate-700 dark:text-slate-400">Data Points:</span>
-                                                <span className="text-white font-medium">{insights.model_health.data_points}</span>
+                                                <span className="text-slate-900 dark:text-white font-medium">{insights.model_health.data_points}</span>
                                             </div>
                                             <div className="flex justify-between">
                                                 <span className="text-slate-700 dark:text-slate-400">Last Retrain:</span>
@@ -705,7 +705,7 @@ const Forecast: React.FC = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <span className="text-white font-medium">
+                                                <span className="text-slate-900 dark:text-white font-medium">
                                                     {insights.model_health.error_mape === 'N/A'
                                                         ? 'N/A'
                                                         : `${insights.model_health.error_mape}%`}
