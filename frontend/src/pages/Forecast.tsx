@@ -599,8 +599,8 @@ const Forecast: React.FC = () => {
                                     <div className="flex items-start gap-3">
                                         <Sparkles className="text-primary-500 mt-1 flex-shrink-0" size={24} />
                                         <div className="flex-1">
-                                            <h3 className="text-lg font-bold text-white mb-2">📊 Trend Analysis</h3>
-                                            <div className="space-y-1 text-slate-300">
+                                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">📊 Trend Analysis</h3>
+                                            <div className="space-y-1 text-slate-700 dark:text-slate-300">
                                                 <p>• <strong>Direction:</strong> {trendAnalysis.interpretation}</p>
                                                 <p>• <strong>Slope:</strong> {trendAnalysis.slope > 0 ? '+' : ''}{Math.round(trendAnalysis.slope)} updates/month</p>
                                                 <p>• <strong>Confidence:</strong> {trendAnalysis.confidence} (based on {dataQuality?.training_months || 'limited'} months of data)</p>
