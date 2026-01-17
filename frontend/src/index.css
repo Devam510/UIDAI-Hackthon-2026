@@ -5,7 +5,31 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Light mode colors */
+    --color-bg: 255 255 255; /* white */
+    --color-bg-secondary: 248 250 252; /* slate-50 */
+    --color-card: 248 250 252; /* slate-50 */
+    --color-text: 15 23 42; /* slate-900 */
+    --color-text-muted: 100 116 139; /* slate-500 */
+    --color-border: 226 232 240; /* slate-200 */
+    --color-accent: 30 64 175; /* UIDAI blue-800 */
+  }
+
+  .dark {
+    /* Dark mode colors */
+    --color-bg: 15 23 42; /* slate-900 */
+    --color-bg-secondary: 30 41 59; /* slate-800 */
+    --color-card: 30 41 59; /* slate-800 */
+    --color-text: 241 245 249; /* slate-100 */
+    --color-text-muted: 148 163 184; /* slate-400 */
+    --color-border: 51 65 85; /* slate-700 */
+    --color-accent: 59 130 246; /* blue-500 */
+  }
+
   body {
-    @apply bg-slate-900 text-slate-100 font-sans;
+    @apply bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans;
+    transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
   }
 }
+
