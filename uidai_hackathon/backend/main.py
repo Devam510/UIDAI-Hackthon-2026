@@ -48,15 +48,27 @@ async def startup_event():
             return
         
         # Step 3: Load data from CSV if database is empty
-        logger.info("Database is empty. Loading data from CSV...")
+        logger.info("Database is empty. Attempting to load data from CSV...")
         
         # Find the CSV file
         project_root = Path(__file__).resolve().parents[1]  # uidai_hackathon folder
         csv_path = project_root / "data" / "processed" / "aadhaar_master_monthly.csv"
         
         if not csv_path.exists():
-            logger.error(f"❌ CSV file not found at {csv_path}")
-            logger.error("Database will remain empty. API endpoints may fail.")
+            logger.warning("=" * 80)
+            logger.warning("⚠️  CSV FILE NOT FOUND - DATABASE IS EMPTY")
+            logger.warning("=" * 80)
+            logger.warning(f"Expected CSV location: {csv_path}")
+            logger.warning("")
+            logger.warning("The database is empty and needs to be seeded with data.")
+            logger.warning("To upload data, use the /admin/upload-csv endpoint:")
+            logger.warning("")
+            logger.warning("  curl -X POST -F \"file=@aadhaar_master_monthly.csv\" \\")
+            logger.warning("    https://your-app.onrender.com/admin/upload-csv")
+            logger.warning("")
+            logger.warning("After uploading once, the PostgreSQL database will persist the data.")
+            logger.warning("You will NOT need to upload again on subsequent restarts.")
+            logger.warning("=" * 80)
             return
         
         # Ingest the CSV data
