@@ -376,6 +376,100 @@ For hackathon demo:
 
 ---
 
+## ☁️ Render Deployment (PostgreSQL)
+
+### Overview
+Deploy backend to Render with persistent PostgreSQL database. **CSV files are NOT pushed to Git** due to size limits (~22MB). Instead, use one-time manual upload.
+
+### 1. Create PostgreSQL Database
+
+1. Go to [Render Dashboard](https://dashboard.render.com/)
+2. Click **New** → **PostgreSQL**
+3. Configure:
+   - **Name**: `uidai-database`
+   - **Region**: Choose closest region
+   - **Plan**: Free tier
+4. Click **Create Database**
+5. **Copy Internal Database URL** (needed for backend)
+
+### 2. Deploy Backend Service
+
+1. **New** → **Web Service**
+2. Connect GitHub repository
+3. Configure:
+   - **Name**: `uidai-hackthon-2026`
+   - **Region**: Same as database
+   - **Root Directory**: `uidai_hackathon`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
+4. **Environment Variable**:
+   - Key: `DATABASE_URL`
+   - Value: (Paste Internal Database URL from Step 1)
+5. Click **Create Web Service**
+
+### 3. Initial Deployment
+
+Backend starts successfully but database is **empty**. Check logs:
+```
+================================================================================
+⚠️  CSV FILE NOT FOUND - DATABASE IS EMPTY
+================================================================================
+```
+
+This is **expected** on first deployment.
+
+### 4. Seed Database (One-Time Only) ⚡
+
+Upload CSV to populate database:
+
+```bash
+curl -X POST -F "file=@uidai_hackathon/data/processed/aadhaar_master_monthly.csv" \
+  https://uidai-hackthon-2026.onrender.com/admin/upload-csv
+```
+
+**Expected response:**
+```json
+{
+  "status": "success",
+  "records_loaded": 123456
+}
+```
+
+### 5. Verify Persistence
+
+1. Check frontend - data should appear
+2. Restart backend service on Render
+3. Check logs:
+   ```
+   ✅ Database already contains 123456 records. Skipping data load.
+   ```
+4. Frontend still shows data ✅
+
+### Important Notes
+
+✅ **Upload CSV only once** - PostgreSQL persists data  
+✅ **No re-upload needed** on restarts/redeployments  
+🔄 **Re-upload only if** you want to refresh data or recreated database  
+🚫 **CSV not in Git** - too large for GitHub limits
+
+### Frontend (GitHub Pages)
+
+1. Update `frontend/.env.production`:
+   ```
+   VITE_API_BASE_URL=https://uidai-hackthon-2026.onrender.com
+   ```
+
+2. Deploy:
+   ```bash
+   cd frontend
+   npm run build
+   npm run deploy
+   ```
+
+
+
+---
+
 ## ✅ Deployment Checklist
 
 - [ ] Backend runs without errors
