@@ -353,7 +353,7 @@ const DemographicRisks: React.FC = () => {
             </div>
 
             {/* AI Insights Panel */}
-            <Card title="🤖 AI Demographic Insight" className="bg-gradient-to-br from-purple-900/10 to-slate-900 border-purple-900/30">
+            <Card title="🤖 AI Demographic Insight" className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/10 dark:to-slate-900 border-purple-200 dark:border-purple-900/30">
                 {loadingInsights ? (
                     <div className="flex items-center justify-center py-8">
                         <Loader />
