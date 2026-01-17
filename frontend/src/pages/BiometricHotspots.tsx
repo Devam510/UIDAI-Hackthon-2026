@@ -380,7 +380,7 @@ const BiometricHotspots: React.FC = () => {
 
                             {/* Trend Sparkline */}
                             <div className="pt-4 border-t border-slate-700">
-                                <p className="text-sm text-slate-400 mb-2">30-Day Risk Trend</p>
+                                <p className="text-sm text-slate-700 dark:text-slate-400 mb-2">30-Day Risk Trend</p>
                                 <Sparkline
                                     data={selectedDistrict.trend_data}
                                     label=""
@@ -396,7 +396,7 @@ const BiometricHotspots: React.FC = () => {
 
                             {/* Compare to State Avg */}
                             <div className="pt-4 border-t border-slate-700">
-                                <p className="text-sm text-slate-400 mb-1">vs State Average</p>
+                                <p className="text-sm text-slate-700 dark:text-slate-400 mb-1">vs State Average</p>
                                 <p className={`text-2xl font-bold ${selectedDistrict.compare_to_avg > 0 ? 'text-red-400' : 'text-green-400'}`}>
                                     {selectedDistrict.compare_to_avg > 0 ? '+' : ''}{selectedDistrict.compare_to_avg}
                                 </p>
