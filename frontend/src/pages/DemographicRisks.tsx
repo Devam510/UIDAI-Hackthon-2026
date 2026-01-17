@@ -293,8 +293,11 @@ const DemographicRisks: React.FC = () => {
                                         {selectedSegment.severity_level}
                                     </span>
                                 </div>
-                                <div className="text-4xl font-bold" style={{ color: getSeverityColor(selectedSegment.severity_level) }}>
-                                    {selectedSegment.risk_score.toFixed(1)}
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-slate-600 dark:text-slate-400">Risk Score:</span>
+                                    <div className="text-4xl font-bold" style={{ color: getSeverityColor(selectedSegment.severity_level) }}>
+                                        {selectedSegment.risk_score.toFixed(1)}
+                                    </div>
                                 </div>
                             </div>
 
