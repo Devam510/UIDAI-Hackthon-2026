@@ -9,6 +9,7 @@ import DataTimestamp from '../components/Common/DataTimestamp';
 import ExportButton from '../components/Common/ExportButton';
 import client from '../api/client';
 import { useStateContext } from '../context/StateContext';
+import { useTheme } from '../hooks/useTheme';
 
 interface DistrictRisk {
     district: string;
@@ -23,6 +24,7 @@ interface DistrictRisk {
 
 const DistrictHotspots: React.FC = () => {
     const { selectedState } = useStateContext();
+    const { theme } = useTheme();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [data, setData] = useState<any>(null);
@@ -128,7 +130,7 @@ const DistrictHotspots: React.FC = () => {
         xAxis: {
             type: 'value',
             axisLine: { lineStyle: { color: '#334155' } },
-            axisLabel: { color: '#94a3b8' },
+            axisLabel: { color: theme === 'dark' ? '#94a3b8' : '#64748b' },
             splitLine: { lineStyle: { color: '#334155', type: 'dashed' } }
         },
         yAxis: {
@@ -136,7 +138,7 @@ const DistrictHotspots: React.FC = () => {
             data: filteredDistricts.map((d: DistrictRisk) => d.district),
             axisLine: { lineStyle: { color: '#334155' } },
             axisLabel: {
-                color: '#94a3b8',
+                color: theme === 'dark' ? '#94a3b8' : '#334155',
                 fontSize: 12,
                 width: 100,
                 overflow: 'truncate'
@@ -356,11 +358,11 @@ const DistrictHotspots: React.FC = () => {
 
 
                             {/* Recommendations */}
-                            <div className="pt-4 border-t border-slate-700">
+                            <div className="pt-4 border-t border-slate-300 dark:border-slate-700">
                                 <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Recommended Actions</p>
                                 <ul className="space-y-2">
                                     {selectedDistrict.recommendations.map((rec, idx) => (
-                                        <li key={idx} className="text-sm text-slate-300 flex items-start gap-2">
+                                        <li key={idx} className="text-sm text-slate-700 dark:text-slate-300 flex items-start gap-2">
                                             <span className="text-primary-400 mt-1">•</span>
                                             <span>{rec}</span>
                                         </li>
