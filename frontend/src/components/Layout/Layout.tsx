@@ -52,7 +52,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }, [mobileDrawerOpen]);
 
     return (
-        <div className="h-screen w-full overflow-hidden bg-slate-950 text-slate-100 font-sans">
+        <div className="h-screen w-full overflow-hidden bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-200">
             {/* Sidebar for desktop */}
             <Sidebar
                 collapsed={sidebarCollapsed}
