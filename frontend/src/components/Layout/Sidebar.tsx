@@ -26,12 +26,12 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse, isMobile
 
     return (
         <aside className={clsx(
-            "min-h-screen bg-dark-bg border-r border-slate-800 flex flex-col fixed left-0 top-0 bottom-0 transition-all duration-300",
+            "min-h-screen bg-slate-50 dark:bg-dark-bg border-r border-slate-200 dark:border-slate-800 flex flex-col fixed left-0 top-0 bottom-0 transition-all duration-300",
             sidebarWidth,
             isMobile ? 'z-40 lg:hidden' : 'hidden lg:flex z-20'
         )}>
             {/* Header */}
-            <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800">
+            <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
                 <div
                     className={clsx(
                         "flex items-center gap-3",
@@ -60,7 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse, isMobile
                 {isMobile && onClose && (
                     <button
                         onClick={onClose}
-                        className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                        className="p-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
                         aria-label="Close menu"
                     >
                         <X size={20} />
@@ -72,7 +72,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse, isMobile
                     <Tooltip content="Collapse sidebar">
                         <button
                             onClick={onToggleCollapse}
-                            className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                            className="p-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
                             aria-label="Collapse sidebar"
                         >
                             <ChevronLeft size={18} />
@@ -98,7 +98,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse, isMobile
                                     'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200',
                                     isActive
                                         ? 'bg-primary-600 text-white shadow-lg shadow-primary-900/50'
-                                        : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                                        : 'text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800'
                                 )
                             }
                         >
@@ -114,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse, isMobile
             {/* Footer */}
             <div className={
                 clsx(
-                    "p-4 border-t border-slate-800 text-xs text-slate-500",
+                    "p-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-500",
                     collapsed && !isMobile ? "text-center" : ""
                 )}>
                 {collapsed && !isMobile ? (
