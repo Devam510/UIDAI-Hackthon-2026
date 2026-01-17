@@ -492,7 +492,7 @@ const Forecast: React.FC = () => {
 
             {/* Header with Controls */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                <h2 className="text-xl md:text-2xl font-bold text-white">Forecast: {selectedState}</h2>
+                <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">Forecast: {selectedState}</h2>
                 <ExportButton
                     endpoint="/export/csv/forecast"
                     filename={`forecast_${selectedState}_${new Date().toISOString().split('T')[0]}.csv`}

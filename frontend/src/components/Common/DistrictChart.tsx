@@ -102,14 +102,14 @@ const DistrictChart: React.FC<DistrictChartProps> = ({
             {/* Controls */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 {/* Toggle Switch */}
-                <div className="flex items-center gap-2 bg-slate-800/50 rounded-lg p-1">
+                <div className="flex items-center gap-2 bg-slate-200 dark:bg-slate-800/50 rounded-lg p-1">
                     <button
                         onClick={() => handleModeChange('enrolment')}
                         className={clsx(
                             "px-4 py-2 rounded-md text-sm font-medium transition-all duration-200",
                             mode === 'enrolment'
                                 ? "bg-primary-600 text-white shadow-lg"
-                                : "text-slate-400 hover:text-white"
+                                : "text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                         )}
                     >
                         Enrolment Risk
@@ -120,7 +120,7 @@ const DistrictChart: React.FC<DistrictChartProps> = ({
                             "px-4 py-2 rounded-md text-sm font-medium transition-all duration-200",
                             mode === 'biometric'
                                 ? "bg-primary-600 text-white shadow-lg"
-                                : "text-slate-400 hover:text-white"
+                                : "text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                         )}
                     >
                         Biometric Risk
@@ -131,7 +131,7 @@ const DistrictChart: React.FC<DistrictChartProps> = ({
                             "px-4 py-2 rounded-md text-sm font-medium transition-all duration-200",
                             mode === 'demographic'
                                 ? "bg-primary-600 text-white shadow-lg"
-                                : "text-slate-400 hover:text-white"
+                                : "text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                         )}
                     >
                         Demographic Risk
@@ -146,7 +146,7 @@ const DistrictChart: React.FC<DistrictChartProps> = ({
                         placeholder="Search districts..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="bg-slate-800/50 border border-slate-700 text-slate-200 text-sm rounded-lg pl-10 pr-4 py-2 w-full focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all"
+                        className="bg-white dark:bg-slate-800/50 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-sm rounded-lg pl-10 pr-4 py-2 w-full focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all"
                     />
                 </div>
             </div>

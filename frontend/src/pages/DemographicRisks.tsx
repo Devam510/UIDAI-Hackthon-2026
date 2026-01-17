@@ -183,7 +183,7 @@ const DemographicRisks: React.FC = () => {
         <div className="space-y-6 animate-in fade-in duration-500">
             {/* Header with Controls */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                <h2 className="text-xl md:text-2xl font-bold text-white">Demographic Risk Analysis: {selectedState}</h2>
+                <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">Demographic Risk Analysis: {selectedState}</h2>
 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
                     {/* Search */}
@@ -194,7 +194,7 @@ const DemographicRisks: React.FC = () => {
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Search segment..."
-                            className="bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg pl-9 pr-4 py-2 w-full focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                            className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-sm rounded-lg pl-9 pr-4 py-2 w-full focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
                         />
                     </div>
                 </div>
