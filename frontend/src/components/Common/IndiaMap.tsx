@@ -83,7 +83,7 @@ const IndiaMap: React.FC<IndiaMapProps> = ({ statesData, onStateClick }) => {
                 <div className="space-y-1">
                     <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded" style={{ backgroundColor: '#22c55e' }}></div>
-                        <span className="text-xs text-slate-700 dark:text-slate-300">Low (<4)</span>
+                        <span className="text-xs text-slate-700 dark:text-slate-300">Low (&lt;4)</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded" style={{ backgroundColor: '#f97316' }}></div>
