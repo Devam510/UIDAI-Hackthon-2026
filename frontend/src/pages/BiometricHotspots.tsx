@@ -298,13 +298,13 @@ const BiometricHotspots: React.FC = () => {
                 <Card className={`bg-gradient-to-br ${data.trend === 'Improving' ? 'from-green-50 to-slate-50 dark:from-green-900/20 border-green-200 dark:border-green-900/50' :
                     data.trend === 'Worsening' ? 'from-red-50 to-slate-50 dark:from-red-900/20 border-red-200 dark:border-red-900/50' :
                         'from-gray-50 to-slate-50 dark:from-gray-900/20 border-gray-200 dark:border-gray-900/50'
-                    } to-slate-900`}>
+                    } dark:to-slate-900`}>
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-400 mb-1">Trend</p>
-                            <p className={`text-2xl font-bold ${data.trend === 'Improving' ? 'text-green-400' :
-                                data.trend === 'Worsening' ? 'text-red-400' :
-                                    'text-gray-400'
+                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Trend</p>
+                            <p className={`text-2xl font-bold ${data.trend === 'Improving' ? 'text-green-700 dark:text-green-400' :
+                                data.trend === 'Worsening' ? 'text-red-700 dark:text-red-400' :
+                                    'text-gray-700 dark:text-gray-400'
                                 }`}>{data.trend}</p>
                         </div>
                         <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${data.trend === 'Improving' ? 'bg-green-500/20' :
