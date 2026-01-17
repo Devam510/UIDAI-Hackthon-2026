@@ -326,7 +326,7 @@ const BiometricHotspots: React.FC = () => {
             {/* Main Content: Chart + Drilldown */}
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                 {/* Chart */}
-                <Card title="Top 20 Biometric Risk Zones" className="lg:col-span-3">
+                <Card title={`Top ${filteredHotspots.length} Biometric Risk Zones`} className="lg:col-span-3">
                     <div className="h-[500px] w-full">
                         {filteredHotspots.length > 0 ? (
                             <ReactECharts

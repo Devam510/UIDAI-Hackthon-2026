@@ -286,7 +286,7 @@ const DistrictHotspots: React.FC = () => {
             {/* Main Content: Chart + Details Panel */}
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                 {/* Chart */}
-                <Card title="Top 20 Critical Districts" className="lg:col-span-3">
+                <Card title={`Top ${filteredDistricts.length} Critical Districts`} className="lg:col-span-3">
                     <div className="h-[500px] w-full">
                         {filteredDistricts.length > 0 ? (
                             <ReactECharts

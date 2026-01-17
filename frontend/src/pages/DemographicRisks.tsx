@@ -261,7 +261,7 @@ const DemographicRisks: React.FC = () => {
             {/* Main Content: Chart + Details Panel */}
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                 {/* Chart */}
-                <Card title="Top 20 Demographic Risk Segments" className="lg:col-span-3">
+                <Card title={`Top ${filteredSegments.length} Demographic Risk Segments`} className="lg:col-span-3">
                     <div className="h-[500px] w-full">
                         {filteredSegments.length > 0 ? (
                             <ReactECharts
