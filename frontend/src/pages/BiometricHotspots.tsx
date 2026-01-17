@@ -256,18 +256,20 @@ const BiometricHotspots: React.FC = () => {
 
             {/* KPI Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card className="bg-gradient-to-br from-blue-50 to-slate-50 dark:from-blue-900/20 dark:to-slate-900 border-blue-200 dark:border-blue-900/50">
+                {/* 1. Total Districts - NEW */}
+                <Card className="bg-gradient-to-br from-purple-50 to-slate-50 dark:from-purple-900/20 dark:to-slate-900 border-purple-200 dark:border-purple-900/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Avg Biometric Risk</p>
-                            <p className="text-3xl font-bold text-blue-400">{data.avg_risk_score.toFixed(1)}</p>
+                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total Districts</p>
+                            <p className="text-3xl font-bold text-purple-400">{data.hotspots?.length || 0}</p>
                         </div>
-                        <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                            <TrendingUp className="text-blue-400" size={24} />
+                        <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                            <MapPin className="text-purple-400" size={24} />
                         </div>
                     </div>
                 </Card>
 
+                {/* 2. Severe Districts - STAYS */}
                 <Card className="bg-gradient-to-br from-red-50 to-slate-50 dark:from-red-900/20 dark:to-slate-900 border-red-200 dark:border-red-900/50">
                     <div className="flex items-center justify-between">
                         <div>
@@ -280,6 +282,7 @@ const BiometricHotspots: React.FC = () => {
                     </div>
                 </Card>
 
+                {/* 3. Worst District - STAYS */}
                 <Card className="bg-gradient-to-br from-orange-50 to-slate-50 dark:from-orange-900/20 dark:to-slate-900 border-orange-200 dark:border-orange-900/50">
                     <div className="flex items-center justify-between">
                         <div>
@@ -297,27 +300,15 @@ const BiometricHotspots: React.FC = () => {
                     </div>
                 </Card>
 
-                <Card className={`bg-gradient-to-br ${data.trend === 'Improving' ? 'from-green-50 to-slate-50 dark:from-green-900/20 border-green-200 dark:border-green-900/50' :
-                    data.trend === 'Worsening' ? 'from-red-50 to-slate-50 dark:from-red-900/20 border-red-200 dark:border-red-900/50' :
-                        'from-gray-50 to-slate-50 dark:from-gray-900/20 border-gray-200 dark:border-gray-900/50'
-                    } dark:to-slate-900`}>
+                {/* 4. Avg Biometric Risk - MOVED FROM 1ST */}
+                <Card className="bg-gradient-to-br from-blue-50 to-slate-50 dark:from-blue-900/20 dark:to-slate-900 border-blue-200 dark:border-blue-900/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Trend</p>
-                            <p className={`text-2xl font-bold ${data.trend === 'Improving' ? 'text-green-700 dark:text-green-400' :
-                                data.trend === 'Worsening' ? 'text-red-700 dark:text-red-400' :
-                                    'text-gray-700 dark:text-gray-400'
-                                }`}>{data.trend}</p>
+                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Avg Biometric Risk</p>
+                            <p className="text-3xl font-bold text-blue-400">{data.avg_risk_score.toFixed(1)}</p>
                         </div>
-                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${data.trend === 'Improving' ? 'bg-green-500/20' :
-                            data.trend === 'Worsening' ? 'bg-red-500/20' :
-                                'bg-gray-500/20'
-                            }`}>
-                            <Activity className={
-                                data.trend === 'Improving' ? 'text-green-400' :
-                                    data.trend === 'Worsening' ? 'text-red-400' :
-                                        'text-gray-400'
-                            } size={24} />
+                        <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <TrendingUp className="text-blue-400" size={24} />
                         </div>
                     </div>
                 </Card>
