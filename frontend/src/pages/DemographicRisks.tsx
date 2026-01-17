@@ -434,9 +434,9 @@ const DemographicRisks: React.FC = () => {
                                     <td className="px-4 py-3 text-center text-slate-700 dark:text-slate-300">{s.deviation_from_state_avg}%</td>
                                     <td className="px-4 py-3 text-center text-slate-700 dark:text-slate-300 capitalize">{s.enrolment_trend}</td>
                                     <td className="px-4 py-3 text-center">
-                                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${s.severity_level === 'Severe' ? 'bg-red-900/30 text-red-400 border border-red-900' :
-                                            s.severity_level === 'Moderate' ? 'bg-orange-900/30 text-orange-400 border border-orange-900' :
-                                                'bg-green-900/30 text-green-400 border border-green-900'
+                                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${s.severity_level === 'Severe' ? 'bg-red-100 text-red-700 border border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-900' :
+                                            s.severity_level === 'Moderate' ? 'bg-orange-100 text-orange-700 border border-orange-300 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-900' :
+                                                'bg-green-100 text-green-700 border border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-900'
                                             }`}>
                                             {s.severity_level}
                                         </span>
