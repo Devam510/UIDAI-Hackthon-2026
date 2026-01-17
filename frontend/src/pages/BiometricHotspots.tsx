@@ -342,7 +342,7 @@ const BiometricHotspots: React.FC = () => {
                 </Card>
 
                 {/* District Drilldown Panel */}
-                <Card title="District Drilldown" className="lg:col-span-2">
+                <Card title="District Details" className="lg:col-span-2">
                     {selectedDistrict ? (
                         <div className="space-y-4">
                             {/* Header */}
