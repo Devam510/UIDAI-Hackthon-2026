@@ -182,7 +182,7 @@ const Overview: React.FC = () => {
 
             {/* Header with Export Controls */}
             <div className="flex flex-wrap items-center justify-between gap-4">
-                <h2 className="text-xl md:text-2xl font-bold text-white">Overview: {selectedState}</h2>
+                <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">Overview: {selectedState}</h2>
                 <div className="flex items-center gap-3">
                     <ExportButton
                         endpoint="/export/csv/district-risks"
@@ -205,7 +205,7 @@ const Overview: React.FC = () => {
                                 <p className="text-slate-400 text-sm font-medium group-hover:text-slate-300 transition-colors">{kpi.label}</p>
                                 <h3 className={`text - 3xl font - bold mt - 2 ${kpi.color} group - hover: scale - 110 transition - transform duration - 300`}>{kpi.value}</h3>
                             </div>
-                            <div className="p-2 bg-slate-800/50 rounded-lg group-hover:bg-slate-700/70 group-hover:scale-110 transition-all duration-300">{kpi.icon}</div>
+                            <div className="p-2 bg-slate-200 dark:bg-slate-800/50 rounded-lg group-hover:bg-slate-300 dark:group-hover:bg-slate-700/70 group-hover:scale-110 transition-all duration-300">{kpi.icon}</div>
                         </div>
                         <div className="absolute -bottom-4 -right-4 text-slate-800/50 opacity-20 transform scale-150 rotate-12 group-hover:opacity-30 group-hover:scale-[1.7] transition-all duration-300">
                             {kpi.icon}

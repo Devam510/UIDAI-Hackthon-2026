@@ -65,16 +65,16 @@ const QuickStartGuide: React.FC<QuickStartGuideProps> = ({ onClose }) => {
 
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-            <div className="bg-gradient-to-br from-slate-900 to-slate-800 border border-primary-500/30 rounded-2xl shadow-2xl max-w-2xl w-full animate-in zoom-in duration-300">
+            <div className="bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 border border-slate-300 dark:border-primary-500/30 rounded-2xl shadow-2xl max-w-2xl w-full animate-in zoom-in duration-300">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-slate-700">
-                    <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                         <span className="text-3xl">{steps[currentStep].icon}</span>
                         Quick Start Guide
                     </h2>
                     <button
                         onClick={handleClose}
-                        className="text-slate-400 hover:text-white transition-colors p-2 hover:bg-slate-700 rounded-lg"
+                        className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg"
                     >
                         <X size={24} />
                     </button>
@@ -83,10 +83,10 @@ const QuickStartGuide: React.FC<QuickStartGuideProps> = ({ onClose }) => {
                 {/* Content */}
                 <div className="p-8">
                     <div className="mb-6">
-                        <h3 className="text-xl font-semibold text-white mb-3">
+                        <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">
                             {steps[currentStep].title}
                         </h3>
-                        <p className="text-slate-300 text-lg leading-relaxed">
+                        <p className="text-slate-700 dark:text-slate-300 text-lg leading-relaxed">
                             {steps[currentStep].description}
                         </p>
                     </div>
@@ -100,26 +100,26 @@ const QuickStartGuide: React.FC<QuickStartGuideProps> = ({ onClose }) => {
                                     ? 'w-8 bg-primary-500'
                                     : index < currentStep
                                         ? 'w-2 bg-primary-400'
-                                        : 'w-2 bg-slate-600'
+                                        : 'w-2 bg-slate-300 dark:bg-slate-600'
                                     }`}
                             />
                         ))}
                     </div>
 
                     {/* Step Counter */}
-                    <p className="text-center text-slate-400 text-sm mb-6">
+                    <p className="text-center text-slate-600 dark:text-slate-400 text-sm mb-6">
                         Step {currentStep + 1} of {steps.length}
                     </p>
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-between p-6 border-t border-slate-700 bg-slate-800/50">
-                    <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                <div className="flex items-center justify-between p-6 border-t border-slate-200 dark:border-slate-700 bg-slate-100/50 dark:bg-slate-800/50">
+                    <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 cursor-pointer">
                         <input
                             type="checkbox"
                             checked={dontShowAgain}
                             onChange={(e) => setDontShowAgain(e.target.checked)}
-                            className="w-4 h-4 rounded border-slate-600 bg-slate-700 text-primary-500 focus:ring-2 focus:ring-primary-500"
+                            className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-primary-500 focus:ring-2 focus:ring-primary-500"
                         />
                         Don't show this again
                     </label>
@@ -128,7 +128,7 @@ const QuickStartGuide: React.FC<QuickStartGuideProps> = ({ onClose }) => {
                         {currentStep > 0 && (
                             <button
                                 onClick={handlePrevious}
-                                className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+                                className="flex items-center gap-2 px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white rounded-lg transition-colors"
                             >
                                 <ChevronLeft size={18} />
                                 Previous

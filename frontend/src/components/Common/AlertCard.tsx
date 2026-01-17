@@ -60,7 +60,7 @@ const AlertCard: React.FC<AlertCardProps> = ({
                     <h4 className={clsx("font-semibold text-sm mb-1", config.textColor)}>
                         {title}
                     </h4>
-                    <p className="text-xs text-slate-400 leading-relaxed">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                         {description}
                     </p>
                     {action && (

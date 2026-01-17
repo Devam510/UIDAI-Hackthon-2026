@@ -239,21 +239,21 @@ const Home: React.FC = () => {
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl"></div>
 
                 <div className="relative z-10">
-                    <h1 className="text-4xl md:text-5xl font-bold text-white mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400">
+                    <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 dark:from-blue-400 dark:via-purple-400 dark:to-indigo-400">
                         UIDAI Insight Platform
                     </h1>
-                    <p className="text-lg text-slate-300 mb-8 max-w-2xl">
+                    <p className="text-lg text-slate-700 dark:text-slate-300 mb-8 max-w-2xl">
                         AI-powered insights for Aadhaar enrolment, anomalies, and biometric stability
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                         <div className="flex items-center gap-3">
-                            <label className="text-sm text-slate-400 font-medium">Select State:</label>
+                            <label className="text-sm text-slate-700 dark:text-slate-400 font-medium">Select State:</label>
                             <div className="relative">
                                 <select
                                     value={selectedStateLocal}
                                     onChange={(e) => setSelectedStateLocal(e.target.value)}
-                                    className="appearance-none bg-slate-800 border border-slate-700 text-white pl-4 pr-10 py-2.5 rounded-lg text-sm font-medium focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500 cursor-pointer min-w-[200px]"
+                                    className="appearance-none bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white pl-4 pr-10 py-2.5 rounded-lg text-sm font-medium focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500 cursor-pointer min-w-[200px]"
                                 >
                                     {states.map(s => <option key={s} value={s}>{s}</option>)}
                                 </select>
@@ -274,7 +274,7 @@ const Home: React.FC = () => {
 
             {/* Interactive India Map */}
             <div className="mb-8">
-                <h2 className="text-2xl font-bold text-white mb-4">National Risk Overview</h2>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">National Risk Overview</h2>
                 <IndiaMap
                     statesData={statesData}
                     onStateClick={(stateName) => {
@@ -288,7 +288,7 @@ const Home: React.FC = () => {
             {/* Priority Flashcards Section */}
             <div>
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-2xl font-bold text-white">Top Priority States</h2>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Top Priority States</h2>
                     <span className="text-sm text-slate-400">Sorted by Risk Score</span>
                 </div>
 
@@ -310,8 +310,8 @@ const Home: React.FC = () => {
                     </div>
 
                     {/* Gradient fade on edges */}
-                    <div className="absolute top-0 left-0 bottom-4 w-8 bg-gradient-to-r from-slate-900 to-transparent pointer-events-none"></div>
-                    <div className="absolute top-0 right-0 bottom-4 w-8 bg-gradient-to-l from-slate-900 to-transparent pointer-events-none"></div>
+                    <div className="absolute top-0 left-0 bottom-4 w-8 bg-gradient-to-r from-white dark:from-slate-900 to-transparent pointer-events-none"></div>
+                    <div className="absolute top-0 right-0 bottom-4 w-8 bg-gradient-to-l from-white dark:from-slate-900 to-transparent pointer-events-none"></div>
                 </div>
             </div>
 
@@ -321,7 +321,7 @@ const Home: React.FC = () => {
                 <Card title="Priority Details" className="lg:col-span-2">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left">
-                            <thead className="text-xs text-slate-400 uppercase bg-slate-800/50">
+                            <thead className="text-xs text-slate-600 dark:text-slate-400 uppercase bg-slate-100 dark:bg-slate-800/50">
                                 <tr>
                                     <th className="px-4 py-3">State</th>
                                     <th className="px-4 py-3 text-center">Risk Score</th>
@@ -334,7 +334,7 @@ const Home: React.FC = () => {
                                     <tr
                                         key={state.name}
                                         onClick={() => handleStateRowClick(state.name)}
-                                        className="hover:bg-slate-800/30 transition-colors cursor-pointer"
+                                        className="hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors cursor-pointer"
                                     >
                                         <td className="px-4 py-3 font-medium text-slate-200">{state.name}</td>
                                         <td className="px-4 py-3 text-center">
