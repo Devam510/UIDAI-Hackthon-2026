@@ -420,19 +420,19 @@ const DemographicRisks: React.FC = () => {
                                 <th className="px-4 py-3 text-center">Severity</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-700">
+                        <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                             {filteredSegments.map((s: DemographicSegment, idx: number) => (
                                 <tr
                                     key={idx}
                                     onClick={() => setSelectedSegment(s)}
-                                    className="hover:bg-slate-800/30 transition-colors cursor-pointer"
+                                    className="hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors cursor-pointer"
                                 >
-                                    <td className="px-4 py-3 font-medium text-slate-200">{s.demographic_group}</td>
+                                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-200">{s.demographic_group}</td>
                                     <td className="px-4 py-3 text-center font-bold" style={{ color: getSeverityColor(s.severity_level) }}>
                                         {s.risk_score.toFixed(1)}
                                     </td>
-                                    <td className="px-4 py-3 text-center text-slate-300">{s.deviation_from_state_avg}%</td>
-                                    <td className="px-4 py-3 text-center text-slate-300 capitalize">{s.enrolment_trend}</td>
+                                    <td className="px-4 py-3 text-center text-slate-700 dark:text-slate-300">{s.deviation_from_state_avg}%</td>
+                                    <td className="px-4 py-3 text-center text-slate-700 dark:text-slate-300 capitalize">{s.enrolment_trend}</td>
                                     <td className="px-4 py-3 text-center">
                                         <span className={`px-2 py-0.5 rounded text-xs font-medium ${s.severity_level === 'Severe' ? 'bg-red-900/30 text-red-400 border border-red-900' :
                                             s.severity_level === 'Moderate' ? 'bg-orange-900/30 text-orange-400 border border-orange-900' :
@@ -445,7 +445,7 @@ const DemographicRisks: React.FC = () => {
                             ))}
                             {filteredSegments.length === 0 && (
                                 <tr>
-                                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                                    <td colSpan={5} className="px-4 py-8 text-center text-slate-600 dark:text-slate-500">
                                         No segments found.
                                     </td>
                                 </tr>

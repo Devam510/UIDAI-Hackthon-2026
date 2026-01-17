@@ -444,19 +444,19 @@ const DistrictHotspots: React.FC = () => {
                                 <th className="px-4 py-3 text-center">Severity</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-700">
+                        <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                             {filteredDistricts.map((d: DistrictRisk, idx: number) => (
                                 <tr
                                     key={idx}
                                     onClick={() => setSelectedDistrict(d)}
-                                    className="hover:bg-slate-800/30 transition-colors cursor-pointer"
+                                    className="hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors cursor-pointer"
                                 >
-                                    <td className="px-4 py-3 font-medium text-slate-200">{d.district}</td>
+                                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-200">{d.district}</td>
                                     <td className="px-4 py-3 text-center font-bold" style={{ color: getSeverityColor(d.severity_level) }}>
                                         {d.risk_score}
                                     </td>
-                                    <td className="px-4 py-3 text-center text-slate-300">{d.gap_abs_mean}</td>
-                                    <td className="px-4 py-3 text-center text-slate-300">{d.negative_gap_ratio}%</td>
+                                    <td className="px-4 py-3 text-center text-slate-700 dark:text-slate-300">{d.gap_abs_mean}</td>
+                                    <td className="px-4 py-3 text-center text-slate-700 dark:text-slate-300">{d.negative_gap_ratio}%</td>
                                     <td className="px-4 py-3 text-center">
                                         <span className={`px-2 py-0.5 rounded text-xs font-medium ${d.severity_level === 'Severe' ? 'bg-red-900/30 text-red-400 border border-red-900' :
                                             d.severity_level === 'Moderate' ? 'bg-orange-900/30 text-orange-400 border border-orange-900' :
@@ -469,7 +469,7 @@ const DistrictHotspots: React.FC = () => {
                             ))}
                             {filteredDistricts.length === 0 && (
                                 <tr>
-                                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                                    <td colSpan={5} className="px-4 py-8 text-center text-slate-600 dark:text-slate-500">
                                         No districts found.
                                     </td>
                                 </tr>
