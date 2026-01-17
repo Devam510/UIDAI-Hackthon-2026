@@ -7,6 +7,7 @@ import ErrorRetry from '../components/Common/ErrorRetry';
 import Sparkline from '../components/Common/Sparkline';
 import client from '../api/client';
 import { ENDPOINTS } from '../api/endpoints';
+import { useStateContext } from '../context/StateContext';
 import { useTheme } from '../hooks/useTheme';
 
 interface BiometricHotspot {
