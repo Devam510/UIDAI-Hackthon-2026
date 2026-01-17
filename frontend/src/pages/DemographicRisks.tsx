@@ -7,6 +7,7 @@ import ErrorRetry from '../components/Common/ErrorRetry';
 import Sparkline from '../components/Common/Sparkline';
 import client from '../api/client';
 import { useStateContext } from '../context/StateContext';
+import { useTheme } from '../hooks/useTheme';
 
 interface DemographicSegment {
     demographic_group: string;
@@ -20,6 +21,7 @@ interface DemographicSegment {
 
 const DemographicRisks: React.FC = () => {
     const { selectedState } = useStateContext();
+    const { theme } = useTheme();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [data, setData] = useState<any>(null);
@@ -120,7 +122,7 @@ const DemographicRisks: React.FC = () => {
         xAxis: {
             type: 'value',
             axisLine: { lineStyle: { color: '#334155' } },
-            axisLabel: { color: '#94a3b8' },
+            axisLabel: { color: theme === 'dark' ? '#94a3b8' : '#64748b' },
             splitLine: { lineStyle: { color: '#334155', type: 'dashed' } }
         },
         yAxis: {
@@ -128,7 +130,7 @@ const DemographicRisks: React.FC = () => {
             data: filteredSegments.map((s: DemographicSegment) => s.demographic_group),
             axisLine: { lineStyle: { color: '#334155' } },
             axisLabel: {
-                color: '#94a3b8',
+                color: theme === 'dark' ? '#94a3b8' : '#334155',
                 fontSize: 12,
                 width: 100,
                 overflow: 'truncate'
@@ -281,12 +283,12 @@ const DemographicRisks: React.FC = () => {
                     {selectedSegment ? (
                         <div className="space-y-4">
                             {/* Segment Header */}
-                            <div className="pb-4 border-b border-slate-700">
+                            <div className="pb-4 border-b border-slate-300 dark:border-slate-700">
                                 <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{selectedSegment.demographic_group}</h3>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${selectedSegment.severity_level === 'Severe' ? 'bg-red-900/30 text-red-400 border border-red-900' :
-                                        selectedSegment.severity_level === 'Moderate' ? 'bg-orange-900/30 text-orange-400 border border-orange-900' :
-                                            'bg-green-900/30 text-green-400 border border-green-900'
+                                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${selectedSegment.severity_level === 'Severe' ? 'bg-red-100 text-red-700 border border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-900' :
+                                        selectedSegment.severity_level === 'Moderate' ? 'bg-orange-100 text-orange-700 border border-orange-300 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-900' :
+                                            'bg-green-100 text-green-700 border border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-900'
                                         }`}>
                                         {selectedSegment.severity_level}
                                     </span>
@@ -309,7 +311,7 @@ const DemographicRisks: React.FC = () => {
                             </div>
 
                             {/* Trend Sparkline */}
-                            <div className="pt-4 border-t border-slate-700">
+                            <div className="pt-4 border-t border-slate-300 dark:border-slate-700">
                                 <p className="text-sm text-slate-700 dark:text-slate-400 mb-2">Engagement Trend</p>
                                 {selectedSegment.trend_data && selectedSegment.trend_data.length > 0 ? (
                                     <Sparkline
@@ -328,12 +330,12 @@ const DemographicRisks: React.FC = () => {
                             </div>
 
                             {/* Recommendations */}
-                            <div className="pt-4 border-t border-slate-700">
+                            <div className="pt-4 border-t border-slate-300 dark:border-slate-700">
                                 <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Recommended Actions</p>
                                 {selectedSegment.recommendations && selectedSegment.recommendations.length > 0 ? (
                                     <ul className="space-y-2">
                                         {selectedSegment.recommendations.map((rec, idx) => (
-                                            <li key={idx} className="text-sm text-slate-300 flex items-start gap-2">
+                                            <li key={idx} className="text-sm text-slate-700 dark:text-slate-300 flex items-start gap-2">
                                                 <span className="text-primary-400 mt-1">•</span>
                                                 <span>{rec}</span>
                                             </li>
