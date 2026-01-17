@@ -8,6 +8,8 @@ import Sparkline from '../components/Common/Sparkline';
 import client from '../api/client';
 import { ENDPOINTS } from '../api/endpoints';
 import { useStateContext } from '../context/StateContext';
+import { useTheme } from '../hooks/useTheme';
+import { useTheme } from '../hooks/useTheme';
 
 interface BiometricHotspot {
     district: string;
@@ -22,6 +24,8 @@ interface BiometricHotspot {
 
 const BiometricHotspots: React.FC = () => {
     const { selectedState } = useStateContext();
+    const { theme } = useTheme();
+    const { theme } = useTheme();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [data, setData] = useState<any>(null);
@@ -116,7 +120,7 @@ const BiometricHotspots: React.FC = () => {
         xAxis: {
             type: 'value',
             axisLine: { lineStyle: { color: '#334155' } },
-            axisLabel: { color: '#94a3b8' },
+            axisLabel: { color: theme === 'dark' ? '#94a3b8' : '#64748b' },
             splitLine: { lineStyle: { color: '#334155', type: 'dashed' } }
         },
         yAxis: {
@@ -124,7 +128,7 @@ const BiometricHotspots: React.FC = () => {
             data: filteredHotspots.map((h: BiometricHotspot) => h.district),
             axisLine: { lineStyle: { color: '#334155' } },
             axisLabel: {
-                color: '#94a3b8',
+                color: theme === 'dark' ? '#94a3b8' : '#334155',
                 fontSize: 12,
                 width: 100,
                 overflow: 'truncate'
