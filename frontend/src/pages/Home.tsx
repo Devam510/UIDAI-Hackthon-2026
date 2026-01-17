@@ -329,14 +329,14 @@ const Home: React.FC = () => {
                                     <th className="px-4 py-3 text-center">Growth</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-700">
+                            <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                                 {sortedStates.slice(0, 10).map((state) => (
                                     <tr
                                         key={state.name}
                                         onClick={() => handleStateRowClick(state.name)}
                                         className="hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors cursor-pointer"
                                     >
-                                        <td className="px-4 py-3 font-medium text-slate-200">{state.name}</td>
+                                        <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-200">{state.name}</td>
                                         <td className="px-4 py-3 text-center">
                                             <span className={`font-bold ${state.risk_score >= 7 ? 'text-red-400' :
                                                 state.risk_score >= 4 ? 'text-orange-400' :

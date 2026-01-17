@@ -65,10 +65,10 @@ const Sparkline: React.FC<SparklineProps> = ({
     };
 
     return (
-        <div className="bg-dark-card border border-slate-700 rounded-xl p-4 hover:border-primary-500/50 transition-all duration-300">
+        <div className="bg-white dark:bg-dark-card border border-slate-300 dark:border-slate-700 rounded-xl p-4 hover:border-primary-500/50 transition-all duration-300">
             <div className="flex items-start justify-between mb-3">
                 <div>
-                    <p className="text-sm text-slate-400 font-medium">{label}</p>
+                    <p className="text-sm text-slate-700 dark:text-slate-400 font-medium">{label}</p>
                     {hasChange && (
                         <div className={clsx(
                             "flex items-center gap-1 mt-1",
@@ -82,7 +82,7 @@ const Sparkline: React.FC<SparklineProps> = ({
                     )}
                 </div>
                 <div className="text-right">
-                    <p className="text-2xl font-bold text-white">
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">
                         {data[data.length - 1]?.toFixed(1) || '0'}
                     </p>
                 </div>

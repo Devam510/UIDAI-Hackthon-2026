@@ -192,7 +192,7 @@ const DistrictHotspots: React.FC = () => {
         <div className="space-y-6 animate-in fade-in duration-500">
             {/* Header with Controls */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                <h2 className="text-xl md:text-2xl font-bold text-white">District Risk Analysis: {selectedState}</h2>
+                <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">District Risk Analysis: {selectedState}</h2>
 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
                     {/* Search */}
@@ -203,12 +203,12 @@ const DistrictHotspots: React.FC = () => {
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Search district..."
-                            className="bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg pl-9 pr-4 py-2 w-full focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                            className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-sm rounded-lg pl-9 pr-4 py-2 w-full focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
                         />
                     </div>
 
                     {/* Time Window Toggle */}
-                    <div className="flex bg-slate-800 border border-slate-700 rounded-lg p-1">
+                    <div className="flex bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg p-1">
                         {[7, 30, 90].map(days => (
                             <button
                                 key={days}
@@ -307,9 +307,9 @@ const DistrictHotspots: React.FC = () => {
                         <div className="space-y-4">
                             {/* District Header */}
                             <div className="pb-4 border-b border-slate-700">
-                                <h3 className="text-xl font-bold text-white mb-2">{selectedDistrict.district}</h3>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{selectedDistrict.district}</h3>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-sm text-slate-400">Risk Score:</span>
+                                    <span className="text-sm text-slate-700 dark:text-slate-400">Risk Score:</span>
                                     <span className="text-2xl font-bold" style={{ color: getSeverityColor(selectedDistrict.severity_level) }}>
                                         {selectedDistrict.risk_score}
                                     </span>
@@ -325,16 +325,16 @@ const DistrictHotspots: React.FC = () => {
                             {/* Metrics */}
                             <div className="space-y-3">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-sm text-slate-400">Gap Mean:</span>
-                                    <span className="text-sm font-semibold text-white">{selectedDistrict.gap_abs_mean}</span>
+                                    <span className="text-sm text-slate-700 dark:text-slate-400">Gap Mean:</span>
+                                    <span className="text-sm font-semibold text-slate-900 dark:text-white">{selectedDistrict.gap_abs_mean}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-sm text-slate-400">Negative Gap Ratio:</span>
-                                    <span className="text-sm font-semibold text-white">{selectedDistrict.negative_gap_ratio}%</span>
+                                    <span className="text-sm text-slate-700 dark:text-slate-400">Negative Gap Ratio:</span>
+                                    <span className="text-sm font-semibold text-slate-900 dark:text-white">{selectedDistrict.negative_gap_ratio}%</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-sm text-slate-400">Total Enrolment:</span>
-                                    <span className="text-sm font-semibold text-white">{selectedDistrict.total_enrolment.toLocaleString()}</span>
+                                    <span className="text-sm text-slate-700 dark:text-slate-400">Total Enrolment:</span>
+                                    <span className="text-sm font-semibold text-slate-900 dark:text-white">{selectedDistrict.total_enrolment.toLocaleString()}</span>
                                 </div>
                             </div>
 
@@ -357,7 +357,7 @@ const DistrictHotspots: React.FC = () => {
 
                             {/* Recommendations */}
                             <div className="pt-4 border-t border-slate-700">
-                                <p className="text-sm font-semibold text-white mb-3">Recommended Actions</p>
+                                <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Recommended Actions</p>
                                 <ul className="space-y-2">
                                     {selectedDistrict.recommendations.map((rec, idx) => (
                                         <li key={idx} className="text-sm text-slate-300 flex items-start gap-2">

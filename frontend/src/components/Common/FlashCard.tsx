@@ -33,11 +33,11 @@ const FlashCard: React.FC<FlashCardProps> = ({
     return (
         <div
             onClick={onClick}
-            className="min-w-[320px] bg-dark-card border border-slate-700 rounded-xl p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary-500/20 hover:border-primary-500/50 group"
+            className="min-w-[320px] bg-white dark:bg-dark-card border border-slate-300 dark:border-slate-700 rounded-xl p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary-500/20 hover:border-primary-500/50 group"
         >
             {/* Header with state name and risk badge */}
             <div className="flex items-start justify-between mb-4">
-                <h3 className="text-xl font-bold text-white group-hover:text-primary-400 transition-colors">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                     {stateName}
                 </h3>
                 <span className={clsx(
@@ -51,25 +51,25 @@ const FlashCard: React.FC<FlashCardProps> = ({
             {/* Metrics grid */}
             <div className="space-y-3 mb-4">
                 <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-400">Risk Score</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">Risk Score</span>
                     <span className={clsx("text-lg font-bold", riskLevel.textColor)}>
                         {riskScore.toFixed(1)}
                     </span>
                 </div>
                 <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-400">Anomaly Severity</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">Anomaly Severity</span>
                     <span className="text-lg font-bold text-orange-400">
                         {anomalySeverity.toFixed(1)}
                     </span>
                 </div>
                 <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-400">Neg. Gap Ratio</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">Neg. Gap Ratio</span>
                     <span className="text-lg font-bold text-blue-400">
                         {negativeGapRatio.toFixed(1)}%
                     </span>
                 </div>
                 <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-400">Forecast Growth</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">Forecast Growth</span>
                     <span className="text-lg font-bold text-emerald-400">
                         {forecastGrowth.toFixed(1)}%
                     </span>
@@ -78,7 +78,7 @@ const FlashCard: React.FC<FlashCardProps> = ({
 
             {/* Top district */}
             {topDistrict && (
-                <div className="flex items-center gap-2 mb-4 text-sm text-slate-300 bg-slate-800/50 rounded-lg p-2">
+                <div className="flex items-center gap-2 mb-4 text-sm text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/50 rounded-lg p-2">
                     <MapPin size={14} className="text-primary-400" />
                     <span>Top Hotspot: <span className="font-semibold">{topDistrict}</span></span>
                 </div>
