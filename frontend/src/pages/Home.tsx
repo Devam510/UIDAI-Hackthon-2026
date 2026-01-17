@@ -335,7 +335,7 @@ const Home: React.FC = () => {
             <div>
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Top Priority States</h2>
-                    <span className="text-sm text-slate-400">Sorted by Risk Score</span>
+                    <span className="text-sm text-slate-700 dark:text-slate-400">Sorted by Risk Score</span>
                 </div>
 
                 <div className="relative">

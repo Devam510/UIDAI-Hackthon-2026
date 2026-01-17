@@ -570,7 +570,7 @@ const Forecast: React.FC = () => {
                                                 {trendBadge} {trendBadge === 'Increasing' ? '📈' : trendBadge === 'Decreasing' ? '📉' : '➡️'}
                                             </h3>
                                             {trendAnalysis && (
-                                                <p className="text-xs text-slate-400 mt-1">{trendAnalysis.strength} strength</p>
+                                                <p className="text-xs text-slate-700 dark:text-slate-400 mt-1">{trendAnalysis.strength} strength</p>
                                             )}
                                         </div>
                                         <CheckCircle2 className={trendColor} size={20} />
@@ -585,7 +585,7 @@ const Forecast: React.FC = () => {
                                                 {dataQuality?.confidence || 'Medium'}
                                             </h3>
                                             {dataQuality && (
-                                                <p className="text-xs text-slate-400 mt-1">{dataQuality.training_months} months</p>
+                                                <p className="text-xs text-slate-700 dark:text-slate-400 mt-1">{dataQuality.training_months} months</p>
                                             )}
                                         </div>
                                         <Sparkles className="text-purple-500" size={20} />
@@ -620,7 +620,7 @@ const Forecast: React.FC = () => {
                                         opts={{ renderer: 'canvas' }}
                                     />
                                 </div>
-                                <div className="mt-2 text-xs text-slate-400 text-center">
+                                <div className="mt-2 text-xs text-slate-700 dark:text-slate-400 text-center">
                                     ⚠️ Projection shows trend direction only (3-6 months) - not a prediction of future values
                                 </div>
                             </Card>
@@ -638,31 +638,31 @@ const Forecast: React.FC = () => {
                                 {showModelInfo && (
                                     <div className="mt-4 space-y-3 text-sm border-t border-slate-700 pt-4">
                                         <div className="flex justify-between">
-                                            <span className="text-slate-400">Date Range:</span>
+                                            <span className="text-slate-700 dark:text-slate-400">Date Range:</span>
                                             <span className="text-white font-medium">{fromDate} to {toDate}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-slate-400">Horizon Days:</span>
+                                            <span className="text-slate-700 dark:text-slate-400">Horizon Days:</span>
                                             <span className="text-white font-medium">{days} days</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-slate-400">Forecast Points Returned:</span>
+                                            <span className="text-slate-700 dark:text-slate-400">Forecast Points Returned:</span>
                                             <span className="text-white font-medium">{forecastData.length}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-slate-400">Historical Points:</span>
+                                            <span className="text-slate-700 dark:text-slate-400">Historical Points:</span>
                                             <span className="text-white font-medium">{historicalData.length}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-slate-400">Aggregation:</span>
+                                            <span className="text-slate-700 dark:text-slate-400">Aggregation:</span>
                                             <span className="text-white font-medium">Monthly (Trend-Based)</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-slate-400">Last Available Data:</span>
+                                            <span className="text-slate-700 dark:text-slate-400">Last Available Data:</span>
                                             <span className="text-white font-medium">{lastAvailableDate}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-slate-400">Last Updated:</span>
+                                            <span className="text-slate-700 dark:text-slate-400">Last Updated:</span>
                                             <span className="text-white font-medium">
                                                 {lastUpdated ? lastUpdated.toLocaleTimeString() : 'N/A'}
                                             </span>
@@ -678,26 +678,26 @@ const Forecast: React.FC = () => {
                                     <Card title="⚙️ Model Health" className="border-slate-700">
                                         <div className="space-y-3 text-sm">
                                             <div className="flex justify-between">
-                                                <span className="text-slate-400">Model Type:</span>
+                                                <span className="text-slate-700 dark:text-slate-400">Model Type:</span>
                                                 <span className="text-white font-medium">{insights.model_health.model_type}</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-slate-400">Training Date:</span>
+                                                <span className="text-slate-700 dark:text-slate-400">Training Date:</span>
                                                 <span className="text-white font-medium">{insights.model_health.training_date}</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-slate-400">Data Points:</span>
+                                                <span className="text-slate-700 dark:text-slate-400">Data Points:</span>
                                                 <span className="text-white font-medium">{insights.model_health.data_points}</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-slate-400">Last Retrain:</span>
+                                                <span className="text-slate-700 dark:text-slate-400">Last Retrain:</span>
                                                 <span className="text-green-400 font-medium flex items-center gap-1">
                                                     <CheckCircle2 size={14} /> {insights.model_health.last_retrain}
                                                 </span>
                                             </div>
                                             <div className="flex justify-between">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-slate-400">Error (MAPE):</span>
+                                                    <span className="text-slate-700 dark:text-slate-400">Error (MAPE):</span>
                                                     <div className="group relative">
                                                         <Info size={14} className="text-slate-500 cursor-help" />
                                                         <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-2 bg-slate-800 border border-slate-600 rounded-lg text-xs text-slate-300 shadow-xl z-10">

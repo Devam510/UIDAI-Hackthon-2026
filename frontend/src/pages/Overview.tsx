@@ -202,7 +202,7 @@ const Overview: React.FC = () => {
                     >
                         <div className="flex justify-between items-start z-10 relative">
                             <div>
-                                <p className="text-slate-400 text-sm font-medium group-hover:text-slate-300 transition-colors">{kpi.label}</p>
+                                <p className="text-slate-700 dark:text-slate-400 text-sm font-medium group-hover:text-slate-900 dark:group-hover:text-slate-300 transition-colors">{kpi.label}</p>
                                 <h3 className={`text - 3xl font - bold mt - 2 ${kpi.color} group - hover: scale - 110 transition - transform duration - 300`}>{kpi.value}</h3>
                             </div>
                             <div className="p-2 bg-slate-200 dark:bg-slate-800/50 rounded-lg group-hover:bg-slate-300 dark:group-hover:bg-slate-700/70 group-hover:scale-110 transition-all duration-300">{kpi.icon}</div>

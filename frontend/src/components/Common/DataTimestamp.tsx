@@ -57,7 +57,7 @@ const DataTimestamp: React.FC<DataTimestampProps> = ({
     return (
         <div className={`flex items-center gap-4 text-sm ${className}`}>
             {lastDataDate && (
-                <div className="flex items-center gap-2 text-slate-400">
+                <div className="flex items-center gap-2 text-slate-700 dark:text-slate-400">
                     <Database size={16} />
                     <span>
                         Data as of: <span className="text-slate-300 font-medium">{formatDate(lastDataDate)}</span>
@@ -66,7 +66,7 @@ const DataTimestamp: React.FC<DataTimestampProps> = ({
             )}
 
             {generatedAt && (
-                <div className="flex items-center gap-2 text-slate-400">
+                <div className="flex items-center gap-2 text-slate-700 dark:text-slate-400">
                     <Clock size={16} />
                     <span>
                         Updated: <span className="text-slate-300 font-medium">{getTimeAgo(generatedAt)}</span>

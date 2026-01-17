@@ -446,7 +446,7 @@ const BiometricHotspots: React.FC = () => {
                 ) : (
                     <div className="text-center py-8">
                         <Sparkles className="mx-auto mb-4 text-purple-400" size={32} />
-                        <p className="text-slate-400 mb-4">Get AI-powered insights for {selectedState}</p>
+                        <p className="text-slate-700 dark:text-slate-400 mb-4">Get AI-powered insights for {selectedState}</p>
                         <button
                             onClick={fetchAIInsights}
                             className="px-6 py-2 bg-purple-600 hover:bg-purple-500 text-white font-medium rounded-lg transition-colors"
@@ -460,7 +460,7 @@ const BiometricHotspots: React.FC = () => {
             {/* Data Table */}
             <Card title="Risk Details" className="overflow-hidden">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                    <p className="text-sm text-slate-400">Showing {filteredHotspots.length} districts</p>
+                    <p className="text-sm text-slate-700 dark:text-slate-400">Showing {filteredHotspots.length} districts</p>
                     <button
                         onClick={exportCSV}
                         className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium rounded-lg transition-colors"
@@ -471,7 +471,7 @@ const BiometricHotspots: React.FC = () => {
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
-                        <thead className="text-xs text-slate-400 uppercase bg-slate-800/50 sticky top-0 z-10 backdrop-blur-sm">
+                        <thead className="text-xs text-slate-700 dark:text-slate-400 uppercase bg-slate-100 dark:bg-slate-800/50 sticky top-0 z-10 backdrop-blur-sm">
                             <tr>
                                 <th className="px-4 py-3">District</th>
                                 <th className="px-4 py-3 text-center">Risk Score</th>

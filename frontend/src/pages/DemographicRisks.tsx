@@ -299,18 +299,18 @@ const DemographicRisks: React.FC = () => {
                             {/* Metrics */}
                             <div className="space-y-3">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-sm text-slate-400">Trend:</span>
+                                    <span className="text-sm text-slate-700 dark:text-slate-400">Trend:</span>
                                     <span className="text-sm font-semibold text-white capitalize">{selectedSegment.enrolment_trend}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-sm text-slate-400">Deviation:</span>
+                                    <span className="text-sm text-slate-700 dark:text-slate-400">Deviation:</span>
                                     <span className="text-sm font-semibold text-white">{selectedSegment.deviation_from_state_avg}%</span>
                                 </div>
                             </div>
 
                             {/* Trend Sparkline */}
                             <div className="pt-4 border-t border-slate-700">
-                                <p className="text-sm text-slate-400 mb-2">Engagement Trend</p>
+                                <p className="text-sm text-slate-700 dark:text-slate-400 mb-2">Engagement Trend</p>
                                 {selectedSegment.trend_data && selectedSegment.trend_data.length > 0 ? (
                                     <Sparkline
                                         data={selectedSegment.trend_data.map(d => d.value)}
@@ -386,7 +386,7 @@ const DemographicRisks: React.FC = () => {
                 ) : (
                     <div className="text-center py-8">
                         <Sparkles className="mx-auto mb-4 text-purple-400" size={32} />
-                        <p className="text-slate-400 mb-4">Get AI-powered insights for {selectedState}</p>
+                        <p className="text-slate-700 dark:text-slate-400 mb-4">Get AI-powered insights for {selectedState}</p>
                         <button
                             onClick={fetchAIInsights}
                             className="px-6 py-2 bg-purple-600 hover:bg-purple-500 text-white font-medium rounded-lg transition-colors"
@@ -400,7 +400,7 @@ const DemographicRisks: React.FC = () => {
             {/* Data Table */}
             <Card title="All Segments" className="overflow-hidden">
                 <div className="flex justify-between items-center mb-4">
-                    <p className="text-sm text-slate-400">Showing {filteredSegments.length} segments</p>
+                    <p className="text-sm text-slate-700 dark:text-slate-400">Showing {filteredSegments.length} segments</p>
                     <button
                         onClick={exportCSV}
                         className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium rounded-lg transition-colors"
@@ -411,7 +411,7 @@ const DemographicRisks: React.FC = () => {
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
-                        <thead className="text-xs text-slate-400 uppercase bg-slate-800/50 sticky top-0 z-10 backdrop-blur-sm">
+                        <thead className="text-xs text-slate-700 dark:text-slate-400 uppercase bg-slate-100 dark:bg-slate-800/50 sticky top-0 z-10 backdrop-blur-sm">
                             <tr>
                                 <th className="px-4 py-3">Segment</th>
                                 <th className="px-4 py-3 text-center">Risk Score</th>

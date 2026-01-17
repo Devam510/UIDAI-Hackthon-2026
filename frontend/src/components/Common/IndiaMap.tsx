@@ -70,28 +70,28 @@ const IndiaMap: React.FC<IndiaMapProps> = ({ statesData, onStateClick }) => {
     };
 
     return (
-        <div className="relative w-full h-full min-h-[500px] bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900/50 dark:to-slate-800/50 rounded-xl border-2 border-slate-300 dark:border-slate-700 p-6 shadow-lg">
+        <div className="relative w-full h-full min-h-[500px] bg-slate-900/50 rounded-xl border border-slate-700 p-6">
             {/* Title */}
             <div className="absolute top-4 left-4 z-10">
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">India Risk Map</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400">Click a state to view details</p>
+                <h3 className="text-lg font-semibold text-white mb-1">India Risk Map</h3>
+                <p className="text-sm text-slate-400">Click a state to view details</p>
             </div>
 
             {/* Legend */}
-            <div className="absolute top-4 right-4 z-10 bg-white/90 dark:bg-slate-800/90 border-2 border-slate-300 dark:border-slate-700 rounded-lg p-3 shadow-lg">
-                <p className="text-xs font-semibold text-slate-900 dark:text-white mb-2">Risk Level</p>
+            <div className="absolute top-4 right-4 z-10 bg-slate-800/90 border border-slate-700 rounded-lg p-3">
+                <p className="text-xs font-semibold text-white mb-2">Risk Level</p>
                 <div className="space-y-1">
                     <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded" style={{ backgroundColor: '#22c55e' }}></div>
-                        <span className="text-xs text-slate-700 dark:text-slate-300">Low (&lt;4)</span>
+                        <span className="text-xs text-slate-300">Low (&lt;4)</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded" style={{ backgroundColor: '#f97316' }}></div>
-                        <span className="text-xs text-slate-700 dark:text-slate-300">Moderate (4-7)</span>
+                        <span className="text-xs text-slate-300">Moderate (4-7)</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded" style={{ backgroundColor: '#ef4444' }}></div>
-                        <span className="text-xs text-slate-700 dark:text-slate-300">Severe (≥7)</span>
+                        <span className="text-xs text-slate-300">Severe (≥7)</span>
                     </div>
                 </div>
             </div>
@@ -168,7 +168,7 @@ const IndiaMap: React.FC<IndiaMapProps> = ({ statesData, onStateClick }) => {
             </svg>
 
             {/* Mobile hint */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-xs text-slate-600 dark:text-slate-500 text-center">
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-xs text-slate-500 text-center">
                 Tap any state to view detailed analytics
             </div>
         </div>
