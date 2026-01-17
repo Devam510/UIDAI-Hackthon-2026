@@ -7,8 +7,6 @@ import ErrorRetry from '../components/Common/ErrorRetry';
 import Sparkline from '../components/Common/Sparkline';
 import client from '../api/client';
 import { ENDPOINTS } from '../api/endpoints';
-import { useStateContext } from '../context/StateContext';
-import { useTheme } from '../hooks/useTheme';
 import { useTheme } from '../hooks/useTheme';
 
 interface BiometricHotspot {
@@ -24,7 +22,6 @@ interface BiometricHotspot {
 
 const BiometricHotspots: React.FC = () => {
     const { selectedState } = useStateContext();
-    const { theme } = useTheme();
     const { theme } = useTheme();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
