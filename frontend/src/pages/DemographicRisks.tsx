@@ -361,21 +361,21 @@ const DemographicRisks: React.FC = () => {
                 ) : aiInsights ? (
                     <div className="space-y-4">
                         <div>
-                            <h4 className="text-sm font-semibold text-purple-300 mb-2">Key Insights:</h4>
+                            <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-400 mb-2">Key Insights:</h4>
                             <ul className="space-y-2">
                                 {aiInsights.summary.map((insight: string, idx: number) => (
-                                    <li key={idx} className="text-sm text-slate-300 flex items-start gap-2">
+                                    <li key={idx} className="text-sm text-slate-700 dark:text-slate-300 flex items-start gap-2">
                                         <span className="text-purple-400 mt-1">•</span>
                                         <span>{insight}</span>
                                     </li>
                                 ))}
                             </ul>
                         </div>
-                        <div className="pt-4 border-t border-slate-700">
-                            <h4 className="text-sm font-semibold text-purple-300 mb-2">Recommended Actions:</h4>
+                        <div className="pt-4 border-t border-slate-300 dark:border-slate-700">
+                            <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-400 mb-2">Recommended Actions:</h4>
                             <ul className="space-y-2">
                                 {aiInsights.actions.map((action: string, idx: number) => (
-                                    <li key={idx} className="text-sm text-slate-300 flex items-start gap-2">
+                                    <li key={idx} className="text-sm text-slate-700 dark:text-slate-300 flex items-start gap-2">
                                         <span className="text-purple-400 mt-1">→</span>
                                         <span>{action}</span>
                                     </li>
