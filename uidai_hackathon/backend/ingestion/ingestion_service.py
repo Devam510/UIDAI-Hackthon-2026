@@ -9,6 +9,7 @@ from backend.validation.validator import validate_dataset
 
 from backend.db.session import SessionLocal
 from backend.db.models import UIDAIRecord
+from backend.common.state_resolver import normalize_state_name
 
 # ✅ Always resolve project root from this file location
 PROJECT_ROOT = Path(__file__).resolve().parents[2]  # .../uidai_hackathon
@@ -41,10 +42,16 @@ def save_to_db(df, dataset_type, source_file, batch_size: int = 20000):
         if hasattr(date_value, "date"):
             date_value = date_value.date()
 
+        # Normalize state safely
+        raw_state = str(row["state"])
+        normalized_state = normalize_state_name(raw_state)
+        # Fallback if normalization fails (though it shouldn't for valid strings)
+        state_val = normalized_state if normalized_state else " ".join(raw_state.strip().split()).title()
+
         base = {
             "dataset_type": dataset_type,
             "date": date_value,
-            "state": " ".join(str(row["state"]).strip().split()).title(),
+            "state": state_val,
             "district": " ".join(str(row["district"]).strip().split()).title(),
             "pincode": str(row["pincode"]).strip() if has_pincode else "",
             "source_file": source_file

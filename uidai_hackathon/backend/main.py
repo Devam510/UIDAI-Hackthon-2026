@@ -39,13 +39,16 @@ async def startup_event():
         # We don't raise here to allow the app to start even if DB is briefly unreachable
         
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from fastapi import Request
 
+# ✅ CORS CONFIGURATION (Strict)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173", 
-        "http://localhost:3000", 
-        "https://uidai-hackathon-2026-ui.onrender.com"
+        "https://uidai-hackathon-2026-ui.onrender.com",
+        "http://localhost:5173",
+        "http://localhost:3000"  # Included for local dev compatibility if needed
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -54,6 +57,17 @@ app.add_middleware(
 
 from fastapi.middleware.gzip import GZipMiddleware
 app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+# ✅ GLOBAL ERROR HANDLER
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    import logging
+    logger = logging.getLogger("uvicorn.error")
+    logger.error(f"🔥 Unhandled Exception: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"status": "error", "message": "Internal Server Error. Please try again later."}
+    )
 
 app.include_router(ingestion_router, prefix="/ingest", tags=["Ingestion"])
 app.include_router(analytics_router, prefix="/analytics", tags=["Analytics"])

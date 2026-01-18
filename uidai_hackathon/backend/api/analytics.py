@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from fastapi.responses import JSONResponse
+import logging
 import pandas as pd
 import numpy as np
 
@@ -8,72 +10,107 @@ from backend.analytics.state_summary import get_state_metric_summary
 from backend.analytics.district_comparison import top_districts_by_enrolment
 from backend.analytics.district_risk_analysis import analyze_district_risks
 
-router = APIRouter()
+logger = logging.getLogger(__name__)
 
+router = APIRouter()
 
 
 @router.get("/trend")
 def trend(state: str, window: int = 7):
-    state = resolve_state(state)
-    return {"status": "success", "state": state, "trend": moving_average_trend(state, window)}
+    try:
+        state = resolve_state(state)
+        return {"status": "success", "state": state, "trend": moving_average_trend(state, window)}
+    except ValueError as e:
+        logger.warning(f"Invalid state input for trend: {state}")
+        return JSONResponse(status_code=400, content={"status": "error", "message": str(e)})
+    except Exception as e:
+        logger.error(f"Error in trend analysis: {e}")
+        return JSONResponse(status_code=500, content={"status": "error", "message": "Internal server error"})
 
 
 @router.get("/metric-summary")
 def metric_summary(state: str, dataset_type: str = "ENROLMENT"):
-    state = resolve_state(state)
-    return {
-        "status": "success",
-        "state": state,
-        "dataset_type": dataset_type,
-        "summary": get_state_metric_summary(state, dataset_type)
-    }
+    try:
+        state = resolve_state(state)
+        return {
+            "status": "success",
+            "state": state,
+            "dataset_type": dataset_type,
+            "summary": get_state_metric_summary(state, dataset_type)
+        }
+    except ValueError as e:
+        logger.warning(f"Invalid state input for metric-summary: {state}")
+        return JSONResponse(status_code=400, content={"status": "error", "message": str(e)})
+    except Exception as e:
+        logger.error(f"Error in metric-summary: {e}")
+        return JSONResponse(status_code=500, content={"status": "error", "message": "Internal server error"})
 
 
 @router.get("/top-districts")
 def top_districts(state: str, top: int = 10):
-    state = resolve_state(state)
-    return {
-        "status": "success",
-        "state": state,
-        "top": top,
-        "districts": top_districts_by_enrolment(state, top)
-    }
+    try:
+        state = resolve_state(state)
+        return {
+            "status": "success",
+            "state": state,
+            "top": top,
+            "districts": top_districts_by_enrolment(state, top)
+        }
+    except ValueError as e:
+        logger.warning(f"Invalid state input for top-districts: {state}")
+        return JSONResponse(status_code=400, content={"status": "error", "message": str(e)})
+    except Exception as e:
+        logger.error(f"Error in top-districts: {e}")
+        return JSONResponse(status_code=500, content={"status": "error", "message": "Internal server error"})
 
 
 @router.get("/district-risks")
 def district_risks(state: str, window: int = 30, top: int = 20):
     """
     Get district-level risk analysis with gap metrics.
-    
-    Args:
-        state: State name (case-insensitive)
-        window: Time window in days (7, 30, 90)
-        top: Number of top districts to return
     """
-    state = resolve_state(state)
-    return analyze_district_risks(state, window, top)
+    try:
+        state = resolve_state(state)
+        return analyze_district_risks(state, window, top)
+    except ValueError as e:
+        logger.warning(f"Invalid state input for district-risks: {state}")
+        return JSONResponse(status_code=400, content={"status": "error", "message": str(e)})
+    except Exception as e:
+        logger.error(f"Error in district-risks: {e}")
+        return JSONResponse(status_code=500, content={"status": "error", "message": "Internal server error"})
 
 
 @router.get("/demographic-risks")
 def demographic_risks(state: str, window: int = 90, top: int = 20):
     """
     Get demographic risk analysis based on biometric update patterns.
-    
-    Args:
-        state: State name (case-insensitive)
-        window: Time window in days (default: 90)
-        top: Number of top segments to return (default: 20)
     """
-    from backend.analytics.demographic_risk_analysis import analyze_demographic_risks
-    
-    state = resolve_state(state)
-    result = analyze_demographic_risks(state, window)
-    
-    # Limit segments to top N
-    if result.get("status") == "success" and "segments" in result:
-        result["segments"] = result["segments"][:top]
-    
-    return result
+    try:
+        from backend.analytics.demographic_risk_analysis import analyze_demographic_risks
+        
+        state = resolve_state(state)
+        result = analyze_demographic_risks(state, window)
+        
+        # Limit segments to top N
+        if result.get("status") == "success" and "segments" in result:
+            result["segments"] = result["segments"][:top]
+        
+        return result
+    except ValueError as e:
+        logger.warning(f"Invalid state input for demographic-risks: {state}")
+        # Return a structured error that frontend can parse but with 400 code
+        return JSONResponse(status_code=400, content={
+            "status": "error", 
+            "message": str(e),
+            "fallback": "Please check state name"
+        })
+    except Exception as e:
+        logger.error(f"Error in demographic-risks: {e}")
+        return JSONResponse(status_code=500, content={
+            "status": "error", 
+            "message": "Internal server error processing demographic risks",
+            "fallback": "Analysis unavailable"
+        })
 
 
 from backend.ml.risk.scoring import compute_state_risk
