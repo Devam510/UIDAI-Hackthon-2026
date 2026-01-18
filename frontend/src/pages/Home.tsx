@@ -232,7 +232,43 @@ const Home: React.FC = () => {
     // Actually the tool replaces specific blocks. I need to be careful.
     // Let's look at the specific line "if (error) return <ErrorRetry ..."
 
-    if (loading) return <Loader />;
+    if (loading) {
+        return (
+            <div className="space-y-6 animate-in fade-in duration-500">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <SkeletonLoader className="h-8 w-64 mb-2" />
+                        <SkeletonLoader className="h-4 w-96" />
+                    </div>
+                    <SkeletonLoader className="h-10 w-32" />
+                </div>
+
+                {/* Skeleton Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="bg-white dark:bg-slate-900 h-32 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+                            <SkeletonLoader className="h-4 w-24 mb-4" />
+                            <SkeletonLoader className="h-8 w-16" />
+                        </div>
+                    ))}
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 h-[400px] bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+                        <SkeletonLoader className="h-full w-full" />
+                    </div>
+                    <div className="h-[400px] bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+                        <div className="space-y-4">
+                            <SkeletonLoader className="h-6 w-32" />
+                            {[1, 2, 3, 4, 5].map(i => (
+                                <SkeletonLoader key={i} className="h-12 w-full" />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
     if (error) return <ErrorRetry onRetry={fetchData} message={error?.message || "Failed to load dashboard data"} error={error} />;
 
     return (

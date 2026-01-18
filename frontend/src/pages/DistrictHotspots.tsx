@@ -32,6 +32,7 @@ const DistrictHotspots: React.FC = () => {
     const [selectedDistrict, setSelectedDistrict] = useState<DistrictRisk | null>(null);
     const [aiInsights, setAiInsights] = useState<any>(null);
     const [loadingInsights, setLoadingInsights] = useState(false);
+    const [visibleCount, setVisibleCount] = useState(20);
 
     const fetchData = async () => {
         setLoading(true);
@@ -392,15 +393,15 @@ const DistrictHotspots: React.FC = () => {
                                 <p className="text-sm font-semibold text-slate-700 dark:text-slate-400 mb-3">📋 Recommended Action Plan</p>
 
                                 <div className={`p-3 rounded-lg border ${selectedDistrict.risk_score >= 7
-                                        ? 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-900/30'
-                                        : selectedDistrict.risk_score >= 4
-                                            ? 'bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-900/30'
-                                            : 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-900/30'
+                                    ? 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-900/30'
+                                    : selectedDistrict.risk_score >= 4
+                                        ? 'bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-900/30'
+                                        : 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-900/30'
                                     }`}>
                                     <div className="flex justify-between items-start mb-2">
                                         <span className={`text-xs font-bold uppercase tracking-wider ${selectedDistrict.risk_score >= 7 ? 'text-red-700 dark:text-red-400' :
-                                                selectedDistrict.risk_score >= 4 ? 'text-orange-700 dark:text-orange-400' :
-                                                    'text-green-700 dark:text-green-400'
+                                            selectedDistrict.risk_score >= 4 ? 'text-orange-700 dark:text-orange-400' :
+                                                'text-green-700 dark:text-green-400'
                                             }`}>
                                             {selectedDistrict.risk_score >= 7 ? 'Emergency Response' :
                                                 selectedDistrict.risk_score >= 4 ? 'Corrective Action' :
@@ -507,7 +508,9 @@ const DistrictHotspots: React.FC = () => {
             {/* Data Table */}
             <Card title="All Districts" className="overflow-hidden">
                 <div className="flex justify-between items-center mb-4">
-                    <p className="text-sm text-slate-700 dark:text-slate-400">Showing {filteredDistricts.length} districts</p>
+                    <p className="text-sm text-slate-700 dark:text-slate-400">
+                        Showing {Math.min(visibleCount, filteredDistricts.length)} of {filteredDistricts.length} districts
+                    </p>
                     <button
                         onClick={exportCSV}
                         className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium rounded-lg transition-colors"
@@ -528,7 +531,7 @@ const DistrictHotspots: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-                            {filteredDistricts.map((d: DistrictRisk, idx: number) => (
+                            {filteredDistricts.slice(0, visibleCount).map((d: DistrictRisk, idx: number) => (
                                 <tr
                                     key={idx}
                                     onClick={() => setSelectedDistrict(d)}
@@ -560,9 +563,22 @@ const DistrictHotspots: React.FC = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Load More Button */}
+                {visibleCount < filteredDistricts.length && (
+                    <div className="flex justify-center mt-6">
+                        <button
+                            onClick={() => setVisibleCount(prev => prev + 20)}
+                            className="px-6 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm"
+                        >
+                            Load More Districts ({filteredDistricts.length - visibleCount} remaining)
+                        </button>
+                    </div>
+                )}
             </Card>
         </div>
     );
 };
+
 
 export default DistrictHotspots;
