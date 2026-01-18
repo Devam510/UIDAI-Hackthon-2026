@@ -154,7 +154,7 @@ const ChatWidget: React.FC = () => {
     return (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
             {isOpen && (
-                <div className="bg-dark-card border border-slate-700 shadow-2xl rounded-2xl w-80 sm:w-96 mb-4 flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 fade-in duration-200" style={{ height: '500px' }}>
+                <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-slate-700 shadow-2xl rounded-2xl w-80 sm:w-96 mb-4 flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 fade-in duration-200" style={{ height: '500px' }}>
                     {/* Header */}
                     <div className="bg-primary-600 p-4 flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -167,20 +167,20 @@ const ChatWidget: React.FC = () => {
                     </div>
 
                     {/* Messages */}
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-900/50">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-900/50">
                         {messages.map((msg) => (
                             <div key={msg.id} className={clsx("flex gap-2", msg.sender === 'user' ? "flex-row-reverse" : "flex-row")}>
                                 <div className={clsx(
                                     "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-                                    msg.sender === 'user' ? "bg-slate-700" : "bg-primary-600"
+                                    msg.sender === 'user' ? "bg-slate-200 dark:bg-slate-700" : "bg-primary-100 dark:bg-primary-600"
                                 )}>
-                                    {msg.sender === 'user' ? <User size={14} className="text-slate-300" /> : <Bot size={14} className="text-white" />}
+                                    {msg.sender === 'user' ? <User size={14} className="text-slate-600 dark:text-slate-300" /> : <Bot size={14} className="text-primary-600 dark:text-white" />}
                                 </div>
                                 <div className={clsx(
                                     "max-w-[80%] p-3 rounded-2xl text-sm leading-relaxed",
                                     msg.sender === 'user'
-                                        ? "bg-slate-700 text-white rounded-tr-none"
-                                        : "bg-slate-800 border border-slate-700 text-slate-200 rounded-tl-none"
+                                        ? "bg-slate-800 dark:bg-slate-700 text-white rounded-tr-none"
+                                        : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-tl-none shadow-sm"
                                 )}>
                                     {msg.text}
                                 </div>
@@ -188,12 +188,12 @@ const ChatWidget: React.FC = () => {
                         ))}
                         {loading && (
                             <div className="flex gap-2">
-                                <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center flex-shrink-0">
-                                    <Bot size={14} className="text-white" />
+                                <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-600 flex items-center justify-center flex-shrink-0">
+                                    <Bot size={14} className="text-primary-600 dark:text-white" />
                                 </div>
-                                <div className="bg-slate-800 border border-slate-700 p-3 rounded-2xl rounded-tl-none flex items-center gap-2">
-                                    <Loader2 size={16} className="animate-spin text-primary-400" />
-                                    <span className="text-xs text-slate-400">Thinking...</span>
+                                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3 rounded-2xl rounded-tl-none flex items-center gap-2 shadow-sm">
+                                    <Loader2 size={16} className="animate-spin text-primary-600 dark:text-primary-400" />
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">Thinking...</span>
                                 </div>
                             </div>
                         )}
@@ -201,13 +201,13 @@ const ChatWidget: React.FC = () => {
                     </div>
 
                     {/* Quick Actions */}
-                    <div className="p-2 bg-slate-800/50 border-t border-slate-700 overflow-x-auto flex gap-2 no-scrollbar">
+                    <div className="p-2 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700 overflow-x-auto flex gap-2 no-scrollbar">
                         {predefinedQuestions.map((q) => (
                             <button
                                 key={q}
                                 onClick={() => handleSend(q)}
                                 disabled={loading}
-                                className="whitespace-nowrap px-3 py-1.5 bg-slate-800 border border-slate-600 rounded-full text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors disabled:opacity-50"
+                                className="whitespace-nowrap px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-primary-600 dark:hover:text-white transition-colors disabled:opacity-50 shadow-sm"
                             >
                                 {q}
                             </button>
@@ -215,7 +215,7 @@ const ChatWidget: React.FC = () => {
                     </div>
 
                     {/* Input */}
-                    <div className="p-3 bg-dark-card border-t border-slate-700">
+                    <div className="p-3 bg-white dark:bg-dark-card border-t border-slate-200 dark:border-slate-700">
                         <div className="relative">
                             <input
                                 type="text"
@@ -224,12 +224,12 @@ const ChatWidget: React.FC = () => {
                                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                                 placeholder="Ask a question..."
                                 disabled={loading}
-                                className="w-full bg-slate-900 border border-slate-700 text-white rounded-full pl-4 pr-10 py-2.5 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 disabled:opacity-50"
+                                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-full pl-4 pr-10 py-2.5 text-sm focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 disabled:opacity-50"
                             />
                             <button
                                 onClick={() => handleSend()}
                                 disabled={!input.trim() || loading}
-                                className="absolute right-1.5 top-1.5 p-1.5 bg-primary-600 text-white rounded-full hover:bg-primary-500 disabled:opacity-0 disabled:pointer-events-none transition-all"
+                                className="absolute right-1.5 top-1.5 p-1.5 bg-primary-600 text-white rounded-full hover:bg-primary-500 disabled:opacity-0 disabled:pointer-events-none transition-all shadow-sm"
                             >
                                 <Send size={16} />
                             </button>
