@@ -81,16 +81,15 @@ from backend.db.session import SessionLocal
 from backend.db.models import UIDAIRecord
 from backend.ml.data_loader import get_last_data_date
 
-@router.get("/state-summary")
-def state_summary(state: str):
+from functools import lru_cache
+
+@lru_cache(maxsize=32)
+def get_dashboard_summary_cached(state: str):
     """
-    Get comprehensive state summary with fast statistical analysis.
-    OPTIMIZED: Pre-calculates only the 10 states that frontend requests.
+    Cached version of state summary calculation.
     """
     from backend.ml.data_loader import load_processed_data
     from datetime import datetime
-    
-    state = resolve_state(state)
     
     # Frontend requests these 10 states (from Home.tsx lines 30-33)
     FRONTEND_STATES = [
@@ -181,6 +180,15 @@ def state_summary(state: str):
             "last_data_date": get_last_data_date()
         }
     }
+
+@router.get("/state-summary")
+def state_summary(state: str):
+    """
+    Get comprehensive state summary with fast statistical analysis.
+    Uses cached logic for sub-millisecond response times on repeat calls.
+    """
+    state_resolved = resolve_state(state)
+    return get_dashboard_summary_cached(state_resolved)
 
 
 

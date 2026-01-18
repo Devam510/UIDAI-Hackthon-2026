@@ -306,7 +306,7 @@ const Forecast: React.FC = () => {
                     if (idx >= 0 && lowerBounds[idx] != null && upperBounds[idx] != null) {
                         tooltip += `<span style="color: #94a3b8;">Range: ${Math.round(lowerBounds[idx]).toLocaleString()} - ${Math.round(upperBounds[idx]).toLocaleString()}</span><br/>`;
                     }
-                    return tooltip;
+                    return tooltip + `<span style="color: #ef4444; font-size: 10px; font-weight: bold;">⚠️ Uncertainty: High (Limited Data)</span>`;
                 }
             },
             // LEGEND ORDER: Accurately labeled with actual model used
@@ -502,21 +502,16 @@ const Forecast: React.FC = () => {
             </div>
 
             {/* Trend Analysis Warning */}
-            <Card className="border-blue-300 dark:border-blue-500/50 bg-blue-100 dark:bg-blue-900/10">
+            <Card className="border-yellow-300 dark:border-yellow-500/50 bg-yellow-50 dark:bg-yellow-900/10">
                 <div className="flex items-start gap-3">
-                    <AlertTriangle className="text-blue-600 dark:text-blue-400 mt-1 flex-shrink-0" size={20} />
-                    <div className="text-sm text-slate-800 dark:text-blue-200">
-                        <strong>⚠️ Trend Direction Analysis Only:</strong> This page shows trend direction (upward/downward), NOT future predictions.
-                        {dataQuality && (
-                            <div className="mt-1">
-                                Data quality: <strong>{dataQuality.quality_level}</strong> •
-                                Confidence: <strong>{dataQuality.confidence}</strong> •
-                                Last data: <strong>{lastAvailableDate}</strong>
-                            </div>
-                        )}
-                        <div className="mt-1 text-xs opacity-80">
-                            {dataQuality?.warning || 'Limited 2025 data - trend direction only, not predictions'}
-                        </div>
+                    <AlertTriangle className="text-yellow-600 dark:text-yellow-400 mt-1 flex-shrink-0" size={20} />
+                    <div className="text-sm text-slate-800 dark:text-yellow-200">
+                        <strong>⚠️ Forecast based on limited 2025 data (Mar-Dec):</strong>
+                        <ul className="list-disc pl-5 mt-1 space-y-1 opacity-90">
+                            <li>Missing data for <strong>Jan, Feb, and Aug 2025</strong>.</li>
+                            <li>Trends are <strong>directional signals only</strong>, not precise predictions.</li>
+                            <li>Confidence is <strong>Low</strong> due to limited historical baseline.</li>
+                        </ul>
                     </div>
                 </div>
             </Card>
@@ -565,7 +560,7 @@ const Forecast: React.FC = () => {
                                 <Card className={`group hover:scale-105 transition-transform duration-300 hover:shadow-xl border`}>
                                     <div className="flex items-start justify-between">
                                         <div>
-                                            <p className="text-slate-600 dark:text-slate-400 text-xs font-medium uppercase">Trend Direction</p>
+                                            <p className="text-slate-600 dark:text-slate-400 text-xs font-medium uppercase">Trend Signal</p>
                                             <h3 className={`text-2xl font-bold mt-1 ${trendColor}`}>
                                                 {trendBadge} {trendBadge === 'Increasing' ? '📈' : trendBadge === 'Decreasing' ? '📉' : '➡️'}
                                             </h3>
@@ -581,8 +576,8 @@ const Forecast: React.FC = () => {
                                     <div className="flex items-start justify-between">
                                         <div>
                                             <p className="text-slate-600 dark:text-slate-400 text-xs font-medium uppercase">Data Confidence</p>
-                                            <h3 className="text-2xl font-bold text-slate-900 dark:text-white mt-1 capitalize">
-                                                {dataQuality?.confidence || 'Medium'}
+                                            <h3 className="text-2xl font-bold text-red-500 mt-1 capitalize flex items-center gap-2">
+                                                Low <span className="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded-full dark:bg-red-900/30 dark:text-red-300">Limited Data</span>
                                             </h3>
                                             {dataQuality && (
                                                 <p className="text-xs text-slate-700 dark:text-slate-400 mt-1">{dataQuality.training_months} months</p>

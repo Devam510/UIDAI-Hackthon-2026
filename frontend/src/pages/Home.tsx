@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, ArrowRight, MessageSquare } from 'lucide-react';
+import { ChevronDown, ArrowRight, MessageSquare, TrendingUp, AlertTriangle, Activity } from 'lucide-react';
 import Card from '../components/Common/Card';
 import FlashCard from '../components/Common/FlashCard';
 import AlertCard from '../components/Common/AlertCard';
 import Loader from '../components/Common/Loader';
+import SkeletonLoader from '../components/Common/SkeletonLoader';
 import ErrorRetry from '../components/Common/ErrorRetry';
 import IndiaMap from '../components/Common/IndiaMap';
 import DataTimestamp from '../components/Common/DataTimestamp';
@@ -13,6 +14,7 @@ import { ENDPOINTS } from '../api/endpoints';
 import { useStateContext } from '../context/StateContext';
 import { useChatContext } from '../context/ChatContext';
 import { validateStateMapping } from '../utils/state-name-mapper';
+import { auditService } from '../services/auditService';
 
 interface StateData {
     name: string;
@@ -28,7 +30,7 @@ const Home: React.FC = () => {
     const { setSelectedState } = useStateContext();
     const { sendMessage } = useChatContext();
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
+    const [error, setError] = useState<any>(null);
     const [lastDataDate, setLastDataDate] = useState<string>('');
     const [statesData, setStatesData] = useState<StateData[]>([]);
     const [selectedStateLocal, setSelectedStateLocal] = useState('Uttar Pradesh');
@@ -122,7 +124,7 @@ const Home: React.FC = () => {
             setStatesData(results.sort((a, b) => b.risk_score - a.risk_score));
         } catch (err) {
             console.error('Failed to fetch states data:', err);
-            setError(true);
+            setError(err);
         } finally {
             setLoading(false);
         }
@@ -130,6 +132,8 @@ const Home: React.FC = () => {
 
     useEffect(() => {
         fetchData();
+        // Log access to dashboard
+        auditService.logAction('VIEW_DASHBOARD', 'Home', 'User accessed main dashboard');
     }, []);
 
     // Validate state name mapping after data is loaded
@@ -220,7 +224,16 @@ const Home: React.FC = () => {
     const alerts = generateAlerts();
 
     if (loading) return <Loader />;
-    if (error) return <ErrorRetry onRetry={fetchData} message="Failed to load dashboard data" />;
+
+
+    // ... lines 32-53 ...
+
+    // Update state type in useState definition line 31 roughly if needed or just use 'any' for now as shown above
+    // Actually the tool replaces specific blocks. I need to be careful.
+    // Let's look at the specific line "if (error) return <ErrorRetry ..."
+
+    if (loading) return <Loader />;
+    if (error) return <ErrorRetry onRetry={fetchData} message={error?.message || "Failed to load dashboard data"} error={error} />;
 
     return (
         <div className="space-y-6 md:space-y-8 animate-in fade-in duration-500">
@@ -419,47 +432,96 @@ const Home: React.FC = () => {
                 </div>
             </Card>
 
+            {/* National Benchmarks Section - NEW */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+                {/* National Average Risk */}
+                <Card className="bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <p className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">National Avg Risk</p>
+                            <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-1">
+                                {(statesData.reduce((acc, curr) => acc + curr.risk_score, 0) / (statesData.length || 1)).toFixed(2)}
+                            </h3>
+                        </div>
+                        <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                            <TrendingUp size={20} className="text-blue-600 dark:text-blue-400" />
+                        </div>
+                    </div>
+                </Card>
+                {/* National Avg Anomaly */}
+                <Card className="bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <p className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Avg Anomaly Score</p>
+                            <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-1">
+                                {(statesData.reduce((acc, curr) => acc + curr.anomaly_severity, 0) / (statesData.length || 1)).toFixed(1)}
+                            </h3>
+                        </div>
+                        <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+                            <AlertTriangle size={20} className="text-orange-600 dark:text-orange-400" />
+                        </div>
+                    </div>
+                </Card>
+                {/* National Growth Trend */}
+                <Card className="bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <p className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Avg Growth Trend</p>
+                            <h3 className={`text-2xl font-bold mt-1 ${(statesData.reduce((acc, curr) => acc + curr.forecast_growth, 0) / (statesData.length || 1)) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                {(statesData.reduce((acc, curr) => acc + curr.forecast_growth, 0) / (statesData.length || 1)) >= 0 ? '+' : ''}
+                                {(statesData.reduce((acc, curr) => acc + curr.forecast_growth, 0) / (statesData.length || 1)).toFixed(2)}%
+                            </h3>
+                        </div>
+                        <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                            <Activity size={20} className="text-green-600 dark:text-green-400" />
+                        </div>
+                    </div>
+                </Card>
+            </div>
+
             {/* Priority Details Table and Alerts */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Priority Details Table */}
-                <Card title="Priority Details" className="lg:col-span-2">
+                {/* Priority Details Table - UPDATED WITH BENCHMARKING */}
+                <Card title="Priority Leaderboard (Benchmarked)" className="lg:col-span-2">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left">
                             <thead className="text-xs text-slate-600 dark:text-slate-400 uppercase bg-slate-100 dark:bg-slate-800/50">
                                 <tr>
+                                    <th className="px-4 py-3 text-center">Rank</th>
                                     <th className="px-4 py-3">State</th>
                                     <th className="px-4 py-3 text-center">Risk Score</th>
-                                    <th className="px-4 py-3 text-center">Anomaly</th>
-                                    <th className="px-4 py-3 text-center">Growth</th>
+                                    <th className="px-4 py-3 text-center">vs Nat. Avg</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-                                {sortedStates.slice(0, 10).map((state) => (
-                                    <tr
-                                        key={state.name}
-                                        onClick={() => handleStateRowClick(state.name)}
-                                        className="hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors cursor-pointer"
-                                    >
-                                        <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-200">{state.name}</td>
-                                        <td className="px-4 py-3 text-center">
-                                            <span className={`font-bold ${state.risk_score >= 7 ? 'text-red-400' :
-                                                state.risk_score >= 4 ? 'text-orange-400' :
-                                                    'text-green-400'
-                                                }`}>
-                                                {state.risk_score.toFixed(1)}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-3 text-center text-orange-400 font-semibold">
-                                            {typeof state.anomaly_severity === 'number' ? state.anomaly_severity.toFixed(1) : state.anomaly_severity}
-                                        </td>
-                                        <td className="px-4 py-3 text-center">
-                                            <span className={`font-semibold ${state.forecast_growth >= 0 ? 'text-emerald-400' : 'text-red-400'
-                                                }`}>
-                                                {state.forecast_growth >= 0 ? '+' : ''}{typeof state.forecast_growth === 'number' ? state.forecast_growth.toFixed(1) : state.forecast_growth}%
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {sortedStates.slice(0, 10).map((state, index) => {
+                                    const nationalAvgRisk = statesData.reduce((acc, curr) => acc + curr.risk_score, 0) / (statesData.length || 1);
+                                    const diff = state.risk_score - nationalAvgRisk;
+
+                                    return (
+                                        <tr
+                                            key={state.name}
+                                            onClick={() => handleStateRowClick(state.name)}
+                                            className="hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors cursor-pointer"
+                                        >
+                                            <td className="px-4 py-3 text-center font-bold text-slate-500">#{index + 1}</td>
+                                            <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-200">{state.name}</td>
+                                            <td className="px-4 py-3 text-center">
+                                                <span className={`font-bold ${state.risk_score >= 7 ? 'text-red-400' :
+                                                    state.risk_score >= 4 ? 'text-orange-400' :
+                                                        'text-green-400'
+                                                    }`}>
+                                                    {state.risk_score.toFixed(1)}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
+                                                <span className={`text-xs font-semibold px-2 py-1 rounded-full ${diff > 0 ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' : 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'}`}>
+                                                    {diff > 0 ? '+' : ''}{diff.toFixed(1)}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>

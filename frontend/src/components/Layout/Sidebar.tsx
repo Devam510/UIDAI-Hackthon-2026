@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, LayoutDashboard, TrendingUp, MapPin, ScanFace, Users, ChevronLeft, X } from 'lucide-react';
+import { Home, LayoutDashboard, TrendingUp, MapPin, ScanFace, Users, ChevronLeft, X, Briefcase, Shield } from 'lucide-react';
 import clsx from 'clsx';
 import Tooltip from '../Common/Tooltip';
 
@@ -14,6 +14,8 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse, isMobile = false, onClose }) => {
     const links = [
         { to: '/', label: 'Home', icon: <Home size={20} /> },
+        { to: '/executive-summary', label: 'Exec. Summary', icon: <Briefcase size={20} /> },
+        { to: '/audit-log', label: 'Audit Logs', icon: <Shield size={20} /> },
         { to: '/overview', label: 'Overview', icon: <LayoutDashboard size={20} /> },
         { to: '/forecast', label: 'Forecast', icon: <TrendingUp size={20} /> },
         { to: '/district-hotspots', label: 'District Risks', icon: <MapPin size={20} /> },

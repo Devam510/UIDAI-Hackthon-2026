@@ -99,6 +99,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from fastapi.middleware.gzip import GZipMiddleware
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
 app.include_router(ingestion_router, prefix="/ingest", tags=["Ingestion"])
 app.include_router(analytics_router, prefix="/analytics", tags=["Analytics"])
 app.include_router(features_router, prefix="/features", tags=["Features"])
