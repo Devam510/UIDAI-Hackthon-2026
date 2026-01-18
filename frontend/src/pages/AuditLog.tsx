@@ -30,8 +30,40 @@ const AuditLog: React.FC = () => {
 
     const handleExport = () => {
         auditService.logAction('EXPORT_LOGS', 'audit_dump.csv', 'User exported audit logs');
-        // Simulate export
-        alert('Audit logs exported successfully to local secure storage.');
+
+        // Generate CSV content
+        const headers = ['ID', 'Timestamp', 'User ID', 'Action', 'Resource', 'IP Address', 'Status', 'Details'];
+        const csvRows = [
+            headers.join(','),
+            ...logs.map(log => {
+                const row = [
+                    log.id,
+                    `"${new Date(log.timestamp).toISOString()}"`,
+                    log.userId,
+                    `"${log.action}"`,
+                    `"${log.resource}"`,
+                    log.ipAddress,
+                    log.status,
+                    `"${log.details.replace(/"/g, '""')}"` // Escape quotes
+                ];
+                return row.join(',');
+            })
+        ];
+        const csvContent = csvRows.join('\n');
+
+        // Trigger download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `audit_logs_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
         loadLogs(); // Refresh to show the export action
     };
 
