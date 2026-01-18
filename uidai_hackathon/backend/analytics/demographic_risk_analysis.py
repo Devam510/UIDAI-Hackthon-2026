@@ -21,7 +21,7 @@ Risk Scoring: ML-based anomaly detection (1-10 scale)
 import pandas as pd
 import numpy as np
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 from datetime import datetime
 
 from backend.ml.data_loader import get_last_data_date, load_processed_data

@@ -1,10 +1,11 @@
-# ... (existing imports)
+import pandas as pd
+import numpy as np
+import json
+from typing import Dict, List, Optional
 from backend.ml.data_loader import load_processed_data
 
-# ... (existing code)
 
 def train_demographic_risk_model(state: str = "Gujarat") -> Dict:
-    # ...
     print(f"[Demographic Risk Model] Training for state: {state}")
     
     # Load data from database
