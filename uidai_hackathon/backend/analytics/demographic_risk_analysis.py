@@ -24,16 +24,24 @@ from pathlib import Path
 from typing import Dict, List
 from datetime import datetime
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-PROCESSED_CSV = PROJECT_ROOT / "data" / "processed" / "aadhaar_master_monthly.csv"
-from backend.ml.data_loader import get_last_data_date
+from backend.ml.data_loader import get_last_data_date, load_processed_data
 
 
 def load_demographic_data(state: str) -> pd.DataFrame:
     """Load and filter processed CSV for demographic analysis."""
-    df = pd.read_csv(PROCESSED_CSV)
-    df['month'] = pd.to_datetime(df['month'])
-    
+    # Load data from database (zero file dependency)
+    try:
+        df = load_processed_data(validate=False)
+    except Exception as e:
+        # Return empty DF on error so we handle it gracefully upstream
+        return pd.DataFrame(columns=[
+            "state", "district", "month", 
+            "total_enrolments", "total_demo_updates", "total_bio_updates"
+        ])
+
+    if df.empty:
+        return df
+        
     # Filter by state
     state_df = df[df['state'].str.lower() == state.lower()].copy()
     
