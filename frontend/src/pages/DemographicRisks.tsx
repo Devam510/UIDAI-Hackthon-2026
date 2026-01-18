@@ -58,17 +58,26 @@ const DemographicRisks: React.FC = () => {
     }, [selectedState]);
 
     const fetchAIInsights = async () => {
+        // Guard clause for empty data
+        if (!data || !data.segments || data.segments.length === 0) return;
+        
         setLoadingInsights(true);
         try {
+            // Safe values for insights generation
+            const totalSegs = data.total_segments ?? 0;
+            const criticalSegs = data.critical_segments ?? 0;
+            const avgRisk = data.avg_risk_score ?? 0;
+            const highestRiskSeg = data.highest_risk_segment || 'high-risk segments';
+            
             // Fallback to generated insights (chatbot integration can be added later)
             const insights = {
                 summary: [
-                    `Demographic risk analysis for ${selectedState} shows ${data.total_segments} segments analyzed`,
-                    `${data.critical_segments} segments require immediate attention for demographic engagement`,
-                    `Average risk score of ${data.avg_risk_score.toFixed(1)} indicates ${data.avg_risk_score > 7 ? 'high' : 'moderate'} state-level concern`
+                    `Demographic risk analysis for ${selectedState} shows ${totalSegs} segments analyzed`,
+                    `${criticalSegs} segments require immediate attention for demographic engagement`,
+                    `Average risk score of ${avgRisk.toFixed(1)} indicates ${avgRisk > 7 ? 'high' : avgRisk > 4 ? 'moderate' : 'low'} state-level concern`
                 ],
                 actions: [
-                    `Deploy targeted biometric update campaigns in ${data.highest_risk_segment || 'high-risk segments'}`,
+                    `Deploy targeted biometric update campaigns in ${highestRiskSeg}`,
                     `Conduct demographic-specific outreach programs`,
                     `Implement monitoring systems for demographic engagement tracking`
                 ]
@@ -181,6 +190,12 @@ const DemographicRisks: React.FC = () => {
     if (loading) return <Loader />;
     if (error || !data) return <ErrorRetry onRetry={fetchData} message="Failed to load demographic risk data." />;
 
+    // Handle empty segments gracefully (data loaded but no districts found)
+    const hasSegments = data.segments && data.segments.length > 0;
+    const safeAvgRiskScore = data.avg_risk_score ?? 0;
+    const safeTotalSegments = data.total_segments ?? 0;
+    const safeCriticalSegments = data.critical_segments ?? 0;
+
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
             {/* Data Timestamp */}
@@ -214,7 +229,7 @@ const DemographicRisks: React.FC = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total Segments</p>
-                            <p className="text-3xl font-bold text-slate-900 dark:text-white">{data.total_segments}</p>
+                            <p className="text-3xl font-bold text-slate-900 dark:text-white">{safeTotalSegments}</p>
                         </div>
                         <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
                             <MapPin className="text-blue-400" size={24} />
@@ -226,7 +241,7 @@ const DemographicRisks: React.FC = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Critical Segments</p>
-                            <p className="text-3xl font-bold text-red-400">{data.critical_segments}</p>
+                            <p className="text-3xl font-bold text-red-400">{safeCriticalSegments}</p>
                         </div>
                         <div className="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
                             <AlertTriangle className="text-red-400" size={24} />
@@ -242,7 +257,7 @@ const DemographicRisks: React.FC = () => {
                                 {data.highest_risk_segment || 'N/A'}
                             </p>
                             <p className="text-sm text-slate-500">
-                                Score: {data.segments && data.segments.length > 0 ? data.segments[0].risk_score.toFixed(1) : '0'}
+                                Score: {hasSegments ? data.segments[0].risk_score.toFixed(1) : 'N/A'}
                             </p>
                         </div>
                         <div className="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center">
@@ -255,7 +270,7 @@ const DemographicRisks: React.FC = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Avg Risk Score</p>
-                            <p className="text-3xl font-bold text-green-400">{data.avg_risk_score.toFixed(1)}</p>
+                            <p className="text-3xl font-bold text-green-400">{safeAvgRiskScore.toFixed(1)}</p>
                         </div>
                         <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
                             <TrendingUp className="text-green-400" size={24} />
@@ -277,8 +292,18 @@ const DemographicRisks: React.FC = () => {
                                 onEvents={{ click: handleChartClick }}
                             />
                         ) : (
-                            <div className="h-full flex items-center justify-center text-slate-500">
-                                No segments found matching your search.
+                            <div className="h-full flex flex-col items-center justify-center text-slate-500 gap-4">
+                                <MapPin size={48} className="text-slate-400" />
+                                <p className="text-lg">
+                                    {!hasSegments 
+                                        ? `No demographic data available for ${selectedState}` 
+                                        : 'No segments found matching your search.'}
+                                </p>
+                                <p className="text-sm text-slate-400">
+                                    {!hasSegments 
+                                        ? 'Data may still be loading or not yet uploaded to the system.' 
+                                        : 'Try a different search term.'}
+                                </p>
                             </div>
                         )}
                     </div>
@@ -391,12 +416,21 @@ const DemographicRisks: React.FC = () => {
                 ) : (
                     <div className="text-center py-8">
                         <Sparkles className="mx-auto mb-4 text-purple-400" size={32} />
-                        <p className="text-slate-700 dark:text-slate-400 mb-4">Get AI-powered insights for {selectedState}</p>
+                    <p className="text-sm text-slate-700 dark:text-slate-400 mb-4">
+                        {hasSegments 
+                            ? `Get AI-powered insights for ${selectedState}` 
+                            : `No data available for AI insights on ${selectedState}`}
+                    </p>
                         <button
                             onClick={fetchAIInsights}
-                            className="px-6 py-2 bg-purple-600 hover:bg-purple-500 text-white font-medium rounded-lg transition-colors"
+                            disabled={!hasSegments}
+                            className={`px-6 py-2 text-white font-medium rounded-lg transition-colors ${
+                                hasSegments 
+                                    ? 'bg-purple-600 hover:bg-purple-500' 
+                                    : 'bg-slate-400 cursor-not-allowed'
+                            }`}
                         >
-                            Ask AI about this state
+                            {hasSegments ? 'Ask AI about this state' : 'No data available'}
                         </button>
                     </div>
                 )}

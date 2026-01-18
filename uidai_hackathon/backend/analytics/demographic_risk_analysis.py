@@ -107,11 +107,142 @@ def generate_recommendations(segment: Dict) -> List[str]:
     return recommendations
 
 
+def _statistical_fallback_analysis(state: str, state_df: pd.DataFrame) -> Dict:
+    """
+    Pure statistical fallback when ML model fails or no data.
+    Ensures the demographic page NEVER crashes.
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"Using statistical fallback for state: {state}")
+    
+    if state_df.empty:
+        # Return valid but empty response structure
+        return {
+            "status": "success",
+            "state": state,
+            "window_days": 90,
+            "total_segments": 0,
+            "critical_segments": 0,
+            "avg_risk_score": 0.0,
+            "highest_risk_segment": None,
+            "segments": [],
+            "metadata": {
+                "csv_source": "database",
+                "demographic_model_name": "StatisticalFallback",
+                "model_version": "1.0",
+                "training_date": datetime.now().strftime('%Y-%m-%d'),
+                "rows_used": 0,
+                "districts_analyzed": 0,
+                "features": [],
+                "data_lineage": "No Data Available",
+                "analysis_basis": "No data available for analysis",
+                "last_data_date": datetime.now().strftime('%Y-%m-%d')
+            }
+        }
+    
+    # Calculate state averages
+    state_avg_bio = state_df.groupby('month')['total_bio_updates'].sum().mean()
+    if state_avg_bio == 0:
+        state_avg_bio = 1
+    
+    segments = []
+    
+    for district in state_df['district'].unique():
+        district_df = state_df[state_df['district'] == district]
+        
+        # Calculate basic metrics
+        monthly_bio = district_df.groupby('month')['total_bio_updates'].sum()
+        monthly_enrol = district_df.groupby('month')['total_enrolments'].sum()
+        
+        if monthly_bio.sum() == 0:
+            continue  # Skip districts with no bio data
+        
+        # Calculate risk score using statistical method
+        bio_rate = monthly_bio.mean()
+        bio_std = monthly_bio.std() if len(monthly_bio) > 1 else 0
+        bio_cv = (bio_std / bio_rate) if bio_rate > 0 else 0
+        deviation = ((bio_rate - state_avg_bio) / state_avg_bio) * 100 if state_avg_bio > 0 else 0
+        
+        # Risk scoring: lower bio rate + high volatility + negative deviation = higher risk
+        risk_score = 5.0  # Base risk
+        risk_score += min(2, bio_cv * 2)  # Volatility factor
+        risk_score -= min(2, bio_rate / 10000)  # Higher bio rate = lower risk
+        if deviation < -20:
+            risk_score += 1.5
+        elif deviation < 0:
+            risk_score += 0.5
+        
+        risk_score = min(10, max(1, risk_score))
+        
+        # Get trend
+        trend = get_trend_direction(district_df)
+        severity = classify_severity(risk_score)
+        
+        # Build trend data
+        monthly_sorted = monthly_bio.sort_index()
+        trend_data = []
+        for month, value in monthly_sorted.items():
+            try:
+                trend_data.append({
+                    "month": month.strftime('%Y-%m') if hasattr(month, 'strftime') else str(month)[:7],
+                    "value": int(value)
+                })
+            except:
+                pass
+        
+        segment = {
+            "demographic_group": district,
+            "risk_score": round(risk_score, 2),
+            "enrolment_trend": trend,
+            "deviation_from_state_avg": round(deviation, 1),
+            "severity_level": severity,
+            "trend_data": trend_data[-12:],
+            "recommendations": generate_recommendations({
+                'severity_level': severity,
+                'enrolment_trend': trend
+            })
+        }
+        segments.append(segment)
+    
+    # Sort by risk
+    segments = sorted(segments, key=lambda x: x['risk_score'], reverse=True)
+    
+    total_segments = len(segments)
+    critical_segments = len([s for s in segments if s['severity_level'] == 'Severe'])
+    avg_risk = np.mean([s['risk_score'] for s in segments]) if segments else 0
+    highest_risk = segments[0] if segments else None
+    
+    return {
+        "status": "success",
+        "state": state,
+        "window_days": 90,
+        "total_segments": total_segments,
+        "critical_segments": critical_segments,
+        "avg_risk_score": round(avg_risk, 2),
+        "highest_risk_segment": highest_risk['demographic_group'] if highest_risk else None,
+        "segments": segments,
+        "metadata": {
+            "csv_source": "database",
+            "demographic_model_name": "StatisticalFallback",
+            "model_version": "1.0",
+            "training_date": datetime.now().strftime('%Y-%m-%d'),
+            "rows_used": len(state_df),
+            "districts_analyzed": total_segments,
+            "features": ["bio_rate", "volatility", "deviation"],
+            "data_lineage": "Database → Statistical Analysis → API → UI",
+            "analysis_basis": "Statistical risk scoring (ML fallback)",
+            "last_data_date": get_last_data_date()
+        }
+    }
+
+
 def analyze_demographic_risks(state: str, window_days: int = 90) -> Dict:
     """
     Analyze demographic risks using TRAINED ML MODEL.
     
     Uses Isolation Forest to detect anomalous biometric engagement patterns.
+    Falls back to statistical analysis if ML fails.
     
     Args:
         state: State name
@@ -120,18 +251,19 @@ def analyze_demographic_risks(state: str, window_days: int = 90) -> Dict:
     Returns:
         Dictionary with risk analysis results and metadata
     """
-    from backend.ml.risk.demographic_risk_model import predict_demographic_risks
+    import logging
+    logger = logging.getLogger(__name__)
     
     state_df = load_demographic_data(state)
     
+    # If no data, return empty but valid response
     if state_df.empty:
-        return {
-            "status": "error",
-            "message": f"No data found for state: {state}"
-        }
+        logger.warning(f"No data found for state: {state}, returning empty response")
+        return _statistical_fallback_analysis(state, state_df)
     
     try:
-        # Get ML model predictions
+        # Try ML model predictions
+        from backend.ml.risk.demographic_risk_model import predict_demographic_risks
         predictions_df = predict_demographic_risks(state, auto_train=True)
         
         # Calculate state average for deviation calculation
@@ -159,10 +291,15 @@ def analyze_demographic_risks(state: str, window_days: int = 90) -> Dict:
             
             # Get trend data for sparkline
             monthly_bio = district_df.groupby('month')['total_bio_updates'].sum().sort_index()
-            trend_data = [
-                {"month": month.strftime('%Y-%m'), "value": int(value)}
-                for month, value in monthly_bio.items()
-            ]
+            trend_data = []
+            for month, value in monthly_bio.items():
+                try:
+                    trend_data.append({
+                        "month": month.strftime('%Y-%m') if hasattr(month, 'strftime') else str(month)[:7],
+                        "value": int(value)
+                    })
+                except:
+                    pass
             
             # Skip districts with no biometric data (all zeros)
             total_bio_updates = sum(d['value'] for d in trend_data)
@@ -196,7 +333,7 @@ def analyze_demographic_risks(state: str, window_days: int = 90) -> Dict:
         # Load model metadata
         from backend.ml.risk.demographic_risk_model import load_demographic_risk_model
         try:
-            _, _, model_metadata = load_demographic_risk_model()
+            _, _, model_metadata = load_demographic_risk_model(state)
         except:
             model_metadata = {
                 "demographic_model_name": "IsolationForest_BiometricEngagement",
@@ -214,23 +351,21 @@ def analyze_demographic_risks(state: str, window_days: int = 90) -> Dict:
             "highest_risk_segment": highest_risk['demographic_group'] if highest_risk else None,
             "segments": segments,
             "metadata": {
-                "csv_source": "aadhaar_master_monthly.csv",
+                "csv_source": "database",
                 "demographic_model_name": model_metadata.get("demographic_model_name", "IsolationForest"),
                 "model_version": model_metadata.get("model_version", "2.0"),
                 "training_date": model_metadata.get("training_date", datetime.now().strftime('%Y-%m-%d')),
                 "rows_used": len(state_df),
                 "districts_analyzed": total_segments,
                 "features": model_metadata.get("features", ["bio_rate", "bio_trend", "bio_volatility", "deviation", "enrol_bio_ratio"]),
-                "data_lineage": "CSV → Feature Engineering → IsolationForest → Risk Scores → API → UI",
+                "data_lineage": "Database → Feature Engineering → IsolationForest → Risk Scores → API → UI",
                 "analysis_basis": "ML-based anomaly detection on biometric engagement patterns",
                 "last_data_date": get_last_data_date()
             }
         }
         
     except Exception as e:
-        return {
-            "status": "error",
-            "message": f"ML model prediction failed: {str(e)}",
-            "fallback": "Statistical analysis not available"
-        }
+        # ML failed - use statistical fallback instead of returning error
+        logger.warning(f"ML model failed for {state}, using statistical fallback: {e}")
+        return _statistical_fallback_analysis(state, state_df)
 
