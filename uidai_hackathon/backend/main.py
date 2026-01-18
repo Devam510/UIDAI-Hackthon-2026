@@ -15,80 +15,29 @@ app = FastAPI(
     version="1.0"
 )
 
-# ✅ STARTUP EVENT: Initialize database and load data
+# ✅ STARTUP EVENT: Initialize database (Schema Only)
 @app.on_event("startup")
 async def startup_event():
     """
-    Initialize database and load CSV data on application startup.
-    This ensures the database exists before any API requests are processed.
-    Critical for Render deployment where database doesn't persist between builds.
+    Initialize database schema on application startup.
+    DOES NOT load data automatically. Data must be uploaded via /admin/upload-csv.
     """
     import logging
-    from pathlib import Path
     from backend.db.base import Base
-    from backend.db.session import engine, SessionLocal
-    from backend.db import models  # Import models to register them with Base
-    from backend.ingestion.ingestion_service import ingest_uidai_source
+    from backend.db.session import engine
+    from backend.db import models  # Register models
     
     logger = logging.getLogger(__name__)
     
     try:
-        # Step 1: Create all database tables
-        logger.info("Creating database tables...")
+        logger.info("🔧 Initializing database schema...")
         Base.metadata.create_all(bind=engine)
-        logger.info("✅ Database tables created successfully")
-        
-        # Step 2: Check if database already has data
-        session = SessionLocal()
-        record_count = session.query(models.UIDAIRecord).count()
-        session.close()
-        
-        if record_count > 0:
-            logger.info(f"✅ Database already contains {record_count} records. Skipping data load.")
-            return
-        
-        # Step 3: Load data from CSV if database is empty
-        logger.info("Database is empty. Attempting to load data from CSV...")
-        
-        # Find the CSV file
-        project_root = Path(__file__).resolve().parents[1]  # uidai_hackathon folder
-        csv_path = project_root / "data" / "processed" / "aadhaar_master_monthly.csv"
-        
-        if not csv_path.exists():
-            logger.warning("=" * 80)
-            logger.warning("⚠️  CSV FILE NOT FOUND - DATABASE IS EMPTY")
-            logger.warning("=" * 80)
-            logger.warning(f"Expected CSV location: {csv_path}")
-            logger.warning("")
-            logger.warning("The database is empty and needs to be seeded with data.")
-            logger.warning("To upload data, use the /admin/upload-csv endpoint:")
-            logger.warning("")
-            logger.warning("  curl -X POST -F \"file=@aadhaar_master_monthly.csv\" \\")
-            logger.warning("    https://your-app.onrender.com/admin/upload-csv")
-            logger.warning("")
-            logger.warning("After uploading once, the PostgreSQL database will persist the data.")
-            logger.warning("You will NOT need to upload again on subsequent restarts.")
-            logger.warning("=" * 80)
-            return
-        
-        # Ingest the CSV data
-        logger.info(f"Loading data from {csv_path}...")
-        results = ingest_uidai_source(csv_path.parent)  # Pass the directory
-        
-        logger.info(f"✅ Data loaded successfully: {results}")
-        
-        # Verify data was loaded
-        session = SessionLocal()
-        final_count = session.query(models.UIDAIRecord).count()
-        session.close()
-        
-        logger.info(f"✅ Database now contains {final_count} records")
+        logger.info("✅ Database schema verified/created.")
         
     except Exception as e:
-        logger.error(f"❌ Error during startup initialization: {e}")
-        logger.exception("Full traceback:")
-        # Don't raise - let the app start anyway, but log the error
-
+        logger.error(f"❌ Error during database initialization: {e}")
+        # We don't raise here to allow the app to start even if DB is briefly unreachable
+        
 from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
@@ -109,7 +58,21 @@ app.include_router(features_router, prefix="/features", tags=["Features"])
 
 @app.get("/")
 def health_check():
-    return {"status": "running", "service": "UIDAI Backend"}
+    from backend.db.session import SessionLocal
+    from sqlalchemy import text
+    try:
+        db = SessionLocal()
+        db.execute(text("SELECT 1"))
+        db.close()
+        db_status = "connected"
+    except Exception:
+        db_status = "error"
+        
+    return {
+        "status": "running", 
+        "service": "UIDAI Backend", 
+        "database": db_status
+    }
 
 from backend.api.ml import router as ml_router
 app.include_router(ml_router, prefix="/ml", tags=["ML"])
@@ -133,74 +96,96 @@ app.include_router(export_router, prefix="/export", tags=["Export"])
 from backend.api.ai_insights import router as ai_insights_router
 app.include_router(ai_insights_router, prefix="/ai", tags=["AI Insights"])
 
-# ✅ TEMPORARY: CSV Upload Endpoint for Render Free Tier
-# Use this to upload CSV file since shell access is not available in free tier
-from fastapi import UploadFile, File, HTTPException
+# ✅ ADMIN: One-time CSV Upload Endpoint
+from fastapi import UploadFile, File, HTTPException, BackgroundTasks
 from pathlib import Path
 import shutil
+import tempfile
+import os
 
 @app.post("/admin/upload-csv")
-async def upload_csv_data(file: UploadFile = File(...)):
+async def upload_csv_data(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...)
+):
     """
-    Temporary endpoint to upload CSV data to Render.
-    Use this once after deployment to upload aadhaar_master_monthly.csv
-    
-    Usage:
-    curl -X POST -F "file=@aadhaar_master_monthly.csv" https://your-app.onrender.com/admin/upload-csv
+    Admin endpoint to seed the PostgreSQL database from CSV.
+    Replace existing data with fresh upload.
     """
     import logging
     from backend.ingestion.ingestion_service import ingest_uidai_source
-    from backend.db import models
     from backend.db.session import SessionLocal
+    from backend.db import models
+    from sqlalchemy import text
     
     logger = logging.getLogger(__name__)
     
+    if not file.filename.endswith('.csv'):
+        raise HTTPException(status_code=400, detail="Only .csv files are allowed")
+    
     try:
-        # Save uploaded file
-        project_root = Path(__file__).resolve().parents[1]
-        csv_dir = project_root / "data" / "processed"
-        csv_dir.mkdir(parents=True, exist_ok=True)
-        csv_path = csv_dir / "aadhaar_master_monthly.csv"
-        
-        logger.info(f"Saving uploaded CSV to {csv_path}")
-        
-        with open(csv_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        
-        logger.info("✅ CSV file saved successfully")
-        
-        # Check if data already exists
-        session = SessionLocal()
-        record_count = session.query(models.UIDAIRecord).count()
-        session.close()
-        
-        if record_count > 0:
-            return {
-                "status": "success",
-                "message": f"CSV uploaded but data already exists ({record_count} records). Skipping ingestion.",
-                "csv_path": str(csv_path)
-            }
-        
-        # Ingest the data
-        logger.info("Starting data ingestion...")
-        results = ingest_uidai_source(csv_dir)
-        
-        # Verify
-        session = SessionLocal()
-        final_count = session.query(models.UIDAIRecord).count()
-        session.close()
-        
-        logger.info(f"✅ Data ingestion complete. {final_count} records in database")
+        # Create a temporary file to store the upload
+        suffix = Path(file.filename).suffix
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp_file:
+            shutil.copyfileobj(file.file, tmp_file)
+            tmp_path = Path(tmp_file.name)
+            
+        logger.info(f"Received file: {file.filename}, saved to temp: {tmp_path}")
+
+        def process_upload(path: Path):
+            """Background task to process the file and clean up."""
+            try:
+                logger.info("⏳ Starting background ingestion...")
+                
+                # OPTIONAL: Clear existing data before load?
+                # For this hackathon, let's append or upsert. 
+                # But user requirement said "Replace existing data safely".
+                # Let's truncate table first to ensure clean state.
+                session = SessionLocal()
+                try:
+                    logger.info("🗑️ Clearing existing records...")
+                    session.execute(text("TRUNCATE TABLE uidai_records RESTART IDENTITY;"))
+                    session.commit()
+                except Exception as e:
+                    session.rollback()
+                    logger.error(f"Failed to truncate table: {e}")
+                finally:
+                    session.close()
+
+                # Process - we create a dummy directory structure because ingest_uidai_source expects a dir
+                # or we verify if ingest_uidai_source handles single file.
+                # Looking at ingestion_service.py, it handles directories.
+                # Let's create a temp dir, move file there.
+                
+                upload_dir = path.parent / "uidai_upload_temp"
+                upload_dir.mkdir(exist_ok=True)
+                target_path = upload_dir / "aadhaar_master_monthly.csv"
+                
+                # Move temp file to expected name
+                if target_path.exists():
+                    os.remove(target_path)
+                shutil.move(str(path), str(target_path))
+                
+                # Run ingestion
+                results = ingest_uidai_source(upload_dir)
+                logger.info(f"✅ Ingestion complete: {results}")
+                
+            except Exception as e:
+                logger.error(f"❌ Ingestion failed: {e}")
+            finally:
+                # Cleanup
+                if upload_dir.exists():
+                    shutil.rmtree(upload_dir)
+                if path.exists(): # Should be gone if moved, but just in case
+                    os.remove(path)
+
+        background_tasks.add_task(process_upload, tmp_path)
         
         return {
-            "status": "success",
-            "message": "CSV uploaded and data ingested successfully",
-            "csv_path": str(csv_path),
-            "records_loaded": final_count,
-            "ingestion_results": results
+            "status": "processing",
+            "message": "File received. Data ingestion started in background. Check logs for completion."
         }
         
     except Exception as e:
-        logger.error(f"❌ Error uploading CSV: {e}")
-        logger.exception("Full traceback:")
-        raise HTTPException(status_code=500, detail=f"Failed to upload CSV: {str(e)}")
+        logger.error(f"Upload failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

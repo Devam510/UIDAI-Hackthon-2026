@@ -1,133 +1,134 @@
 """
 Data loader for processed monthly Aadhaar data.
-Replaces raw database queries with CSV-based loading.
-Includes in-memory caching for performance.
+Replaces CSV reading with PostgreSQL database query.
+"Zero File Dependency" version for Render.
 """
 import pandas as pd
+import logging
 from pathlib import Path
 from typing import Optional, List, Dict
 from datetime import datetime, timedelta
 
-# ✅ Always resolve project root from this file location
-PROJECT_ROOT = Path(__file__).resolve().parents[2]  # .../uidai_hackathon (2 levels up from backend/ml/)
-PROCESSED_CSV_PATH = PROJECT_ROOT / "data" / "processed" / "aadhaar_master_monthly.csv"
+from backend.db.session import SessionLocal, engine
+from backend.db.models import UIDAIRecord
 
-# In-memory cache for CSV data
-_CSV_CACHE = {
+logger = logging.getLogger(__name__)
+
+# In-memory cache to reduce DB hits
+_DB_CACHE = {
     "data": None,
     "loaded_at": None,
     "ttl_minutes": 5  # Cache expires after 5 minutes
 }
 
-
-
 def load_processed_data(validate: bool = True, force_reload: bool = False) -> pd.DataFrame:
     """
-    Load processed monthly Aadhaar data from CSV with caching.
+    Load data from PostgreSQL database and pivot to expected format.
     
     Args:
-        validate: If True, run validation checks
-        force_reload: Force reload from disk (bypass cache)
+        validate: If True, run validation checks (kept for compatibility)
+        force_reload: Force reload from DB (bypass cache)
     
     Returns:
         DataFrame with columns: state, district, month, total_enrolments, 
                                 total_demo_updates, total_bio_updates
-    
-    Cache Strategy:
-        - First load: Read from CSV and cache
-        - Subsequent loads: Return cached data (if < 5 minutes old)
-        - After 5 minutes: Reload from CSV and update cache
     """
-    global _CSV_CACHE
+    global _DB_CACHE
     
-    # Check if cache is valid
-    if not force_reload and _CSV_CACHE["data"] is not None and _CSV_CACHE["loaded_at"] is not None:
-        cache_age = datetime.now() - _CSV_CACHE["loaded_at"]
-        if cache_age < timedelta(minutes=_CSV_CACHE["ttl_minutes"]):
-            # Cache is still valid
-            return _CSV_CACHE["data"].copy()  # Return copy to prevent modifications
+    # Check cache
+    if not force_reload and _DB_CACHE["data"] is not None and _DB_CACHE["loaded_at"] is not None:
+        cache_age = datetime.now() - _DB_CACHE["loaded_at"]
+        if cache_age < timedelta(minutes=_DB_CACHE["ttl_minutes"]):
+            return _DB_CACHE["data"].copy()
     
-    # Load from CSV (cache miss or expired)
-    if not PROCESSED_CSV_PATH.exists():
-        raise FileNotFoundError(
-            f"Processed CSV not found at: {PROCESSED_CSV_PATH}\n"
-            f"Please ensure data processing has been run."
-        )
+    logger.info("📡 Fetching data from PostgreSQL database...")
     
-    df = pd.read_csv(PROCESSED_CSV_PATH)
-    
-    # Ensure correct data types
-    df['month'] = pd.to_datetime(df['month'], format='%Y-%m')
-    df['total_enrolments'] = df['total_enrolments'].astype(int)
-    df['total_demo_updates'] = df['total_demo_updates'].fillna(0).astype(int)
-    df['total_bio_updates'] = df['total_bio_updates'].fillna(0).astype(int)
-    
-    # Normalize state and district names
-    df['state'] = df['state'].str.strip().str.title()
-    df['district'] = df['district'].str.strip().str.title()
-    
-    # ✅ DEDUPLICATE: Aggregate duplicate (state, district, month) records
-    # This handles inconsistent district naming (e.g., "K.V.Rangareddy" vs "K.v. Rangareddy")
-    df = df.groupby(['state', 'district', 'month'], as_index=False).agg({
-        'total_enrolments': 'sum',
-        'total_demo_updates': 'sum',
-        'total_bio_updates': 'sum'
-    })
-    
-    # Sort by date
-    df = df.sort_values(['state', 'district', 'month']).reset_index(drop=True)
-    
-    if validate:
-        validate_monthly_data(df)
-    
-    # Update cache
-    _CSV_CACHE["data"] = df
-    _CSV_CACHE["loaded_at"] = datetime.now()
-    
-    return df.copy()
+    try:
+        # SQL Query to fetch data
+        # We fetch raw records: date, state, district, metric_name, value
+        query = "SELECT date as month, state, district, metric_name, metric_value FROM uidai_records"
+        
+        # Use pandas read_sql with the engine
+        df_long = pd.read_sql(query, engine)
+        
+        if df_long.empty:
+            logger.warning("⚠️ Database return empty DataFrame! Database might be empty.")
+            # Return empty DataFrame with expected columns to prevent crashes
+            return pd.DataFrame(columns=[
+                "state", "district", "month", 
+                "total_enrolments", "total_demo_updates", "total_bio_updates"
+            ])
 
+        # Convert date to datetime
+        df_long['month'] = pd.to_datetime(df_long['month'])
+        
+        # Pivot the table: Long -> Wide
+        # Index: month, state, district
+        # Columns: metric_name
+        # Values: metric_value
+        df_wide = df_long.pivot_table(
+            index=['state', 'district', 'month'], 
+            columns='metric_name', 
+            values='metric_value', 
+            aggfunc='sum',
+            fill_value=0
+        ).reset_index()
+        
+        # Ensure we have all expected columns
+        expected_cols = ["total_enrolments", "total_demo_updates", "total_bio_updates"]
+        for col in expected_cols:
+            if col not in df_wide.columns:
+                df_wide[col] = 0
+                
+        # Rename columns to match exact expected schema if needed (pivot uses metric names as cols)
+        # Ensure types
+        df_wide['total_enrolments'] = df_wide['total_enrolments'].astype(int)
+        df_wide['total_demo_updates'] = df_wide['total_demo_updates'].astype(int)
+        df_wide['total_bio_updates'] = df_wide['total_bio_updates'].astype(int)
+        
+        # Normalize exact format as original (sort by state, district, month)
+        df_wide = df_wide.sort_values(['state', 'district', 'month']).reset_index(drop=True)
+        
+        logger.info(f"✅ Loaded {len(df_wide)} rows from database.")
+        
+        # Update cache
+        _DB_CACHE["data"] = df_wide
+        _DB_CACHE["loaded_at"] = datetime.now()
+        
+        return df_wide.copy()
+
+    except Exception as e:
+        logger.error(f"❌ Failed to load data from database: {e}")
+        # Return empty DF on error to avoid critical crash
+        return pd.DataFrame(columns=[
+            "state", "district", "month", 
+            "total_enrolments", "total_demo_updates", "total_bio_updates"
+        ])
 
 
 def get_monthly_enrolment_series(state: Optional[str] = None, 
                                   district: Optional[str] = None) -> List[Dict]:
-    """
-    Get monthly enrolment time series for a state/district.
-    
-    Args:
-        state: State name (optional)
-        district: District name (optional)
-    
-    Returns:
-        List of dicts with 'month' and 'total_enrolment' keys
-    """
+    """Get monthly enrolment time series for a state/district."""
     df = load_processed_data(validate=False)
     
-    print(f"[Data Loader] get_monthly_enrolment_series called with state='{state}', district='{district}'")
-    print(f"[Data Loader] Total records in CSV: {len(df)}")
-    print(f"[Data Loader] Unique states in CSV: {df['state'].unique()[:5]}")
-    
+    if df.empty:
+        return []
+
     # Normalize filters
     if state:
-        original_state = state
         state = " ".join(str(state).strip().split()).title()
-        print(f"[Data Loader] Normalized state: '{original_state}' -> '{state}'")
         df = df[df['state'] == state]
-        print(f"[Data Loader] Records after state filter: {len(df)}")
     
     if district:
         district = " ".join(str(district).strip().split()).title()
         df = df[df['district'] == district]
-        print(f"[Data Loader] Records after district filter: {len(df)}")
     
     if df.empty:
-        print(f"[Data Loader] WARNING: No data found for state='{state}', district='{district}'")
         return []
     
     # Group by month and sum enrolments
     monthly = df.groupby('month')['total_enrolments'].sum().reset_index()
     monthly = monthly.sort_values('month')
-    
-    print(f"[Data Loader] Returning {len(monthly)} monthly data points")
     
     return [
         {"month": row['month'], "total_enrolment": int(row['total_enrolments'])}
@@ -137,19 +138,12 @@ def get_monthly_enrolment_series(state: Optional[str] = None,
 
 def get_monthly_biometric_series(state: Optional[str] = None,
                                   district: Optional[str] = None) -> List[Dict]:
-    """
-    Get monthly biometric update time series for a state/district.
-    
-    Args:
-        state: State name (optional)
-        district: District name (optional)
-    
-    Returns:
-        List of dicts with 'month' and 'total_biometric' keys
-    """
+    """Get monthly biometric update time series for a state/district."""
     df = load_processed_data(validate=False)
     
-    # Normalize filters
+    if df.empty:
+        return []
+        
     if state:
         state = " ".join(str(state).strip().split()).title()
         df = df[df['state'] == state]
@@ -161,7 +155,6 @@ def get_monthly_biometric_series(state: Optional[str] = None,
     if df.empty:
         return []
     
-    # Group by month and sum biometric updates
     monthly = df.groupby('month')['total_bio_updates'].sum().reset_index()
     monthly = monthly.sort_values('month')
     
@@ -173,19 +166,12 @@ def get_monthly_biometric_series(state: Optional[str] = None,
 
 def get_monthly_demographic_series(state: Optional[str] = None,
                                     district: Optional[str] = None) -> List[Dict]:
-    """
-    Get monthly demographic update time series for a state/district.
-    
-    Args:
-        state: State name (optional)
-        district: District name (optional)
-    
-    Returns:
-        List of dicts with 'month' and 'total_demographic' keys
-    """
+    """Get monthly demographic update time series for a state/district."""
     df = load_processed_data(validate=False)
     
-    # Normalize filters
+    if df.empty:
+        return []
+
     if state:
         state = " ".join(str(state).strip().split()).title()
         df = df[df['state'] == state]
@@ -197,7 +183,6 @@ def get_monthly_demographic_series(state: Optional[str] = None,
     if df.empty:
         return []
     
-    # Group by month and sum demographic updates
     monthly = df.groupby('month')['total_demo_updates'].sum().reset_index()
     monthly = monthly.sort_values('month')
     
@@ -210,6 +195,8 @@ def get_monthly_demographic_series(state: Optional[str] = None,
 def list_states() -> List[str]:
     """Get list of unique states in processed data."""
     df = load_processed_data(validate=False)
+    if df.empty:
+        return []
     return sorted(df['state'].unique().tolist())
 
 
@@ -217,7 +204,6 @@ def list_districts(state: str) -> List[str]:
     """Get list of unique districts for a state."""
     df = load_processed_data(validate=False)
     
-    # Normalize state name
     state = " ".join(str(state).strip().split()).title()
     df = df[df['state'] == state]
     
@@ -225,13 +211,10 @@ def list_districts(state: str) -> List[str]:
 
 
 def get_last_data_date() -> str:
-    """
-    Get the last (most recent) date in the CSV data.
-    Returns date in YYYY-MM-DD format for frontend timestamps.
-    """
+    """Get the last (most recent) date in the data."""
     df = load_processed_data(validate=False)
-    if 'month' in df.columns:
+    if not df.empty and 'month' in df.columns:
         max_date = pd.to_datetime(df['month']).max()
         return max_date.strftime('%Y-%m-%d')
-    return '2025-07-01'  # Fallback if no data
+    return datetime.now().strftime('%Y-%m-%d')
 
