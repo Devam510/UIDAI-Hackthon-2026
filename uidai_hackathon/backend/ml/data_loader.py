@@ -8,7 +8,7 @@ import logging
 from pathlib import Path
 from typing import Optional, List, Dict
 from datetime import datetime, timedelta
-from backend.common.state_resolver import normalize_state_name
+
 # ... imports
 
 # ... (data_loader function)
@@ -23,6 +23,7 @@ def get_monthly_enrolment_series(state: Optional[str] = None,
 
     # Normalize filters
     if state:
+        from backend.common.state_resolver import normalize_state_name
         normalized = normalize_state_name(state)
         state_filter = normalized if normalized else " ".join(str(state).strip().split()).title()
         df = df[df['state'] == state_filter]
@@ -45,6 +46,7 @@ def get_monthly_biometric_series(state: Optional[str] = None,
         return []
         
     if state:
+        from backend.common.state_resolver import normalize_state_name
         normalized = normalize_state_name(state)
         state_filter = normalized if normalized else " ".join(str(state).strip().split()).title()
         df = df[df['state'] == state_filter]
@@ -67,6 +69,7 @@ def get_monthly_demographic_series(state: Optional[str] = None,
         return []
 
     if state:
+        from backend.common.state_resolver import normalize_state_name
         normalized = normalize_state_name(state)
         state_filter = normalized if normalized else " ".join(str(state).strip().split()).title()
         df = df[df['state'] == state_filter]
@@ -84,6 +87,9 @@ def list_districts(state: str) -> List[str]:
     """Get list of unique districts for a state."""
     df = load_processed_data(validate=False)
     
+    df = load_processed_data(validate=False)
+    
+    from backend.common.state_resolver import normalize_state_name
     normalized = normalize_state_name(state)
     state_filter = normalized if normalized else " ".join(str(state).strip().split()).title()
     df = df[df['state'] == state_filter]
