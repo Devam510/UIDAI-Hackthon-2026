@@ -45,8 +45,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173", 
         "http://localhost:3000", 
-        "https://uidai-hackathon-2026-ui.onrender.com",
-        "*"
+        "https://uidai-hackathon-2026-ui.onrender.com"
     ],
     allow_credentials=True,
     allow_methods=["*"],
