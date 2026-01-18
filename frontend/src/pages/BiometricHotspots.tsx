@@ -410,69 +410,7 @@ const BiometricHotspots: React.FC = () => {
                                 </p>
                             </div>
 
-                            {/* Recommended Actions - NEW */}
-                            <div className="pt-4 border-t border-slate-300 dark:border-slate-700">
-                                <p className="text-sm font-semibold text-slate-700 dark:text-slate-400 mb-3">📋 Recommended Action Plan</p>
 
-                                <div className={`p-3 rounded-lg border ${selectedDistrict.severity === 'Severe'
-                                    ? 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-900/30'
-                                    : selectedDistrict.severity === 'Moderate'
-                                        ? 'bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-900/30'
-                                        : 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-900/30'
-                                    }`}>
-                                    <div className="flex justify-between items-start mb-2">
-                                        <span className={`text-xs font-bold uppercase tracking-wider ${selectedDistrict.severity === 'Severe' ? 'text-red-700 dark:text-red-400' :
-                                            selectedDistrict.severity === 'Moderate' ? 'text-orange-700 dark:text-orange-400' :
-                                                'text-green-700 dark:text-green-400'
-                                            }`}>
-                                            {selectedDistrict.severity === 'Severe' ? 'Critical Remediation' :
-                                                selectedDistrict.severity === 'Moderate' ? 'Correction Required' :
-                                                    'Optimization'}
-                                        </span>
-                                        <span className="text-xs font-medium text-slate-500">
-                                            {selectedDistrict.severity === 'Severe' ? 'Immediate (48h)' :
-                                                selectedDistrict.severity === 'Moderate' ? 'Within 2 Weeks' :
-                                                    'Ongoing'}
-                                        </span>
-                                    </div>
-
-                                    <div className="space-y-2 mb-3">
-                                        <div className="flex items-start gap-2">
-                                            <div className="mt-1 w-1.5 h-1.5 rounded-full bg-slate-400" />
-                                            <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
-                                                {selectedDistrict.severity === 'Severe'
-                                                    ? 'Mandatory device recalibration for all centers >10% failure rate'
-                                                    : selectedDistrict.severity === 'Moderate'
-                                                        ? 'Schedule retraining for operators with high exception counts'
-                                                        : 'Perform routine preventive maintenance on capture devices'}
-                                            </p>
-                                        </div>
-                                        <div className="flex items-start gap-2">
-                                            <div className="mt-1 w-1.5 h-1.5 rounded-full bg-slate-400" />
-                                            <p className="text-sm text-slate-700 dark:text-slate-300">
-                                                {selectedDistrict.severity === 'Severe'
-                                                    ? 'Freeze IDs of flagged operators pending investigation'
-                                                    : selectedDistrict.severity === 'Moderate'
-                                                        ? 'Increase biometric exception monitoring frequency'
-                                                        : 'Reward top-performing centers to maintain quality standards'}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700/50">
-                                        <div className="text-xs text-slate-500">
-                                            Est. Budget: <span className="font-semibold text-slate-700 dark:text-slate-300">
-                                                {selectedDistrict.severity === 'Severe' ? '₹1.5 Lakhs' :
-                                                    selectedDistrict.severity === 'Moderate' ? '₹25,000' :
-                                                        '₹0 (OpEx)'}
-                                            </span>
-                                        </div>
-                                        <button className="text-xs font-medium text-primary-600 hover:text-primary-500 hover:underline">
-                                            View Protocols →
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     ) : (
                         <div className="h-full flex items-center justify-center text-slate-500">

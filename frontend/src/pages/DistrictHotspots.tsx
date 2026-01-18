@@ -388,69 +388,7 @@ const DistrictHotspots: React.FC = () => {
                                 </p>
                             </div>
 
-                            {/* Recommended Actions - NEW STRUCTURE */}
-                            <div className="pt-4 border-t border-slate-300 dark:border-slate-700">
-                                <p className="text-sm font-semibold text-slate-700 dark:text-slate-400 mb-3">📋 Recommended Action Plan</p>
 
-                                <div className={`p-3 rounded-lg border ${selectedDistrict.risk_score >= 7
-                                    ? 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-900/30'
-                                    : selectedDistrict.risk_score >= 4
-                                        ? 'bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-900/30'
-                                        : 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-900/30'
-                                    }`}>
-                                    <div className="flex justify-between items-start mb-2">
-                                        <span className={`text-xs font-bold uppercase tracking-wider ${selectedDistrict.risk_score >= 7 ? 'text-red-700 dark:text-red-400' :
-                                            selectedDistrict.risk_score >= 4 ? 'text-orange-700 dark:text-orange-400' :
-                                                'text-green-700 dark:text-green-400'
-                                            }`}>
-                                            {selectedDistrict.risk_score >= 7 ? 'Emergency Response' :
-                                                selectedDistrict.risk_score >= 4 ? 'Corrective Action' :
-                                                    'Maintenance'}
-                                        </span>
-                                        <span className="text-xs font-medium text-slate-500">
-                                            {selectedDistrict.risk_score >= 7 ? 'Immediate (24-48h)' :
-                                                selectedDistrict.risk_score >= 4 ? 'High Priority (1 week)' :
-                                                    'Routine'}
-                                        </span>
-                                    </div>
-
-                                    <div className="space-y-2 mb-3">
-                                        <div className="flex items-start gap-2">
-                                            <div className="mt-1 w-1.5 h-1.5 rounded-full bg-slate-400" />
-                                            <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
-                                                {selectedDistrict.risk_score >= 7
-                                                    ? 'Deploy 2 Mobile Enrollment Units to high-gap blocks'
-                                                    : selectedDistrict.risk_score >= 4
-                                                        ? 'Conduct operator refresher training on document update guidelines'
-                                                        : 'continue regular daily performance monitoring'}
-                                            </p>
-                                        </div>
-                                        <div className="flex items-start gap-2">
-                                            <div className="mt-1 w-1.5 h-1.5 rounded-full bg-slate-400" />
-                                            <p className="text-sm text-slate-700 dark:text-slate-300">
-                                                {selectedDistrict.risk_score >= 7
-                                                    ? 'Initiate district-wide awareness camp for mandatory updates'
-                                                    : selectedDistrict.risk_score >= 4
-                                                        ? 'Audit center infrastructure for connectivity issues'
-                                                        : 'Share best practices with nearby high-risk districts'}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700/50">
-                                        <div className="text-xs text-slate-500">
-                                            Est. Budget: <span className="font-semibold text-slate-700 dark:text-slate-300">
-                                                {selectedDistrict.risk_score >= 7 ? '₹2.5 Lakhs' :
-                                                    selectedDistrict.risk_score >= 4 ? '₹50,000' :
-                                                        '₹0 (OpEx)'}
-                                            </span>
-                                        </div>
-                                        <button className="text-xs font-medium text-primary-600 hover:text-primary-500 hover:underline">
-                                            Generate Proposal →
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     ) : (
                         <div className="h-full flex items-center justify-center text-slate-500">
