@@ -15,12 +15,12 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse, isMobile
     const links = [
         { to: '/', label: 'Home', icon: <Home size={20} /> },
 
-        { to: '/audit-log', label: 'Audit Logs', icon: <Shield size={20} /> },
         { to: '/overview', label: 'Overview', icon: <LayoutDashboard size={20} /> },
         { to: '/forecast', label: 'Forecast', icon: <TrendingUp size={20} /> },
         { to: '/district-hotspots', label: 'District Risks', icon: <MapPin size={20} /> },
         { to: '/biometric-hotspots', label: 'Biometric Risks', icon: <ScanFace size={20} /> },
         { to: '/demographic-risks', label: 'Demographic Risks', icon: <Users size={20} /> },
+        { to: '/audit-log', label: 'Audit Logs', icon: <Shield size={20} /> },
     ];
 
 
