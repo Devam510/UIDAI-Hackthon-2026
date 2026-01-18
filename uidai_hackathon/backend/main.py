@@ -1,19 +1,48 @@
 # FastAPI application entry point - Updated for frontend connection
+# CRITICAL: Import order matters for Render cold-start reliability
 from backend.config.logging import setup_logging
 setup_logging()
 
+import logging
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
+from fastapi import Request
 
-from backend.api.ingestion import router as ingestion_router
-from backend.api.analytics import router as analytics_router
-from backend.api.features import router as features_router
+logger = logging.getLogger(__name__)
 
-
+# Create FastAPI app
 app = FastAPI(
     title="UIDAI Trends Platform",
     description="Dynamic analytics & insights for Aadhaar enrolment",
     version="1.0"
 )
+
+# ✅ CORS CONFIGURATION - MUST BE BEFORE ROUTES
+# Critical: Add CORS middleware FIRST, before any routes are registered
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://uidai-hackathon-2026-ui.onrender.com",
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "*"  # Allow all origins for hackathon reliability
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+)
+
+# GZip compression
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+# ✅ LIGHTWEIGHT HEALTH ENDPOINT - No DB required (for cold-start wake-up)
+@app.get("/health")
+def health_check_light():
+    """Lightweight health check - responds immediately without DB check."""
+    return {"status": "ok", "service": "UIDAI Backend", "ready": True}
 
 # ✅ STARTUP EVENT: Initialize database (Schema Only)
 @app.on_event("startup")
@@ -22,12 +51,9 @@ async def startup_event():
     Initialize database schema on application startup.
     DOES NOT load data automatically. Data must be uploaded via /admin/upload-csv.
     """
-    import logging
     from backend.db.base import Base
     from backend.db.session import engine
     from backend.db import models  # Register models
-    
-    logger = logging.getLogger(__name__)
     
     try:
         logger.info("🔧 Initializing database schema...")
@@ -37,26 +63,11 @@ async def startup_event():
     except Exception as e:
         logger.error(f"❌ Error during database initialization: {e}")
         # We don't raise here to allow the app to start even if DB is briefly unreachable
-        
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from fastapi import Request
 
-# ✅ CORS CONFIGURATION (Strict)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "https://uidai-hackathon-2026-ui.onrender.com",
-        "http://localhost:5173",
-        "http://localhost:3000"  # Included for local dev compatibility if needed
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-from fastapi.middleware.gzip import GZipMiddleware
-app.add_middleware(GZipMiddleware, minimum_size=1000)
+# Import routers AFTER middleware setup
+from backend.api.ingestion import router as ingestion_router
+from backend.api.analytics import router as analytics_router
+from backend.api.features import router as features_router
 
 # ✅ GLOBAL ERROR HANDLER
 @app.exception_handler(Exception)

@@ -178,14 +178,27 @@ def resolve_state(user_input: str) -> str:
     if not normalized:
         raise ValueError(f"Invalid state input: '{user_input}'")
     
-    # Get all states from database
-    session = SessionLocal()
+    # Try to get states from database, but handle cold-start failures gracefully
+    db_states = []
     try:
-        states_query = session.query(UIDAIRecord.state).distinct().all()
-        db_states = [normalize_state_name(s[0]) for s in states_query if s[0]]
-        db_states = [s for s in db_states if s]  # Filter None values
-    finally:
-        session.close()
+        session = SessionLocal()
+        try:
+            states_query = session.query(UIDAIRecord.state).distinct().all()
+            db_states = [normalize_state_name(s[0]) for s in states_query if s[0]]
+            db_states = [s for s in db_states if s]  # Filter None values
+        finally:
+            session.close()
+    except Exception as e:
+        # Database not ready (cold start) - proceed with normalized name
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f"DB query failed during state resolution (cold start?): {e}")
+        # Return normalized form - don't crash the API
+        return normalized
+    
+    # If no states in DB, return normalized form
+    if not db_states:
+        return normalized
     
     # Exact match (case-insensitive)
     for st in db_states:
@@ -209,21 +222,36 @@ def get_all_canonical_states() -> list:
     Returns:
         List of canonical state names, sorted alphabetically
     """
-    session = SessionLocal()
     try:
-        # Get all distinct states from database
-        states_query = session.query(UIDAIRecord.state).distinct().all()
-        raw_states = [s[0] for s in states_query if s[0]]
-        
-        # Normalize all states
-        normalized_states = set()
-        for state in raw_states:
-            canonical = normalize_state_name(state)
-            if canonical:
-                normalized_states.add(canonical)
-        
-        # Sort alphabetically
-        return sorted(list(normalized_states))
-        
-    finally:
-        session.close()
+        session = SessionLocal()
+        try:
+            # Get all distinct states from database
+            states_query = session.query(UIDAIRecord.state).distinct().all()
+            raw_states = [s[0] for s in states_query if s[0]]
+            
+            # Normalize all states
+            normalized_states = set()
+            for state in raw_states:
+                canonical = normalize_state_name(state)
+                if canonical:
+                    normalized_states.add(canonical)
+            
+            # Sort alphabetically
+            return sorted(list(normalized_states))
+            
+        finally:
+            session.close()
+    except Exception as e:
+        # Database not ready (cold start) - return default list
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f"DB query failed during get_all_canonical_states (cold start?): {e}")
+        # Return common Indian states as fallback
+        return [
+            "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+            "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand",
+            "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
+            "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
+            "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
+            "Uttar Pradesh", "Uttarakhand", "West Bengal", "Delhi"
+        ]
