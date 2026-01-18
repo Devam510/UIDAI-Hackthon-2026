@@ -309,9 +309,9 @@ const Forecast: React.FC = () => {
                     return tooltip;
                 }
             },
-            // LEGEND ORDER: Exactly as in reference image
+            // LEGEND ORDER: Accurately labeled with actual model used
             legend: {
-                data: ['95% Confidence Interval', 'Prophet Forecast', 'Historical Data'],
+                data: ['95% Confidence Interval', 'Trend Forecast (Ridge Regression)', 'Historical Data'],
                 bottom: 0,
                 textStyle: { color: '#94a3b8', fontSize: 11 },
                 itemGap: 20
@@ -422,9 +422,9 @@ const Forecast: React.FC = () => {
                         }
                     }
                 },
-                // 3. PROPHET FORECAST LINE (pink dashed)
+                // 3. RIDGE REGRESSION FORECAST LINE (pink dashed)
                 {
-                    name: 'Prophet Forecast',
+                    name: 'Trend Forecast (Ridge Regression)',
                     type: 'line',
                     data: predictedValues,
                     lineStyle: {
@@ -612,7 +612,7 @@ const Forecast: React.FC = () => {
                             )}
 
                             {/* Main Trend Analysis Graph */}
-                            <Card title="Trend Direction Analysis (Historical + Short-term Projection)">
+                            <Card title="Enrollment Trend Forecast (Ridge Regression Model)">
                                 <div className="h-[450px] w-full">
                                     <ReactECharts
                                         option={chartOption}
@@ -637,6 +637,16 @@ const Forecast: React.FC = () => {
 
                                 {showModelInfo && (
                                     <div className="mt-4 space-y-3 text-sm border-t border-slate-700 pt-4">
+                                        {/* Model Explanation */}
+                                        <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-900/30 rounded-lg p-3 mb-4">
+                                            <div className="flex items-start gap-2">
+                                                <Info size={16} className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                                                <div className="text-xs text-slate-700 dark:text-slate-300">
+                                                    <strong className="text-blue-700 dark:text-blue-400">Model Choice:</strong> This forecast uses <strong>Ridge Regression with temporal features</strong> (time index, 7-day lag, 7-day rolling average). Prophet models were explored in research notebooks for future enhancement but Ridge Regression is deployed for production.
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <div className="flex justify-between">
                                             <span className="text-slate-700 dark:text-slate-400">Date Range:</span>
                                             <span className="text-slate-900 dark:text-white font-medium">{fromDate} to {toDate}</span>

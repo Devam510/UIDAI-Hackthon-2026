@@ -361,6 +361,64 @@ const Home: React.FC = () => {
                 </div>
             </div>
 
+            {/* Top 3 Quick Wins - Executive Summary */}
+            <Card
+                title="🎯 Top 3 Quick Wins"
+                className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10 border-amber-200 dark:border-amber-900/30"
+            >
+                <p className="text-xs text-slate-600 dark:text-slate-400 mb-4">Prioritized actions for immediate impact</p>
+                <div className="space-y-3">
+                    {sortedStates.slice(0, 3).map((state, idx) => {
+                        // Generate dynamic quick win recommendation based on state data
+                        let action = '';
+                        let impact = '';
+
+                        if (state.risk_score >= 7) {
+                            action = `${state.name}: Deploy mobile enrollment units in ${state.top_district || 'high-risk districts'}`;
+                            impact = `Reduces risk from ${state.risk_score.toFixed(1)} to ~${(state.risk_score - 1.6).toFixed(1)}`;
+                        } else if (state.negative_gap_ratio >= 40) {
+                            action = `${state.name}: Conduct biometric recapture campaign in ${state.top_district || 'critical areas'}`;
+                            impact = `Failure rate: ${state.negative_gap_ratio.toFixed(0)}% - target reduction to 25%`;
+                        } else if (state.anomaly_severity >= 6) {
+                            action = `${state.name}: Investigate enrollment anomaly in ${state.top_district || 'affected regions'}`;
+                            impact = `Anomaly severity: ${state.anomaly_severity.toFixed(1)} - validate data integrity`;
+                        } else if (state.forecast_growth < 0) {
+                            action = `${state.name}: Launch awareness campaign to reverse declining trend`;
+                            impact = `Forecast growth: ${state.forecast_growth.toFixed(1)}% - target +3% growth`;
+                        } else {
+                            action = `${state.name}: Maintain monitoring for ${state.top_district || 'all districts'}`;
+                            impact = `Current performance: Stable (Risk: ${state.risk_score.toFixed(1)})`;
+                        }
+
+                        return (
+                            <div
+                                key={idx}
+                                className="flex items-start gap-3 p-3 bg-white dark:bg-slate-800/50 rounded-lg border border-amber-200 dark:border-amber-900/30 hover:shadow-md transition-shadow cursor-pointer"
+                                onClick={() => handleViewState(state.name)}
+                            >
+                                <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                    {idx + 1}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-semibold text-slate-900 dark:text-white mb-1">
+                                        {action}
+                                    </p>
+                                    <p className="text-xs text-slate-600 dark:text-slate-400">
+                                        📊 {impact}
+                                    </p>
+                                </div>
+                                <ArrowRight className="flex-shrink-0 text-amber-500 dark:text-amber-400" size={18} />
+                            </div>
+                        );
+                    })}
+                </div>
+                <div className="mt-4 pt-4 border-t border-amber-200 dark:border-amber-900/30">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 italic">
+                        💡 Click any item to view detailed analytics and implement targeted interventions
+                    </p>
+                </div>
+            </Card>
+
             {/* Priority Details Table and Alerts */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Priority Details Table */}

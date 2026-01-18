@@ -5,6 +5,7 @@ import Card from '../components/Common/Card';
 import Loader from '../components/Common/Loader';
 import ErrorRetry from '../components/Common/ErrorRetry';
 import Sparkline from '../components/Common/Sparkline';
+import DataTimestamp from '../components/Common/DataTimestamp';
 import client from '../api/client';
 import { useStateContext } from '../context/StateContext';
 import { useTheme } from '../hooks/useTheme';
@@ -182,6 +183,12 @@ const DemographicRisks: React.FC = () => {
 
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
+            {/* Data Timestamp */}
+            <DataTimestamp
+                lastDataDate={data.last_data_date || new Date().toISOString().split('T')[0]}
+                generatedAt={new Date().toISOString()}
+            />
+
             {/* Header with Controls */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">Demographic Risk Analysis: {selectedState}</h2>
@@ -338,6 +345,59 @@ const DemographicRisks: React.FC = () => {
                                 <p className="text-xs text-slate-500">
                                     {(selectedSegment.risk_score - (data?.avg_risk_score || 0)) > 0 ? 'Above' : 'Below'} state average
                                 </p>
+                            </div>
+
+                            {/* Recommended Actions */}
+                            <div className="pt-4 border-t border-slate-300 dark:border-slate-700">
+                                <p className="text-sm font-semibold text-slate-700 dark:text-slate-400 mb-3">📋 Recommended Actions</p>
+                                <div className="space-y-2">
+                                    {selectedSegment.risk_score >= 7 ? (
+                                        <>
+                                            <div className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300">
+                                                <span className="text-red-400 mt-0.5">•</span>
+                                                <span>Deploy mobile enrollment unit</span>
+                                            </div>
+                                            <div className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300">
+                                                <span className="text-red-400 mt-0.5">•</span>
+                                                <span>Conduct awareness campaign</span>
+                                            </div>
+                                            <div className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300">
+                                                <span className="text-red-400 mt-0.5">•</span>
+                                                <span>Investigate infrastructure gaps</span>
+                                            </div>
+                                        </>
+                                    ) : selectedSegment.risk_score >= 4 ? (
+                                        <>
+                                            <div className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300">
+                                                <span className="text-orange-400 mt-0.5">•</span>
+                                                <span>Monitor weekly trends</span>
+                                            </div>
+                                            <div className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300">
+                                                <span className="text-orange-400 mt-0.5">•</span>
+                                                <span>Review operator training</span>
+                                            </div>
+                                            <div className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300">
+                                                <span className="text-orange-400 mt-0.5">•</span>
+                                                <span>Analyze district-specific barriers</span>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300">
+                                                <span className="text-green-400 mt-0.5">•</span>
+                                                <span>Maintain current operations</span>
+                                            </div>
+                                            <div className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300">
+                                                <span className="text-green-400 mt-0.5">•</span>
+                                                <span>Track for anomalies</span>
+                                            </div>
+                                            <div className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300">
+                                                <span className="text-green-400 mt-0.5">•</span>
+                                                <span>Share best practices with high-risk districts</span>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     ) : (

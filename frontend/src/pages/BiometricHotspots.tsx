@@ -5,6 +5,7 @@ import Card from '../components/Common/Card';
 import Loader from '../components/Common/Loader';
 import ErrorRetry from '../components/Common/ErrorRetry';
 import Sparkline from '../components/Common/Sparkline';
+import DataTimestamp from '../components/Common/DataTimestamp';
 import client from '../api/client';
 import { ENDPOINTS } from '../api/endpoints';
 import { useStateContext } from '../context/StateContext';
@@ -162,9 +163,9 @@ const BiometricHotspots: React.FC = () => {
             // Parse response - assuming chatbot returns structured data or text
             const insights = {
                 summary: [
+                    `⚠️ Note: This analysis uses simulated biometric data. Production deployment requires integration with real biometric quality metrics.`,
                     `Biometric quality in ${selectedState} shows ${data.trend.toLowerCase()} trend`,
-                    `${data.severe_count} districts require immediate attention for biometric stability`,
-                    `Average risk score of ${data.avg_risk_score} indicates ${data.avg_risk_score > 7 ? 'high' : 'moderate'} state-level concern`
+                    `${data.severe_count} districts require immediate attention for biometric stability`
                 ],
                 actions: [
                     `Deploy additional biometric quality audits in ${data.worst_district?.name || 'high-risk districts'}`,
@@ -179,9 +180,9 @@ const BiometricHotspots: React.FC = () => {
             // Fallback to generated insights
             const insights = {
                 summary: [
+                    `⚠️ Note: This analysis uses simulated biometric data. Production deployment requires integration with real biometric quality metrics.`,
                     `Biometric quality in ${selectedState} shows ${data.trend.toLowerCase()} trend`,
-                    `${data.severe_count} districts require immediate attention for biometric stability`,
-                    `Average risk score of ${data.avg_risk_score} indicates ${data.avg_risk_score > 7 ? 'high' : 'moderate'} state-level concern`
+                    `${data.severe_count} districts require immediate attention for biometric stability`
                 ],
                 actions: [
                     `Deploy additional biometric quality audits in ${data.worst_district?.name || 'high-risk districts'}`,
@@ -223,9 +224,20 @@ const BiometricHotspots: React.FC = () => {
 
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
+            {/* Data Timestamp */}
+            <DataTimestamp
+                lastDataDate={data.last_data_date || new Date().toISOString().split('T')[0]}
+                generatedAt={new Date().toISOString()}
+            />
+
             {/* Header with Controls */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">Biometric Risk Analysis: {selectedState}</h2>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                    <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">Biometric Risk Framework (Proof-of-Concept): {selectedState}</h2>
+                    <span className="px-3 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 text-xs font-semibold rounded-full border border-amber-300 dark:border-amber-700 shadow-sm">
+                        DEMONSTRATION MODULE
+                    </span>
+                </div>
 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
                     {/* Search */}
