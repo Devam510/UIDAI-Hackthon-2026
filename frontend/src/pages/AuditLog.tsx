@@ -8,6 +8,9 @@ const AuditLog: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
 
+    const [statusFilter, setStatusFilter] = useState<'ALL' | 'SUCCESS' | 'FAILURE' | 'WARNING'>('ALL');
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+
     const loadLogs = () => {
         setLoading(true);
         // Simulate network delay for realism
@@ -67,12 +70,17 @@ const AuditLog: React.FC = () => {
         loadLogs(); // Refresh to show the export action
     };
 
-    const filteredLogs = logs.filter(log =>
-        log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        log.resource.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        log.userId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        log.details.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredLogs = logs.filter(log => {
+        const matchesSearch =
+            log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            log.resource.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            log.userId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            log.details.toLowerCase().includes(searchTerm.toLowerCase());
+
+        const matchesFilter = statusFilter === 'ALL' || log.status === statusFilter;
+
+        return matchesSearch && matchesFilter;
+    });
 
     const getStatusIcon = (status: string) => {
         switch (status) {
@@ -127,11 +135,37 @@ const AuditLog: React.FC = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <div className="flex gap-2">
-                        <button className="flex items-center gap-2 px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">
+                    <div className="relative">
+                        <button
+                            onClick={() => setIsFilterOpen(!isFilterOpen)}
+                            className={`flex items-center gap-2 px-3 py-2 border rounded-lg transition-colors ${statusFilter !== 'ALL'
+                                    ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400'
+                                    : 'border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                }`}
+                        >
                             <Filter size={18} />
-                            <span>Filter</span>
+                            <span>{statusFilter === 'ALL' ? 'Filter Status' : statusFilter}</span>
                         </button>
+
+                        {isFilterOpen && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 z-10 py-1">
+                                {['ALL', 'SUCCESS', 'FAILURE', 'WARNING'].map((status) => (
+                                    <button
+                                        key={status}
+                                        onClick={() => {
+                                            setStatusFilter(status as any);
+                                            setIsFilterOpen(false);
+                                        }}
+                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-700/50 ${statusFilter === status
+                                                ? 'text-blue-600 dark:text-blue-400 font-medium'
+                                                : 'text-slate-700 dark:text-slate-300'
+                                            }`}
+                                    >
+                                        {status === 'ALL' ? 'All Records' : status}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
 
