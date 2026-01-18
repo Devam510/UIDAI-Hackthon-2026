@@ -249,7 +249,7 @@ def biometric_hotspots(state: str):
     Get biometric risk hotspots for a state with ML-powered analysis.
     Uses CSV data and trained biometric ML models (with statistical fallback).
     """
-    from backend.ml.data_loader import load_processed_data
+    from backend.ml.data_loader import load_processed_data, get_last_data_date
     from datetime import datetime
     import numpy as np
     import pandas as pd
@@ -458,7 +458,8 @@ def biometric_hotspots(state: str):
             "timestamp": datetime.now().isoformat(),
             "data_lineage": "CSV → Statistical Analysis → Risk Score",
             "districts_analyzed": len(districts),
-            "districts_with_data": len(results)
+            "districts_with_data": len(results),
+            "last_data_date": get_last_data_date()
         }
     }
 

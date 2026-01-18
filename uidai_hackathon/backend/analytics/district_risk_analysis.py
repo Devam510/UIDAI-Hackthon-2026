@@ -8,7 +8,7 @@ import numpy as np
 from typing import Dict, List, Optional
 from datetime import datetime
 
-from backend.ml.data_loader import load_processed_data, list_districts
+from backend.ml.data_loader import load_processed_data, list_districts, get_last_data_date
 from backend.ml.risk.district_scoring import compute_district_risk
 from backend.common.state_resolver import resolve_state
 
@@ -281,7 +281,8 @@ def analyze_district_risks(state: str, window_days: int = 30, top: int = 20) -> 
             "timestamp": datetime.now().isoformat(),
             "window_months": window_months,
             "total_districts_analyzed": len(districts_list),
-            "districts_with_sufficient_data": len(districts_results)
+            "districts_with_sufficient_data": len(districts_results),
+            "last_data_date": get_last_data_date()
         }
     }
 

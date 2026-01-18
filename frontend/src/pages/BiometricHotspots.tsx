@@ -226,7 +226,7 @@ const BiometricHotspots: React.FC = () => {
         <div className="space-y-6 animate-in fade-in duration-500">
             {/* Data Timestamp */}
             <DataTimestamp
-                lastDataDate={data.last_data_date || new Date().toISOString().split('T')[0]}
+                lastDataDate={data.metadata?.last_data_date || new Date().toISOString().split('T')[0]}
                 generatedAt={new Date().toISOString()}
             />
 
@@ -415,15 +415,15 @@ const BiometricHotspots: React.FC = () => {
                                 <p className="text-sm font-semibold text-slate-700 dark:text-slate-400 mb-3">📋 Recommended Action Plan</p>
 
                                 <div className={`p-3 rounded-lg border ${selectedDistrict.severity === 'Severe'
-                                        ? 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-900/30'
-                                        : selectedDistrict.severity === 'Moderate'
-                                            ? 'bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-900/30'
-                                            : 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-900/30'
+                                    ? 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-900/30'
+                                    : selectedDistrict.severity === 'Moderate'
+                                        ? 'bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-900/30'
+                                        : 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-900/30'
                                     }`}>
                                     <div className="flex justify-between items-start mb-2">
                                         <span className={`text-xs font-bold uppercase tracking-wider ${selectedDistrict.severity === 'Severe' ? 'text-red-700 dark:text-red-400' :
-                                                selectedDistrict.severity === 'Moderate' ? 'text-orange-700 dark:text-orange-400' :
-                                                    'text-green-700 dark:text-green-400'
+                                            selectedDistrict.severity === 'Moderate' ? 'text-orange-700 dark:text-orange-400' :
+                                                'text-green-700 dark:text-green-400'
                                             }`}>
                                             {selectedDistrict.severity === 'Severe' ? 'Critical Remediation' :
                                                 selectedDistrict.severity === 'Moderate' ? 'Correction Required' :

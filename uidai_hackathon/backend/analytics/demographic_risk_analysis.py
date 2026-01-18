@@ -26,6 +26,7 @@ from datetime import datetime
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 PROCESSED_CSV = PROJECT_ROOT / "data" / "processed" / "aadhaar_master_monthly.csv"
+from backend.ml.data_loader import get_last_data_date
 
 
 def load_demographic_data(state: str) -> pd.DataFrame:
@@ -213,7 +214,8 @@ def analyze_demographic_risks(state: str, window_days: int = 90) -> Dict:
                 "districts_analyzed": total_segments,
                 "features": model_metadata.get("features", ["bio_rate", "bio_trend", "bio_volatility", "deviation", "enrol_bio_ratio"]),
                 "data_lineage": "CSV → Feature Engineering → IsolationForest → Risk Scores → API → UI",
-                "analysis_basis": "ML-based anomaly detection on biometric engagement patterns"
+                "analysis_basis": "ML-based anomaly detection on biometric engagement patterns",
+                "last_data_date": get_last_data_date()
             }
         }
         

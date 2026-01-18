@@ -194,7 +194,7 @@ const DistrictHotspots: React.FC = () => {
         <div className="space-y-6 animate-in fade-in duration-500">
             {/* Data Timestamp */}
             <DataTimestamp
-                lastDataDate={data.last_data_date || new Date().toISOString().split('T')[0]}
+                lastDataDate={data.metadata?.last_data_date || data.last_data_date || new Date().toISOString().split('T')[0]}
                 generatedAt={new Date().toISOString()}
             />
 
