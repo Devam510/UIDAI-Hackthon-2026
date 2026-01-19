@@ -53,15 +53,56 @@ def train_trend_forecast_model(state: str):
     print(f"[Trend Forecast] Range: {prophet_df['ds'].min()} to {prophet_df['ds'].max()}")
     
     # EXACT configuration from notebook - TREND ONLY
-    model = Prophet(
-        yearly_seasonality=False,  # NO seasonality
-        weekly_seasonality=False,
-        daily_seasonality=False,
-        changepoint_prior_scale=0.05,  # Low flexibility for smooth trend
-        interval_width=0.95
-    )
-    
-    model.fit(prophet_df)
+    try:
+        model = Prophet(
+            yearly_seasonality=False,  # NO seasonality
+            weekly_seasonality=False,
+            daily_seasonality=False,
+            changepoint_prior_scale=0.05,  # Low flexibility for smooth trend
+            interval_width=0.95
+        )
+        
+        model.fit(prophet_df)
+        print(f"[Trend Forecast] Model trained successfully")
+    except Exception as e:
+        print(f"[Trend Forecast] Prophet training failed (expected on Render): {e}")
+        # Save minimal metadata for LinearRegression fallback
+        metadata = {
+            "state": state,
+            "model_type": "LinearRegression (Prophet unavailable)",
+            "training_date": datetime.now().isoformat(),
+            "data_points": len(prophet_df),
+            "date_range_start": str(prophet_df['ds'].min().date()),
+            "date_range_end": str(prophet_df['ds'].max().date()),
+            "seasonality": "none",
+            "interval_width": 0.95,
+            "monthly_data_points": len(prophet_df)
+        }
+        
+        metadata_path = ARTIFACTS_DIR / f"trend_forecast_{state}_metadata.json"
+        model_path = ARTIFACTS_DIR / f"forecast_{state}_params.json"
+        
+        # Save training data for LinearRegression fallback
+        training_data_serializable = []
+        for record in prophet_df.to_dict('records'):
+            training_data_serializable.append({
+                'ds': record['ds'].isoformat() if hasattr(record['ds'], 'isoformat') else str(record['ds']),
+                'y': float(record['y'])
+            })
+        
+        model_params = {
+            "training_data": training_data_serializable,
+            "state": state,
+            "fallback": "LinearRegression"
+        }
+        
+        with open(model_path, 'w') as f:
+            json.dump(model_params, f, indent=2)
+        
+        with open(metadata_path, 'w') as f:
+            json.dump(metadata, f, indent=2)
+        
+        return {"status": "trained", "state": state, "metadata": metadata, "monthly_data_points": len(prophet_df), "fallback": True}
     
     # WORKAROUND: Don't serialize Prophet model (causes stan_backend errors)
     # Instead, save the training data and model parameters
