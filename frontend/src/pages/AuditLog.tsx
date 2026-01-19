@@ -10,6 +10,8 @@ const AuditLog: React.FC = () => {
 
     const [statusFilter, setStatusFilter] = useState<'ALL' | 'SUCCESS' | 'FAILURE' | 'WARNING'>('ALL');
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const LOGS_PER_PAGE = 20;
 
     const loadLogs = () => {
         setLoading(true);
@@ -82,6 +84,17 @@ const AuditLog: React.FC = () => {
         return matchesSearch && matchesFilter;
     });
 
+    // Pagination calculations
+    const totalPages = Math.ceil(filteredLogs.length / LOGS_PER_PAGE);
+    const startIndex = (currentPage - 1) * LOGS_PER_PAGE;
+    const endIndex = startIndex + LOGS_PER_PAGE;
+    const paginatedLogs = filteredLogs.slice(startIndex, endIndex);
+
+    // Reset to page 1 when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, statusFilter]);
+
     const getStatusIcon = (status: string) => {
         switch (status) {
             case 'SUCCESS': return <CheckCircle size={16} className="text-green-500" />;
@@ -139,8 +152,8 @@ const AuditLog: React.FC = () => {
                         <button
                             onClick={() => setIsFilterOpen(!isFilterOpen)}
                             className={`flex items-center gap-2 px-3 py-2 border rounded-lg transition-colors ${statusFilter !== 'ALL'
-                                    ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400'
-                                    : 'border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400'
+                                : 'border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                                 }`}
                         >
                             <Filter size={18} />
@@ -157,8 +170,8 @@ const AuditLog: React.FC = () => {
                                             setIsFilterOpen(false);
                                         }}
                                         className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-700/50 ${statusFilter === status
-                                                ? 'text-blue-600 dark:text-blue-400 font-medium'
-                                                : 'text-slate-700 dark:text-slate-300'
+                                            ? 'text-blue-600 dark:text-blue-400 font-medium'
+                                            : 'text-slate-700 dark:text-slate-300'
                                             }`}
                                     >
                                         {status === 'ALL' ? 'All Records' : status}
@@ -184,8 +197,8 @@ const AuditLog: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-slate-900">
-                            {filteredLogs.length > 0 ? (
-                                filteredLogs.map((log) => (
+                            {paginatedLogs.length > 0 ? (
+                                paginatedLogs.map((log) => (
                                     <tr key={log.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             {getStatusIcon(log.status)}
@@ -225,13 +238,34 @@ const AuditLog: React.FC = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="mt-4 flex items-center justify-center">
+                        <div className="flex items-center gap-1 bg-slate-800 dark:bg-slate-700 rounded-lg px-2 py-1">
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                                <button
+                                    key={pageNum}
+                                    onClick={() => setCurrentPage(pageNum)}
+                                    className={`w-8 h-8 rounded text-xs font-medium transition-colors ${currentPage === pageNum
+                                        ? 'bg-blue-600 text-white'
+                                        : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                                        }`}
+                                >
+                                    {pageNum}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
                     <div className="flex items-center gap-2">
                         <Shield size={14} className="text-green-500" />
                         <span>Audit Log Integrity Verified</span>
                     </div>
                     <div>
-                        Showing {filteredLogs.length} records
+                        Showing {startIndex + 1}-{Math.min(endIndex, filteredLogs.length)} of {filteredLogs.length} records
                     </div>
                 </div>
             </Card>
