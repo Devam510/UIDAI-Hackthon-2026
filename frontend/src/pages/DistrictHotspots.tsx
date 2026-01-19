@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
-import { MapPin, Search, Download, TrendingUp, AlertTriangle, Award, Sparkles } from 'lucide-react';
+import { MapPin, Search, Download, TrendingUp, AlertTriangle, Award, Sparkles, Info } from 'lucide-react';
 import Card from '../components/Common/Card';
 import Loader from '../components/Common/Loader';
 import ErrorRetry from '../components/Common/ErrorRetry';
 import Sparkline from '../components/Common/Sparkline';
 import DataTimestamp from '../components/Common/DataTimestamp';
 import ExportButton from '../components/Common/ExportButton';
+import Tooltip from '../components/Common/Tooltip';
 import client from '../api/client';
 import { useStateContext } from '../context/StateContext';
 import { useTheme } from '../hooks/useTheme';
@@ -238,7 +239,12 @@ const DistrictHotspots: React.FC = () => {
                 <Card className="bg-gradient-to-br from-blue-50 to-slate-50 dark:from-slate-800 dark:to-slate-900 border-slate-200 dark:border-slate-700">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total Districts</p>
+                            <div className="flex items-center gap-2">
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total Districts</p>
+                                <Tooltip content="Total number of districts analyzed in this state for enrollment risk assessment." position="top">
+                                    <Info size={12} className="text-slate-400 hover:text-primary-500 cursor-help transition-colors" />
+                                </Tooltip>
+                            </div>
                             <p className="text-3xl font-bold text-slate-900 dark:text-white">{data.count}</p>
                         </div>
                         <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
@@ -250,7 +256,12 @@ const DistrictHotspots: React.FC = () => {
                 <Card className="bg-gradient-to-br from-red-50 to-slate-50 dark:from-red-900/20 dark:to-slate-900 border-red-200 dark:border-red-900/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Critical Districts</p>
+                            <div className="flex items-center gap-2">
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Critical Districts</p>
+                                <Tooltip content="Number of districts with severe risk levels (risk score ≥ 7) requiring immediate intervention." position="top">
+                                    <Info size={12} className="text-slate-400 hover:text-primary-500 cursor-help transition-colors" />
+                                </Tooltip>
+                            </div>
                             <p className="text-3xl font-bold text-red-400">{data.critical_count}</p>
                         </div>
                         <div className="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
@@ -262,7 +273,12 @@ const DistrictHotspots: React.FC = () => {
                 <Card className="bg-gradient-to-br from-orange-50 to-slate-50 dark:from-orange-900/20 dark:to-slate-900 border-orange-200 dark:border-orange-900/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Highest Risk</p>
+                            <div className="flex items-center gap-2">
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Highest Risk</p>
+                                <Tooltip content="District with the highest enrollment risk score in the state, indicating the most critical area." position="top">
+                                    <Info size={12} className="text-slate-400 hover:text-primary-500 cursor-help transition-colors" />
+                                </Tooltip>
+                            </div>
                             <p className="text-lg font-bold text-orange-400 truncate">
                                 {data.highest_risk_district?.name || 'N/A'}
                             </p>
@@ -279,7 +295,12 @@ const DistrictHotspots: React.FC = () => {
                 <Card className="bg-gradient-to-br from-green-50 to-slate-50 dark:from-green-900/20 dark:to-slate-900 border-green-200 dark:border-green-900/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Avg Risk Score</p>
+                            <div className="flex items-center gap-2">
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Avg Risk Score</p>
+                                <Tooltip content="Average enrollment risk score across all districts in the state. Provides a state-level risk benchmark." position="top">
+                                    <Info size={12} className="text-slate-400 hover:text-primary-500 cursor-help transition-colors" />
+                                </Tooltip>
+                            </div>
                             <p className="text-3xl font-bold text-green-400">{data.avg_risk_score.toFixed(1)}</p>
                         </div>
                         <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">

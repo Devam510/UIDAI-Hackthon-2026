@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
-import { Search, Download, TrendingUp, AlertTriangle, Award, Activity, Sparkles, MapPin } from 'lucide-react';
+import { Search, Download, TrendingUp, AlertTriangle, Award, Activity, Sparkles, MapPin, Info } from 'lucide-react';
 import Card from '../components/Common/Card';
 import Loader from '../components/Common/Loader';
 import ErrorRetry from '../components/Common/ErrorRetry';
 import Sparkline from '../components/Common/Sparkline';
 import DataTimestamp from '../components/Common/DataTimestamp';
+import Tooltip from '../components/Common/Tooltip';
 import client from '../api/client';
 import { ENDPOINTS } from '../api/endpoints';
 import { useStateContext } from '../context/StateContext';
@@ -272,7 +273,12 @@ const BiometricHotspots: React.FC = () => {
                 <Card className="bg-gradient-to-br from-cyan-50 to-slate-50 dark:from-cyan-900/20 dark:to-slate-900 border-cyan-200 dark:border-cyan-900/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total Districts</p>
+                            <div className="flex items-center gap-2">
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total Districts</p>
+                                <Tooltip content="Total number of districts analyzed for biometric data quality and stability assessment." position="top">
+                                    <Info size={12} className="text-slate-400 hover:text-primary-500 cursor-help transition-colors" />
+                                </Tooltip>
+                            </div>
                             <p className="text-3xl font-bold text-cyan-400">{data.hotspots?.length || 0}</p>
                         </div>
                         <div className="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center">
@@ -285,7 +291,12 @@ const BiometricHotspots: React.FC = () => {
                 <Card className="bg-gradient-to-br from-red-50 to-slate-50 dark:from-red-900/20 dark:to-slate-900 border-red-200 dark:border-red-900/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Severe Districts</p>
+                            <div className="flex items-center gap-2">
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Severe Districts</p>
+                                <Tooltip content="Number of districts with severe biometric quality issues requiring immediate operational review and corrective measures." position="top">
+                                    <Info size={12} className="text-slate-400 hover:text-primary-500 cursor-help transition-colors" />
+                                </Tooltip>
+                            </div>
                             <p className="text-3xl font-bold text-red-400">{data.severe_count}</p>
                         </div>
                         <div className="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
@@ -298,7 +309,12 @@ const BiometricHotspots: React.FC = () => {
                 <Card className="bg-gradient-to-br from-orange-50 to-slate-50 dark:from-orange-900/20 dark:to-slate-900 border-orange-200 dark:border-orange-900/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Worst District</p>
+                            <div className="flex items-center gap-2">
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Worst District</p>
+                                <Tooltip content="District with the highest biometric risk score, indicating the most critical biometric data quality issues." position="top">
+                                    <Info size={12} className="text-slate-400 hover:text-primary-500 cursor-help transition-colors" />
+                                </Tooltip>
+                            </div>
                             <p className="text-lg font-bold text-orange-400 truncate">
                                 {data.worst_district?.name || 'N/A'}
                             </p>
@@ -316,7 +332,12 @@ const BiometricHotspots: React.FC = () => {
                 <Card className="bg-gradient-to-br from-green-50 to-slate-50 dark:from-green-900/20 dark:to-slate-900 border-green-200 dark:border-green-900/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Avg Biometric Risk</p>
+                            <div className="flex items-center gap-2">
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Avg Biometric Risk</p>
+                                <Tooltip content="Average biometric risk score across all districts. Indicates overall biometric data quality at the state level." position="top">
+                                    <Info size={12} className="text-slate-400 hover:text-primary-500 cursor-help transition-colors" />
+                                </Tooltip>
+                            </div>
                             <p className="text-3xl font-bold text-green-400">{data.avg_risk_score.toFixed(1)}</p>
                         </div>
                         <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">

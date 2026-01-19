@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
-import { Search, Download, TrendingUp, AlertTriangle, Award, MapPin, Sparkles } from 'lucide-react';
+import { Search, Download, TrendingUp, AlertTriangle, Award, MapPin, Sparkles, Info } from 'lucide-react';
 import Card from '../components/Common/Card';
 import Loader from '../components/Common/Loader';
 import ErrorRetry from '../components/Common/ErrorRetry';
 import Sparkline from '../components/Common/Sparkline';
 import DataTimestamp from '../components/Common/DataTimestamp';
+import Tooltip from '../components/Common/Tooltip';
 import client from '../api/client';
 import { useStateContext } from '../context/StateContext';
 import { useTheme } from '../hooks/useTheme';
@@ -60,7 +61,7 @@ const DemographicRisks: React.FC = () => {
     const fetchAIInsights = async () => {
         // Guard clause for empty data
         if (!data || !data.segments || data.segments.length === 0) return;
-        
+
         setLoadingInsights(true);
         try {
             // Safe values for insights generation
@@ -68,7 +69,7 @@ const DemographicRisks: React.FC = () => {
             const criticalSegs = data.critical_segments ?? 0;
             const avgRisk = data.avg_risk_score ?? 0;
             const highestRiskSeg = data.highest_risk_segment || 'high-risk segments';
-            
+
             // Fallback to generated insights (chatbot integration can be added later)
             const insights = {
                 summary: [
@@ -228,7 +229,12 @@ const DemographicRisks: React.FC = () => {
                 <Card className="bg-gradient-to-br from-blue-50 to-slate-50 dark:from-slate-800 dark:to-slate-900 border-slate-200 dark:border-slate-700">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total Segments</p>
+                            <div className="flex items-center gap-2">
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total Segments</p>
+                                <Tooltip content="Total number of demographic segments analyzed for enrollment engagement patterns." position="top">
+                                    <Info size={12} className="text-slate-400 hover:text-primary-500 cursor-help transition-colors" />
+                                </Tooltip>
+                            </div>
                             <p className="text-3xl font-bold text-slate-900 dark:text-white">{safeTotalSegments}</p>
                         </div>
                         <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
@@ -240,7 +246,12 @@ const DemographicRisks: React.FC = () => {
                 <Card className="bg-gradient-to-br from-red-50 to-slate-50 dark:from-red-900/20 dark:to-slate-900 border-red-200 dark:border-red-900/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Critical Segments</p>
+                            <div className="flex items-center gap-2">
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Critical Segments</p>
+                                <Tooltip content="Number of demographic segments with severe engagement issues requiring targeted interventions." position="top">
+                                    <Info size={12} className="text-slate-400 hover:text-primary-500 cursor-help transition-colors" />
+                                </Tooltip>
+                            </div>
                             <p className="text-3xl font-bold text-red-400">{safeCriticalSegments}</p>
                         </div>
                         <div className="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
@@ -252,7 +263,12 @@ const DemographicRisks: React.FC = () => {
                 <Card className="bg-gradient-to-br from-orange-50 to-slate-50 dark:from-orange-900/20 dark:to-slate-900 border-orange-200 dark:border-orange-900/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Highest Risk</p>
+                            <div className="flex items-center gap-2">
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Highest Risk</p>
+                                <Tooltip content="Demographic segment with the highest risk score, indicating the most critical engagement gap." position="top">
+                                    <Info size={12} className="text-slate-400 hover:text-primary-500 cursor-help transition-colors" />
+                                </Tooltip>
+                            </div>
                             <p className="text-lg font-bold text-orange-400 truncate">
                                 {data.highest_risk_segment || 'N/A'}
                             </p>
@@ -269,7 +285,12 @@ const DemographicRisks: React.FC = () => {
                 <Card className="bg-gradient-to-br from-green-50 to-slate-50 dark:from-green-900/20 dark:to-slate-900 border-green-200 dark:border-green-900/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Avg Risk Score</p>
+                            <div className="flex items-center gap-2">
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Avg Risk Score</p>
+                                <Tooltip content="Average risk score across all demographic segments. Provides a state-level demographic engagement benchmark." position="top">
+                                    <Info size={12} className="text-slate-400 hover:text-primary-500 cursor-help transition-colors" />
+                                </Tooltip>
+                            </div>
                             <p className="text-3xl font-bold text-green-400">{safeAvgRiskScore.toFixed(1)}</p>
                         </div>
                         <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
@@ -295,13 +316,13 @@ const DemographicRisks: React.FC = () => {
                             <div className="h-full flex flex-col items-center justify-center text-slate-500 gap-4">
                                 <MapPin size={48} className="text-slate-400" />
                                 <p className="text-lg">
-                                    {!hasSegments 
-                                        ? `No demographic data available for ${selectedState}` 
+                                    {!hasSegments
+                                        ? `No demographic data available for ${selectedState}`
                                         : 'No segments found matching your search.'}
                                 </p>
                                 <p className="text-sm text-slate-400">
-                                    {!hasSegments 
-                                        ? 'Data may still be loading or not yet uploaded to the system.' 
+                                    {!hasSegments
+                                        ? 'Data may still be loading or not yet uploaded to the system.'
                                         : 'Try a different search term.'}
                                 </p>
                             </div>
@@ -416,19 +437,18 @@ const DemographicRisks: React.FC = () => {
                 ) : (
                     <div className="text-center py-8">
                         <Sparkles className="mx-auto mb-4 text-purple-400" size={32} />
-                    <p className="text-sm text-slate-700 dark:text-slate-400 mb-4">
-                        {hasSegments 
-                            ? `Get AI-powered insights for ${selectedState}` 
-                            : `No data available for AI insights on ${selectedState}`}
-                    </p>
+                        <p className="text-sm text-slate-700 dark:text-slate-400 mb-4">
+                            {hasSegments
+                                ? `Get AI-powered insights for ${selectedState}`
+                                : `No data available for AI insights on ${selectedState}`}
+                        </p>
                         <button
                             onClick={fetchAIInsights}
                             disabled={!hasSegments}
-                            className={`px-6 py-2 text-white font-medium rounded-lg transition-colors ${
-                                hasSegments 
-                                    ? 'bg-purple-600 hover:bg-purple-500' 
+                            className={`px-6 py-2 text-white font-medium rounded-lg transition-colors ${hasSegments
+                                    ? 'bg-purple-600 hover:bg-purple-500'
                                     : 'bg-slate-400 cursor-not-allowed'
-                            }`}
+                                }`}
                         >
                             {hasSegments ? 'Ask AI about this state' : 'No data available'}
                         </button>

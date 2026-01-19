@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AlertTriangle, TrendingUp, Activity, Users } from 'lucide-react';
+import { AlertTriangle, TrendingUp, Activity, Users, Info } from 'lucide-react';
 import Card from '../components/Common/Card';
 import Loader from '../components/Common/Loader';
 import ErrorRetry from '../components/Common/ErrorRetry';
@@ -8,6 +8,7 @@ import SmartSummary from '../components/Common/SmartSummary';
 import Sparkline from '../components/Common/Sparkline';
 import DataTimestamp from '../components/Common/DataTimestamp';
 import ExportButton from '../components/Common/ExportButton';
+import Tooltip from '../components/Common/Tooltip';
 import client from '../api/client';
 import { ENDPOINTS } from '../api/endpoints';
 import { useStateContext } from '../context/StateContext';
@@ -164,10 +165,34 @@ const Overview: React.FC = () => {
     };
 
     const kpis = [
-        { label: 'Risk Score', value: kpiData?.risk_score?.toFixed(2) || '0', icon: <AlertTriangle size={24} />, color: 'text-red-400' },
-        { label: 'Anomaly Severity', value: kpiData?.anomaly_severity || 'Low', icon: <Activity size={24} />, color: 'text-orange-400' },
-        { label: 'Neg. Gap Ratio', value: kpiData?.negative_gap_ratio || '0%', icon: <Users size={24} />, color: 'text-blue-400' },
-        { label: 'Forecast Growth', value: kpiData?.forecast_growth || '0%', icon: <TrendingUp size={24} />, color: 'text-green-400' }
+        {
+            label: 'Risk Score',
+            value: kpiData?.risk_score?.toFixed(2) || '0',
+            icon: <AlertTriangle size={24} />,
+            color: 'text-red-400',
+            tooltip: 'Combined metric indicating overall enrollment risk on a scale of 0-10. Higher scores indicate greater risk of enrollment gaps and require immediate attention.'
+        },
+        {
+            label: 'Anomaly Severity',
+            value: kpiData?.anomaly_severity || 'Low',
+            icon: <Activity size={24} />,
+            color: 'text-orange-400',
+            tooltip: 'Detects unusual patterns in enrollment data. High severity indicates unexpected spikes or drops that may require investigation.'
+        },
+        {
+            label: 'Neg. Gap Ratio',
+            value: kpiData?.negative_gap_ratio || '0%',
+            icon: <Users size={24} />,
+            color: 'text-blue-400',
+            tooltip: 'Percentage of districts where actual enrollment falls below expected levels. Higher ratios indicate widespread enrollment challenges.'
+        },
+        {
+            label: 'Forecast Growth',
+            value: kpiData?.forecast_growth || '0%',
+            icon: <TrendingUp size={24} />,
+            color: 'text-green-400',
+            tooltip: 'Predicted enrollment growth rate based on ML forecasting models. Positive values indicate expected growth, negative values suggest declining trends.'
+        }
     ];
 
     return (
@@ -201,9 +226,14 @@ const Overview: React.FC = () => {
                         className="relative overflow-hidden group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary-500/20 hover:border-primary-500/50"
                     >
                         <div className="flex justify-between items-start z-10 relative">
-                            <div>
-                                <p className="text-slate-700 dark:text-slate-400 text-sm font-medium group-hover:text-slate-900 dark:group-hover:text-slate-300 transition-colors">{kpi.label}</p>
-                                <h3 className={`text - 3xl font - bold mt - 2 ${kpi.color} group - hover: scale - 110 transition - transform duration - 300`}>{kpi.value}</h3>
+                            <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                    <p className="text-slate-700 dark:text-slate-400 text-sm font-medium group-hover:text-slate-900 dark:group-hover:text-slate-300 transition-colors">{kpi.label}</p>
+                                    <Tooltip content={kpi.tooltip} position="top">
+                                        <Info size={14} className="text-slate-400 hover:text-primary-500 cursor-help transition-colors" />
+                                    </Tooltip>
+                                </div>
+                                <h3 className={`text-3xl font-bold mt-2 ${kpi.color} group-hover:scale-110 transition-transform duration-300`}>{kpi.value}</h3>
                             </div>
                             <div className="p-2 bg-slate-200 dark:bg-slate-800/50 rounded-lg group-hover:bg-slate-300 dark:group-hover:bg-slate-700/70 group-hover:scale-110 transition-all duration-300">{kpi.icon}</div>
                         </div>
