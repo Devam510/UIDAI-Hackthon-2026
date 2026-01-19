@@ -225,6 +225,8 @@ def state_summary(state: str):
     Uses cached logic for sub-millisecond response times on repeat calls.
     """
     state_resolved = resolve_state(state)
+    # Clear cache to ensure fresh calculations with updated formula
+    get_dashboard_summary_cached.cache_clear()
     return get_dashboard_summary_cached(state_resolved)
 
 
@@ -240,13 +242,19 @@ def _get_top_district(state_df: pd.DataFrame) -> str:
 
 
 def _calculate_risk_from_csv(state_df: pd.DataFrame) -> float:
-    """Calculate risk score from CSV statistics using multiple factors."""
+    """Calculate risk score from CSV statistics using multiple factors.
+    
+    Formula designed to spread scores across 1-10 scale:
+    - Low risk (1-3): Stable enrollment with low volatility
+    - Moderate risk (4-6): Some volatility or declining trend
+    - High risk (7-10): High volatility AND declining trend
+    """
     try:
         monthly = state_df.groupby('month')['total_enrolments'].sum()
         if len(monthly) < 2:
             return 5.0
         
-        # Factor 1: Coefficient of Variation (volatility)
+        # Factor 1: Coefficient of Variation (volatility) - REDUCED WEIGHT
         std_dev = monthly.std()
         mean_val = monthly.mean()
         cv = (std_dev / mean_val) if mean_val > 0 else 0
@@ -255,21 +263,28 @@ def _calculate_risk_from_csv(state_df: pd.DataFrame) -> float:
         if len(monthly) >= 6:
             recent_avg = monthly.tail(3).mean()
             older_avg = monthly.head(3).mean()
-            trend_factor = 1.0 if recent_avg >= older_avg else 1.5
+            # Calculate trend as percentage change
+            trend_change = ((recent_avg - older_avg) / older_avg) if older_avg > 0 else 0
+            # Declining trend adds risk, growing trend reduces risk
+            trend_score = max(0, -trend_change * 10)  # Negative growth = higher score
         else:
-            trend_factor = 1.0
+            trend_score = 0
         
         # Factor 3: Negative months ratio
         negative_ratio = (monthly < mean_val).mean()
         
-        # Combined risk score (normalized to 1-10)
-        # Use logarithmic scale to spread values more evenly
-        raw_risk = (cv * 5) + (negative_ratio * 3) + (trend_factor - 1) * 2
-        risk = min(10, max(1, raw_risk + 2))  # Shift to 2-10 range, then cap
+        # Combined risk score - ADJUSTED WEIGHTS for better distribution
+        # CV weight reduced from 5 to 3, trend is now additive
+        raw_risk = (cv * 3) + (negative_ratio * 2) + trend_score
+        
+        # Normalize to 1-10 scale WITHOUT the +2 shift
+        # Use a scaling factor to spread values more evenly
+        risk = min(10, max(1, raw_risk * 1.2))  # Scale by 1.2 to reach higher values
         
         return round(risk, 2)
     except:
         return 5.0
+
 
 
 def _calculate_anomaly_from_csv(state_df: pd.DataFrame) -> str:
