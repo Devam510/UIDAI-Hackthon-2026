@@ -83,7 +83,7 @@ const Methodology: React.FC = () => {
                 <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30 rounded-lg p-4 mb-4 flex items-start gap-3">
                     <AlertCircle className="text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" size={18} />
                     <div className="text-sm text-amber-800 dark:text-amber-300">
-                        <strong>Hackathon Constraint:</strong> The insights are generated based on a provided static dataset covering approximately 10 months of enrollment activity.
+                        <strong>Hackathon Constraint:</strong> The insights are generated based on a provided static dataset covering 9 months of enrollment activity (missing January, February, and August).
                     </div>
                 </div>
 

@@ -136,25 +136,29 @@ const IndiaMap: React.FC<IndiaMapProps> = ({ statesData, onStateClick }) => {
                                         dominantBaseline="middle"
                                         className="font-bold fill-white pointer-events-none select-none"
                                         style={{
-                                            fontSize: '10px',
+                                            fontSize: location.id === 'ch' || location.id === 'dl' ? '8px' : '10px',
                                             textShadow: '2px 2px 4px rgba(0,0,0,1), -1px -1px 3px rgba(0,0,0,1), 1px -1px 3px rgba(0,0,0,1), -1px 1px 3px rgba(0,0,0,1)',
                                             letterSpacing: '0.3px'
                                         }}
                                     >
-                                        {location.name.length > 18 ? location.id.toUpperCase() : location.name}
+                                        {location.id === 'ch' ? 'CHD' :
+                                            location.id === 'dl' ? 'DEL' :
+                                                location.id === 'ct' ? 'CG' :
+                                                    location.name.length > 18 ? location.id.toUpperCase() : location.name}
                                     </text>
 
-                                    {/* Risk score badge - larger and more visible */}
-                                    {stateData && (
+                                    {/* Risk score badge - always show if data exists, with better contrast */}
+                                    {stateData && riskScore > 0 && (
                                         <text
                                             x={labelPos.x}
                                             y={labelPos.y + 13}
                                             textAnchor="middle"
                                             dominantBaseline="middle"
-                                            className="font-extrabold fill-yellow-300 pointer-events-none select-none"
+                                            className="font-extrabold pointer-events-none select-none"
                                             style={{
                                                 fontSize: '9px',
-                                                textShadow: '2px 2px 4px rgba(0,0,0,1), -1px -1px 3px rgba(0,0,0,1)'
+                                                fill: riskScore >= 4 ? '#fef08a' : '#fff',
+                                                textShadow: '2px 2px 4px rgba(0,0,0,1), -1px -1px 3px rgba(0,0,0,1), 1px -1px 3px rgba(0,0,0,1), -1px 1px 3px rgba(0,0,0,1)'
                                             }}
                                         >
                                             {riskScore.toFixed(1)}

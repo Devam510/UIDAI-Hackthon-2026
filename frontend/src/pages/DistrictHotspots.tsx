@@ -30,6 +30,7 @@ const DistrictHotspots: React.FC = () => {
     const [data, setData] = useState<any>(null);
     const [search, setSearch] = useState('');
     const [timeWindow, setTimeWindow] = useState(30);
+    const [severityFilter, setSeverityFilter] = useState('All');
     const [selectedDistrict, setSelectedDistrict] = useState<DistrictRisk | null>(null);
     const [aiInsights, setAiInsights] = useState<any>(null);
     const [loadingInsights, setLoadingInsights] = useState(false);
@@ -92,10 +93,21 @@ const DistrictHotspots: React.FC = () => {
 
     const filteredDistricts = useMemo(() => {
         if (!data?.districts) return [];
-        return data.districts.filter((d: DistrictRisk) =>
+
+        let result = data.districts;
+
+        // Apply severity filter
+        if (severityFilter !== 'All') {
+            result = result.filter((d: DistrictRisk) => d.severity_level === severityFilter);
+        }
+
+        // Apply search
+        result = result.filter((d: DistrictRisk) =>
             d.district.toLowerCase().includes(search.toLowerCase())
         );
-    }, [data, search]);
+
+        return result;
+    }, [data, search, severityFilter]);
 
     const getSeverityColor = (severity: string) => {
         switch (severity) {
@@ -231,6 +243,18 @@ const DistrictHotspots: React.FC = () => {
                             </button>
                         ))}
                     </div>
+
+                    {/* Severity Filter */}
+                    <select
+                        value={severityFilter}
+                        onChange={(e) => setSeverityFilter(e.target.value)}
+                        className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-sm rounded-lg px-4 py-2 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                    >
+                        <option>All</option>
+                        <option>Severe</option>
+                        <option>Moderate</option>
+                        <option>Low</option>
+                    </select>
                 </div>
             </div>
 

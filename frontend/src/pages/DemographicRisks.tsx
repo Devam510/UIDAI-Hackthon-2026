@@ -27,6 +27,7 @@ const DemographicRisks: React.FC = () => {
     const [error, setError] = useState(false);
     const [data, setData] = useState<any>(null);
     const [search, setSearch] = useState('');
+    const [severityFilter, setSeverityFilter] = useState('All');
     const [selectedSegment, setSelectedSegment] = useState<DemographicSegment | null>(null);
     const [aiInsights, setAiInsights] = useState<any>(null);
     const [loadingInsights, setLoadingInsights] = useState(false);
@@ -93,10 +94,21 @@ const DemographicRisks: React.FC = () => {
 
     const filteredSegments = useMemo(() => {
         if (!data?.segments) return [];
-        return data.segments.filter((seg: DemographicSegment) =>
+
+        let result = data.segments;
+
+        // Apply severity filter
+        if (severityFilter !== 'All') {
+            result = result.filter((seg: DemographicSegment) => seg.severity_level === severityFilter);
+        }
+
+        // Apply search
+        result = result.filter((seg: DemographicSegment) =>
             seg.demographic_group.toLowerCase().includes(search.toLowerCase())
         );
-    }, [data, search]);
+
+        return result;
+    }, [data, search, severityFilter]);
 
     const getSeverityColor = (severity: string) => {
         switch (severity) {
@@ -221,6 +233,18 @@ const DemographicRisks: React.FC = () => {
                             className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-sm rounded-lg pl-9 pr-4 py-2 w-full focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
                         />
                     </div>
+
+                    {/* Severity Filter */}
+                    <select
+                        value={severityFilter}
+                        onChange={(e) => setSeverityFilter(e.target.value)}
+                        className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-sm rounded-lg px-4 py-2 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+                    >
+                        <option>All</option>
+                        <option>Severe</option>
+                        <option>Moderate</option>
+                        <option>Low</option>
+                    </select>
                 </div>
             </div>
 
@@ -230,7 +254,7 @@ const DemographicRisks: React.FC = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <div className="flex items-center gap-2">
-                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total Segments</p>
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total Districts</p>
                                 <Tooltip content="Total number of demographic segments analyzed for enrollment engagement patterns." position="top">
                                     <Info size={12} className="text-slate-400 hover:text-primary-500 cursor-help transition-colors" />
                                 </Tooltip>
@@ -247,7 +271,7 @@ const DemographicRisks: React.FC = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <div className="flex items-center gap-2">
-                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Critical Segments</p>
+                                <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Critical Districts</p>
                                 <Tooltip content="Number of demographic segments with severe engagement issues requiring targeted interventions." position="top">
                                     <Info size={12} className="text-slate-400 hover:text-primary-500 cursor-help transition-colors" />
                                 </Tooltip>
@@ -446,8 +470,8 @@ const DemographicRisks: React.FC = () => {
                             onClick={fetchAIInsights}
                             disabled={!hasSegments}
                             className={`px-6 py-2 text-white font-medium rounded-lg transition-colors ${hasSegments
-                                    ? 'bg-purple-600 hover:bg-purple-500'
-                                    : 'bg-slate-400 cursor-not-allowed'
+                                ? 'bg-purple-600 hover:bg-purple-500'
+                                : 'bg-slate-400 cursor-not-allowed'
                                 }`}
                         >
                             {hasSegments ? 'Ask AI about this state' : 'No data available'}

@@ -28,12 +28,22 @@ const DistrictChart: React.FC<DistrictChartProps> = ({
 
     const currentData = mode === 'enrolment' ? enrolmentData : mode === 'biometric' ? biometricData : demographicData;
 
-    // Filter data based on search term
+    // Filter and sort data based on search term, then limit to top 10
     const filteredData = useMemo(() => {
-        if (!searchTerm.trim()) return currentData;
-        return currentData.filter(item =>
-            item.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+        let data = currentData;
+
+        // Apply search filter
+        if (searchTerm.trim()) {
+            data = data.filter(item =>
+                item.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        // Sort by risk score in descending order (highest first)
+        data = [...data].sort((a, b) => b.value - a.value);
+
+        // Limit to top 10 states
+        return data.slice(0, 10);
     }, [currentData, searchTerm]);
 
     const handleModeChange = (newMode: 'enrolment' | 'biometric' | 'demographic') => {
