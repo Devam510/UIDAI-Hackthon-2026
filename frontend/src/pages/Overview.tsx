@@ -238,7 +238,15 @@ const Overview: React.FC = () => {
             </div>
 
             {/* Smart Summary */}
-            <SmartSummary stateName={selectedState} />
+            <SmartSummary
+                stateName={selectedState}
+                kpiData={kpiData ? {
+                    risk_score: kpiData.risk_score || 0,
+                    anomaly_severity: kpiData.anomaly_severity || 'N/A',
+                    negative_gap_ratio: kpiData.negative_gap_ratio || 'N/A',
+                    forecast_growth: kpiData.forecast_growth || 'N/A'
+                } : undefined}
+            />
 
             {/* District Hotspot Chart */}
             <Card title="District Hotspot Analysis">

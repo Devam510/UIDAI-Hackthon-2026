@@ -5,9 +5,15 @@ import { ENDPOINTS } from '../../api/endpoints';
 
 interface SmartSummaryProps {
     stateName: string;
+    kpiData?: {
+        risk_score: number;
+        anomaly_severity: string;
+        negative_gap_ratio: string;
+        forecast_growth: string;
+    };
 }
 
-const SmartSummary: React.FC<SmartSummaryProps> = ({ stateName }) => {
+const SmartSummary: React.FC<SmartSummaryProps> = ({ stateName, kpiData }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [summary, setSummary] = useState('');
@@ -19,7 +25,28 @@ const SmartSummary: React.FC<SmartSummaryProps> = ({ stateName }) => {
         setIsTyping(true);
 
         try {
-            const question = `Summarize the current situation for ${stateName} and explain why risk is high/low. Provide 3 recommended actions.`;
+            // Build the question with actual KPI data if available
+            let question = `Summarize the current situation for ${stateName}`;
+
+            if (kpiData) {
+                question = `Analyze the current situation for ${stateName} using ONLY the following EXACT data (do NOT make up any numbers):
+
+**Current Metrics:**
+- Risk Score: ${kpiData.risk_score.toFixed(2)} out of 10
+- Anomaly Severity: ${kpiData.anomaly_severity}
+- Negative Gap Ratio: ${kpiData.negative_gap_ratio}
+- Forecast Growth: ${kpiData.forecast_growth}
+
+Based on these EXACT values, provide:
+1. A brief analysis of the enrollment situation
+2. Explanation of why the risk is at this level
+3. Three specific recommended actions
+
+IMPORTANT: Use ONLY the exact numbers provided above. Do NOT invent or estimate any values.`;
+            } else {
+                question += ` and explain why risk is high/low. Provide 3 recommended actions.`;
+            }
+
             const response = await client.post(ENDPOINTS.CHAT, {
                 message: question,
                 history: []
@@ -57,7 +84,7 @@ const SmartSummary: React.FC<SmartSummaryProps> = ({ stateName }) => {
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [stateName]);
+    }, [stateName, kpiData]);
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-primary-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-primary-500/30 rounded-xl p-6 relative overflow-hidden">
