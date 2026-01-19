@@ -33,19 +33,34 @@ const FlashCard: React.FC<FlashCardProps> = ({
     return (
         <div
             onClick={onClick}
-            className="min-w-[320px] bg-white dark:bg-dark-card border border-slate-300 dark:border-slate-700 rounded-xl p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary-500/20 hover:border-primary-500/50 group"
+            className="
+                flex-shrink-0 w-64 min-h-[340px]
+                bg-gradient-to-br from-slate-800 to-slate-900 dark:from-slate-900 dark:to-black
+                rounded-xl border border-slate-700 dark:border-slate-800
+                cursor-pointer transition-all duration-300
+                hover:scale-105 hover:shadow-2xl hover:shadow-primary-500/20
+                relative overflow-hidden
+                flex flex-col
+            "
         >
-            {/* Header with state name and risk badge */}
-            <div className="flex items-start justify-between mb-4">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            {/* Risk Score Badge */}
+            <div className="absolute top-3 right-3 z-10">
+                <div className={`
+                    px-3 py-1 rounded-full text-xs font-bold shadow-md
+                    ${riskScore >= 7 ? 'bg-red-500 text-white' : riskScore >= 4 ? 'bg-orange-500 text-white' : 'bg-green-500 text-white'}
+                `}>
+                    {riskLevel.label}
+                </div>
+            </div>
+
+            {/* State Name - Fixed height with truncation */}
+            <div className="p-4 flex-shrink-0">
+                <h3
+                    className="text-xl font-bold text-white line-clamp-2 min-h-[56px]"
+                    title={stateName}
+                >
                     {stateName}
                 </h3>
-                <span className={clsx(
-                    "px-3 py-1 rounded-full text-xs font-semibold text-white",
-                    riskLevel.color
-                )}>
-                    {riskLevel.label}
-                </span>
             </div>
 
             {/* Metrics grid */}
