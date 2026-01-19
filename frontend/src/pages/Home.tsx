@@ -389,8 +389,8 @@ const Home: React.FC = () => {
                 </div>
 
                 <div className="relative">
-                    {/* Horizontal scroll container */}
-                    <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-900">
+                    {/* Horizontal scroll container with better padding */}
+                    <div className="flex gap-4 overflow-x-auto pb-6 pt-2 px-4 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700 scrollbar-track-transparent">
                         {topPriorityStates.map((state) => (
                             <FlashCard
                                 key={state.name}
@@ -405,9 +405,9 @@ const Home: React.FC = () => {
                         ))}
                     </div>
 
-                    {/* Gradient fade on edges */}
-                    <div className="absolute top-0 left-0 bottom-4 w-8 bg-gradient-to-r from-white dark:from-slate-900 to-transparent pointer-events-none"></div>
-                    <div className="absolute top-0 right-0 bottom-4 w-8 bg-gradient-to-l from-white dark:from-slate-900 to-transparent pointer-events-none"></div>
+                    {/* Gradient fade on edges - refined to not block content */}
+                    <div className="absolute top-0 left-0 bottom-6 w-8 bg-gradient-to-r from-white/90 dark:from-slate-900/90 to-transparent pointer-events-none md:block hidden"></div>
+                    <div className="absolute top-0 right-0 bottom-6 w-8 bg-gradient-to-l from-white/90 dark:from-slate-900/90 to-transparent pointer-events-none md:block hidden"></div>
                 </div>
             </div>
 
