@@ -1,4 +1,5 @@
 import React, { type ReactNode, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import ChatWidget from '../Chatbot/ChatWidget';
@@ -102,9 +103,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         <div className="flex flex-col md:flex-row items-center justify-center gap-4">
                             <span>© 2026 UIDAI Hackathon Team</span>
                             <span className="hidden md:inline text-slate-300 dark:text-slate-700">|</span>
-                            <a href="/methodology" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                            <Link to="/methodology" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                                 Methodology & Data Sources
-                            </a>
+                            </Link>
                             <span className="hidden md:inline text-slate-300 dark:text-slate-700">|</span>
                             <span>Version 1.0.0 (Hackathon Build)</span>
                         </div>
