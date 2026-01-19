@@ -56,73 +56,57 @@ const Home: React.FC = () => {
         setLoading(true);
         setError(false);
         try {
-            // Since backend requires state parameter, fetch data for all states individually
-            const statePromises = states.map(async (state) => {
-                try {
-                    const response = await client.get(ENDPOINTS.ANALYTICS.STATE_SUMMARY, {
-                        params: { state }
-                    });
+            // PERFORMANCE OPTIMIZATION: Use bulk endpoint instead of 35+ individual calls
+            const response = await client.get(ENDPOINTS.ANALYTICS.ALL_STATES_SUMMARY);
 
-                    // Extract last_data_date from first successful response
-                    if (!lastDataDate && response.data.metadata?.last_data_date) {
-                        setLastDataDate(response.data.metadata.last_data_date);
-                    }
+            // Extract last_data_date from metadata
+            if (response.data.metadata?.last_data_date) {
+                setLastDataDate(response.data.metadata.last_data_date);
+            }
 
-                    // Parse anomaly_severity - backend returns string like "High", "Medium", "Low"
-                    // Convert to numeric scale: High=8, Medium=5, Low=2
-                    let anomalySeverityNum = 0;
-                    const anomalySev = response.data.anomaly_severity;
-                    if (typeof anomalySev === 'string') {
-                        if (anomalySev.toLowerCase() === 'high') anomalySeverityNum = 8;
-                        else if (anomalySev.toLowerCase() === 'medium') anomalySeverityNum = 5;
-                        else if (anomalySev.toLowerCase() === 'low') anomalySeverityNum = 2;
-                    } else {
-                        anomalySeverityNum = toNumber(anomalySev);
-                    }
-
-                    // Parse forecast_growth - backend returns string like "+0.00" or "-0.05"
-                    let forecastGrowthNum = 0;
-                    const forecastGrowth = response.data.forecast_growth;
-                    if (typeof forecastGrowth === 'string') {
-                        // Remove + sign and parse as float, then multiply by 100 for percentage
-                        forecastGrowthNum = parseFloat(forecastGrowth.replace('+', '')) * 100;
-                    } else {
-                        forecastGrowthNum = toNumber(forecastGrowth);
-                    }
-
-                    // Parse negative_gap_ratio - backend returns string like "12.5%"
-                    let negativeGapRatioNum = 0;
-                    const negGapRatio = response.data.negative_gap_ratio;
-                    if (typeof negGapRatio === 'string') {
-                        negativeGapRatioNum = parseFloat(negGapRatio.replace('%', ''));
-                    } else {
-                        negativeGapRatioNum = toNumber(negGapRatio) * 100;
-                    }
-
-                    return {
-                        name: state,
-                        risk_score: toNumber(response.data.risk_score),
-                        anomaly_severity: anomalySeverityNum,
-                        negative_gap_ratio: negativeGapRatioNum,
-                        forecast_growth: forecastGrowthNum,
-                        top_district: response.data.top_district || undefined
-                    };
-                } catch (err) {
-                    console.error(`Failed to fetch data for ${state}:`, err);
-                    // Return default data for failed state
-                    return {
-                        name: state,
-                        risk_score: 0,
-                        anomaly_severity: 0,
-                        negative_gap_ratio: 0,
-                        forecast_growth: 0,
-                        top_district: undefined
-                    };
+            // Parse data for all states
+            const parsedStates = response.data.states.map((stateData: any) => {
+                // Parse anomaly_severity - backend returns string like "High", "Medium", "Low"
+                let anomalySeverityNum = 0;
+                const anomalySev = stateData.anomaly_severity;
+                if (typeof anomalySev === 'string') {
+                    if (anomalySev.toLowerCase() === 'high') anomalySeverityNum = 8;
+                    else if (anomalySev.toLowerCase() === 'medium') anomalySeverityNum = 5;
+                    else if (anomalySev.toLowerCase() === 'low') anomalySeverityNum = 2;
+                } else {
+                    anomalySeverityNum = toNumber(anomalySev);
                 }
+
+                // Parse forecast_growth - backend returns string like "+0.00" or "-0.05"
+                let forecastGrowthNum = 0;
+                const forecastGrowth = stateData.forecast_growth;
+                if (typeof forecastGrowth === 'string') {
+                    forecastGrowthNum = parseFloat(forecastGrowth.replace('+', '')) * 100;
+                } else {
+                    forecastGrowthNum = toNumber(forecastGrowth);
+                }
+
+                // Parse negative_gap_ratio - backend returns string like "12.5%"
+                let negativeGapRatioNum = 0;
+                const negGapRatio = stateData.negative_gap_ratio;
+                if (typeof negGapRatio === 'string') {
+                    negativeGapRatioNum = parseFloat(negGapRatio.replace('%', ''));
+                } else {
+                    negativeGapRatioNum = toNumber(negGapRatio) * 100;
+                }
+
+                return {
+                    name: stateData.name,
+                    risk_score: toNumber(stateData.risk_score),
+                    anomaly_severity: anomalySeverityNum,
+                    negative_gap_ratio: negativeGapRatioNum,
+                    forecast_growth: forecastGrowthNum,
+                    top_district: stateData.top_district || undefined
+                };
             });
 
-            const results = await Promise.all(statePromises);
-            setStatesData(results.sort((a, b) => b.risk_score - a.risk_score));
+            // Already sorted by risk_score from backend, but ensure it
+            setStatesData(parsedStates.sort((a: StateData, b: StateData) => b.risk_score - a.risk_score));
         } catch (err) {
             console.error('Failed to fetch states data:', err);
             setError(err);

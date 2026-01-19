@@ -230,6 +230,63 @@ def state_summary(state: str):
     return get_dashboard_summary_cached(state_resolved)
 
 
+@router.get("/all-states-summary")
+def all_states_summary():
+    """
+    PERFORMANCE OPTIMIZATION: Get summary for ALL states in a single API call.
+    This eliminates the N+1 query problem on the Home page (35+ sequential calls → 1 call).
+    Returns data for all states sorted by risk score.
+    """
+    from backend.ml.data_loader import load_processed_data
+    from datetime import datetime
+    
+    try:
+        # Load CSV data ONCE
+        df = load_processed_data(validate=False)
+    except Exception as e:
+        return JSONResponse(status_code=500, content={
+            "status": "error",
+            "message": f"Failed to load CSV data: {str(e)}"
+        })
+    
+    # Get all unique states from the CSV
+    all_states = df['state'].unique().tolist()
+    
+    # Calculate metrics for ALL states in parallel
+    all_state_data = []
+    
+    for state in all_states:
+        state_df = df[df['state'].str.lower() == state.lower()]
+        if state_df.empty:
+            continue
+        
+        # Calculate all metrics for this state
+        all_state_data.append({
+            "name": state,
+            "risk_score": _calculate_risk_from_csv(state_df),
+            "anomaly_severity": _calculate_anomaly_from_csv(state_df),
+            "negative_gap_ratio": _calculate_negative_gap_ratio(state_df),
+            "forecast_growth": _calculate_growth_from_csv(state_df),
+            "top_district": _get_top_district(state_df)
+        })
+    
+    # Sort by risk score (descending)
+    all_state_data.sort(key=lambda x: x["risk_score"], reverse=True)
+    
+    return {
+        "status": "success",
+        "states": all_state_data,
+        "metadata": {
+            "total_states": len(all_state_data),
+            "csv_source": "aadhaar_master_monthly.csv",
+            "analysis_type": "Statistical (bulk optimized)",
+            "data_lineage": "CSV → Bulk Statistical Analysis → API",
+            "timestamp": datetime.now().isoformat(),
+            "last_data_date": get_last_data_date()
+        }
+    }
+
+
 
 def _get_top_district(state_df: pd.DataFrame) -> str:
     """Get top district by total enrolments."""

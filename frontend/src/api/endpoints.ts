@@ -1,6 +1,7 @@
 export const ENDPOINTS = {
     ANALYTICS: {
         STATE_SUMMARY: '/analytics/state-summary',
+        ALL_STATES_SUMMARY: '/analytics/all-states-summary',
         DEMOGRAPHIC_RISKS: '/analytics/demographic-risks',
     },
     FEATURES: {
