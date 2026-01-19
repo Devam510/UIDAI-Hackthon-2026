@@ -311,7 +311,7 @@ const Forecast: React.FC = () => {
             },
             // LEGEND ORDER: Accurately labeled with actual model used
             legend: {
-                data: ['95% Confidence Interval', 'Trend Forecast (Ridge Regression)', 'Historical Data'],
+                data: ['95% Confidence Interval', 'Trend Forecast (Prophet/Linear Model)', 'Historical Data'],
                 bottom: 0,
                 textStyle: { color: '#94a3b8', fontSize: 11 },
                 itemGap: 20
@@ -422,9 +422,9 @@ const Forecast: React.FC = () => {
                         }
                     }
                 },
-                // 3. RIDGE REGRESSION FORECAST LINE (pink dashed)
+                // 3. PROPHET/LINEAR FORECAST LINE (pink dashed)
                 {
-                    name: 'Trend Forecast (Ridge Regression)',
+                    name: 'Trend Forecast (Prophet/Linear Model)',
                     type: 'line',
                     data: predictedValues,
                     lineStyle: {
@@ -607,7 +607,7 @@ const Forecast: React.FC = () => {
                             )}
 
                             {/* Main Trend Analysis Graph */}
-                            <Card title="Enrollment Trend Forecast (Ridge Regression Model)">
+                            <Card title="Enrollment Trend Forecast (Prophet Trend Model)">
                                 <div className="h-[450px] w-full">
                                     <ReactECharts
                                         option={chartOption}
@@ -637,7 +637,7 @@ const Forecast: React.FC = () => {
                                             <div className="flex items-start gap-2">
                                                 <Info size={16} className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
                                                 <div className="text-xs text-slate-700 dark:text-slate-300">
-                                                    <strong className="text-blue-700 dark:text-blue-400">Model Choice:</strong> This forecast uses <strong>Ridge Regression with temporal features</strong> (time index, 7-day lag, 7-day rolling average). Prophet models were explored in research notebooks for future enhancement but Ridge Regression is deployed for production.
+                                                    <strong className="text-blue-700 dark:text-blue-400">Model Choice:</strong> This forecast uses <strong>Prophet (trend-only, no seasonality)</strong> for local deployment, with <strong>LinearRegression fallback</strong> for Render. Uses monthly aggregated data for trend-based directional projection, not precise predictions.
                                                 </div>
                                             </div>
                                         </div>
