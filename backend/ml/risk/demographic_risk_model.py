@@ -19,8 +19,8 @@ _model_cache = {}
 
 logger = logging.getLogger(__name__)
 
-# Model storage path
-MODEL_DIR = Path(__file__).parent.parent.parent / "data" / "models"
+# Model storage path - backend/ml/risk -> backend -> data/models
+MODEL_DIR = Path(__file__).parent.parent / "data" / "models"
 
 
 def _ensure_sklearn():

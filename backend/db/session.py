@@ -34,7 +34,7 @@ if DATABASE_URL:
     )
 else:
     # Local development: Use SQLite
-    PROJECT_ROOT = Path(__file__).resolve().parents[2]  # .../uidai_hackathon
+    PROJECT_ROOT = Path(__file__).resolve().parents[1]  # backend/db -> backend -> project root
     DB_PATH = PROJECT_ROOT / "uidai.db"
     DATABASE_URL = f"sqlite:///{DB_PATH}"
     

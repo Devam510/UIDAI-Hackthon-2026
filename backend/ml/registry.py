@@ -3,7 +3,7 @@ import joblib
 
 # ✅ Always resolve project root from this file location
 # registry.py is at: backend/ml/registry.py
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[1]  #backend/ml -> backend -> project root
 
 MODEL_DIR = PROJECT_ROOT / "data" / "processed" / "models"
 MODEL_DIR.mkdir(parents=True, exist_ok=True)

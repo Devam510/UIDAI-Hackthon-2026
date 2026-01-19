@@ -12,7 +12,7 @@ from backend.db.models import UIDAIRecord
 from backend.common.state_resolver import normalize_state_name
 
 # ✅ Always resolve project root from this file location
-PROJECT_ROOT = Path(__file__).resolve().parents[2]  # .../uidai_hackathon
+PROJECT_ROOT = Path(__file__).resolve().parents[1]  # backend/ingestion -> backend -> project root
 
 
 def save_to_db(df, dataset_type, source_file, batch_size: int = 20000):
