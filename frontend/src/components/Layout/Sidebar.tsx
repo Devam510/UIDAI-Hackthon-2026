@@ -113,19 +113,20 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse, isMobile
                 ))}
             </nav>
 
-            {/* Footer */}
+            {/* Footer - Hackathon Logo */}
             <div className={
                 clsx(
-                    "p-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-500",
-                    collapsed && !isMobile ? "text-center" : ""
+                    "p-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-center",
+                    collapsed && !isMobile ? "px-2" : "px-4"
                 )}>
-                {collapsed && !isMobile ? (
-                    <Tooltip content="UIDAI Hackathon 2026">
-                        <div className="text-center">©</div>
-                    </Tooltip>
-                ) : (
-                    <div className="text-center">UIDAI Hackathon 2026</div>
-                )}
+                <img
+                    src="/uidai-hackathon-logo.png"
+                    alt="UIDAI Hackathon 2026"
+                    className={clsx(
+                        "object-contain opacity-60 dark:opacity-40 hover:opacity-100 transition-opacity",
+                        collapsed && !isMobile ? "w-12 h-12" : "w-40 h-auto"
+                    )}
+                />
             </div>
         </aside>
     );
