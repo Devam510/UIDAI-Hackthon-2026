@@ -27,7 +27,7 @@ interface StateData {
 
 const Home: React.FC = () => {
     const navigate = useNavigate();
-    const { setSelectedState } = useStateContext();
+    const { setSelectedState, availableStates } = useStateContext();
     const { sendMessage } = useChatContext();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<any>(null);
@@ -35,7 +35,8 @@ const Home: React.FC = () => {
     const [statesData, setStatesData] = useState<StateData[]>([]);
     const [selectedStateLocal, setSelectedStateLocal] = useState('Uttar Pradesh');
 
-    const states = [
+    // Use availableStates from context, fallback to a default list if not loaded yet
+    const states = availableStates.length > 0 ? availableStates : [
         "Uttar Pradesh", "Maharashtra", "Bihar", "West Bengal", "Madhya Pradesh",
         "Tamil Nadu", "Rajasthan", "Karnataka", "Gujarat", "Andhra Pradesh"
     ];
@@ -410,9 +411,9 @@ const Home: React.FC = () => {
                 </div>
             </div>
 
-            {/* Top 3 Quick Wins - Executive Summary */}
+            {/* Top Priority Actions - Executive Summary */}
             <Card
-                title="🎯 Top 3 Quick Wins"
+                title="🎯 Top Priority Actions"
                 className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10 border-amber-200 dark:border-amber-900/30"
             >
                 <p className="text-xs text-slate-600 dark:text-slate-400 mb-4">Prioritized actions for immediate impact</p>

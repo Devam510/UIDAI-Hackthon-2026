@@ -149,20 +149,32 @@ const IndiaMap: React.FC<IndiaMapProps> = ({ statesData, onStateClick }) => {
 
                                     {/* Risk score badge - always show if data exists, with better contrast */}
                                     {stateData && riskScore > 0 && (
-                                        <text
-                                            x={labelPos.x}
-                                            y={labelPos.y + 13}
-                                            textAnchor="middle"
-                                            dominantBaseline="middle"
-                                            className="font-extrabold pointer-events-none select-none"
-                                            style={{
-                                                fontSize: '9px',
-                                                fill: riskScore >= 4 ? '#fef08a' : '#fff',
-                                                textShadow: '2px 2px 4px rgba(0,0,0,1), -1px -1px 3px rgba(0,0,0,1), 1px -1px 3px rgba(0,0,0,1), -1px 1px 3px rgba(0,0,0,1)'
-                                            }}
-                                        >
-                                            {riskScore.toFixed(1)}
-                                        </text>
+                                        <>
+                                            {/* Background rectangle for better visibility */}
+                                            <rect
+                                                x={labelPos.x - 15}
+                                                y={labelPos.y + 5}
+                                                width="30"
+                                                height="14"
+                                                rx="3"
+                                                fill="rgba(0, 0, 0, 0.7)"
+                                                className="pointer-events-none"
+                                            />
+                                            <text
+                                                x={labelPos.x}
+                                                y={labelPos.y + 13}
+                                                textAnchor="middle"
+                                                dominantBaseline="middle"
+                                                className="font-extrabold pointer-events-none select-none"
+                                                style={{
+                                                    fontSize: '10px',
+                                                    fill: riskScore >= 7 ? '#fef08a' : riskScore >= 4 ? '#fef08a' : '#fff',
+                                                    textShadow: '1px 1px 2px rgba(0,0,0,1)'
+                                                }}
+                                            >
+                                                {riskScore.toFixed(1)}
+                                            </text>
+                                        </>
                                     )}
                                 </>
                             )}
