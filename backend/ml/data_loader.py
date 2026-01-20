@@ -89,7 +89,20 @@ def load_processed_data(validate: bool = True, force_reload: bool = False) -> pd
         # Normalize exact format as original (sort by state, district, month)
         df_wide = df_wide.sort_values(['state', 'district', 'month']).reset_index(drop=True)
         
-        logger.info(f"✅ Loaded {len(df_wide)} rows from database.")
+        # --- FIX: Normalize district names ---
+        # Import comprehensive district normalization map covering all states
+        from backend.common.district_normalizer import DISTRICT_NORMALIZATION_MAP
+        
+        # Apply normalization to fix 240+ duplicate district names across all states
+        df_wide['district'] = df_wide['district'].replace(DISTRICT_NORMALIZATION_MAP)
+        
+        # Re-aggregate to merge data for normalized districts (e.g. if Jan data was split)
+        df_wide = df_wide.groupby(['state', 'district', 'month'], as_index=False)[
+            ["total_enrolments", "total_demo_updates", "total_bio_updates"]
+        ].sum()
+        # -------------------------------------
+        
+        logger.info(f"✅ Loaded {len(df_wide)} rows from database (after normalization).")
         
         # Update cache
         _DB_CACHE["data"] = df_wide
