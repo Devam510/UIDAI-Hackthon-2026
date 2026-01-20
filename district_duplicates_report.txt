@@ -1,0 +1,140 @@
+﻿State,District1,District2,MatchType
+================================================================================
+Andaman and Nicobar Islands,Nicobar,Nicobars,substring
+Andhra Pradesh,Ananthapur,Ananthapuramu,substring
+Andhra Pradesh,Chittoor,chittoor,exact_normalized
+Andhra Pradesh,K.V.Rangareddy,K.v. Rangareddy,exact_normalized
+Andhra Pradesh,Karim Nagar,Karimnagar,exact_normalized
+Andhra Pradesh,Mahabub Nagar,Mahabubnagar,exact_normalized
+Andhra Pradesh,Nellore,Spsr Nellore,substring
+Andhra Pradesh,Rangareddi,rangareddi,exact_normalized
+Arunachal Pradesh,Dibang Valley,Lower Dibang Valley,substring
+Arunachal Pradesh,East Siang,Siang,substring
+Arunachal Pradesh,Lower Siang,Siang,substring
+Arunachal Pradesh,Siang,Upper Siang,substring
+Arunachal Pradesh,Siang,West Siang,substring
+Assam,Kamrup,Kamrup Metro,substring
+Assam,Karbi Anglong,West Karbi Anglong,substring
+Bihar,Aurangabad,Aurangabad(BH),substring
+Bihar,Aurangabad,Aurangabad(bh),substring
+Bihar,Aurangabad(BH),Aurangabad(bh),exact_normalized
+Chhattisgarh,Janjgir - Champa,Janjgir Champa,exact_normalized
+Chhattisgarh,Janjgir - Champa,Janjgir-champa,exact_normalized
+Chhattisgarh,Janjgir Champa,Janjgir-champa,exact_normalized
+Dadra and Nagar Haveli and Daman and Diu,Dadra And Nagar Haveli,Dadra and Nagar Haveli,exact_normalized
+Delhi,East Delhi,North East Delhi,substring
+Delhi,East Delhi,South East Delhi,substring
+Delhi,North East,North East   *,exact_normalized
+Delhi,North East,North East Delhi,substring
+Delhi,North East   *,North East Delhi,substring
+Delhi,North West Delhi,West Delhi,substring
+Delhi,South West Delhi,West Delhi,substring
+Gujarat,Banas Kantha,Banaskantha,exact_normalized
+Gujarat,Dang,The Dangs,substring
+Gujarat,Panch Mahals,Panchmahals,exact_normalized
+Gujarat,Sabar Kantha,Sabarkantha,exact_normalized
+Gujarat,Surendra Nagar,Surendranagar,exact_normalized
+Haryana,Jhajjar,Jhajjar *,exact_normalized
+Haryana,Yamuna Nagar,Yamunanagar,exact_normalized
+Jammu and Kashmir,Punch,punch,exact_normalized
+Jharkhand,Bokaro,Bokaro *,exact_normalized
+Jharkhand,Garhwa,Garhwa *,exact_normalized
+Jharkhand,Hazaribag,Hazaribagh,substring
+Jharkhand,Seraikela-Kharsawan,Seraikela-kharsawan,exact_normalized
+Karnataka,Bagalkot,Bagalkot *,exact_normalized
+Karnataka,Bangalore,Bangalore Rural,substring
+Karnataka,Bengaluru,Bengaluru Rural,substring
+Karnataka,Bengaluru,Bengaluru South,substring
+Karnataka,Bengaluru,Bengaluru Urban,substring
+Karnataka,Bijapur,Bijapur(KAR),substring
+Karnataka,Chamarajanagar,Chamarajanagar *,exact_normalized
+Karnataka,Gadag,Gadag *,exact_normalized
+Karnataka,Haveri,Haveri *,exact_normalized
+Karnataka,Ramanagar,Ramanagara,substring
+Karnataka,Udupi,Udupi *,exact_normalized
+Karnataka,Yadgir,yadgir,exact_normalized
+Madhya Pradesh,Ashok Nagar,Ashoknagar,exact_normalized
+Madhya Pradesh,Harda,Harda *,exact_normalized
+Maharashtra,Ahmed Nagar,Ahmednagar,exact_normalized
+Maharashtra,Gondiya,Gondiya *,exact_normalized
+Maharashtra,Hingoli,Hingoli *,exact_normalized
+Maharashtra,Mumbai,Mumbai City,substring
+Maharashtra,Mumbai Suburban,Mumbai( Sub Urban ),exact_normalized
+Maharashtra,Nandurbar,Nandurbar *,exact_normalized
+Maharashtra,Raigarh,Raigarh(MH),substring
+Maharashtra,Washim,Washim *,exact_normalized
+Meghalaya,East Jaintia Hills,Jaintia Hills,substring
+Meghalaya,Jaintia Hills,West Jaintia Hills,substring
+Meghalaya,South West Garo Hills,West Garo Hills,substring
+Meghalaya,South West Khasi Hills,West Khasi Hills,substring
+Odisha,ANGUL,Angul,exact_normalized
+Odisha,ANUGUL,Anugul,exact_normalized
+Odisha,JAJPUR,Jajpur,exact_normalized
+Odisha,JAJPUR,jajpur,exact_normalized
+Odisha,Jajpur,jajpur,exact_normalized
+Odisha,Kendrapara,Kendrapara *,exact_normalized
+Odisha,NUAPADA,Nuapada,exact_normalized
+Punjab,S.A.S Nagar(Mohali),SAS Nagar (Mohali),exact_normalized
+Rajasthan,Deeg,Deegá,exact_normalized
+Rajasthan,Jalor,Jalore,substring
+Rajasthan,Jhunjhunu,Jhunjhunun,substring
+Tamil Nadu,Namakkal,Namakkal   *,exact_normalized
+Telangana,K.v. Rangareddy,Ranga Reddy,substring
+Telangana,K.v. Rangareddy,Rangareddy,substring
+Telangana,Medchal Malkajgiri,Medchal-malkajgiri,exact_normalized
+Telangana,Medchal Malkajgiri,Medchal?malkajgiri,exact_normalized
+python : Traceback 
+(most recent call 
+last):
+At line:1 char:1
++ python analyze_dist
+rict_duplicates.py 
+2>&1 | Out-File 
+-FilePath distr ...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (Traceba   
+ ck (most recent     
+call last)::Stri    
+ng) [], RemoteEx    
+ception
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+  File 
+"D:\Devam\Microsoft 
+VS Code\Codes\UIDAI\U
+IDAI Hackthon\analyze
+_district_duplicates.
+py", line 56, in 
+<module>
+    print(f"{state},{
+d1},{d2},{match_type}
+")
+  File "C:\Program Fi
+les\WindowsApps\Pytho
+nSoftwareFoundation.P
+ython.3.12_3.12.2800.
+0_x64__qbz5n2kfra8p0\
+Lib\encodings\cp1252.
+py", line 19, in 
+encode
+    return codecs.cha
+rmap_encode(input,sel
+f.errors,encoding_tab
+le)[0]
+           ^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
+^^^
+UnicodeEncodeError: 
+'charmap' codec 
+can't encode 
+character '\u2212' 
+in position 36: 
+character maps to 
+<undefined>
